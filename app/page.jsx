@@ -94,45 +94,44 @@ export default function Home() {
 
   const ojosConDatos = Object.entries(curvas).filter(([,m])=>m.length>=2)
 
-  // Modal términos
   const ModalTerminos = () => (
     <div style={{ position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.7)', zIndex:2000, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
-      <div style={{ background:'white', borderRadius:'16px', padding:'1.5rem', maxWidth:'500px', width:'100%', maxHeight:'85vh', overflowY:'auto' }}>
+      <div style={{ background:'white', borderRadius:'16px', padding:'1.5rem', maxWidth:'480px', width:'100%', maxHeight:'85vh', overflowY:'auto' }}>
         <div style={{ textAlign:'center', marginBottom:'1rem' }}>
-          <div style={{ fontSize:'2rem', marginBottom:'4px' }}>👁</div>
+          <div style={{ fontSize:'2.5rem', marginBottom:'4px' }}>👁</div>
           <h2 style={{ margin:0, color:'#1e40af', fontSize:'1.1rem' }}>PROLENS · Curvas de Desenfoque</h2>
           <p style={{ margin:'4px 0 0', fontSize:'0.8rem', color:'#64748b' }}>App clínica para análisis de IOL multifocal</p>
         </div>
 
-        <div style={{ background:'#fef3c7', border:'1px solid #f59e0b', borderRadius:'8px', padding:'0.75rem', marginBottom:'1rem', fontSize:'0.82rem', color:'#92400e' }}>
-          <strong>⚠️ Aviso importante — Uso clínico con IA</strong>
-          <p style={{ margin:'6px 0 0', lineHeight:1.6 }}>
-            Esta aplicación utiliza inteligencia artificial (Claude — Anthropic) para generar análisis clínicos de curvas de desenfoque. Estos análisis son <strong>únicamente un apoyo diagnóstico</strong> y no reemplazan el criterio del profesional de la salud visual.
+        <div style={{ background:'#fef3c7', border:'1px solid #f59e0b', borderRadius:'8px', padding:'0.75rem', marginBottom:'1rem', fontSize:'0.82rem', color:'#92400e', lineHeight:1.6 }}>
+          <strong>⚠️ Términos de uso clínico</strong>
+          <p style={{ margin:'6px 0 0' }}>
+            Esta aplicación está diseñada con el modelo <strong>MAIdx sd Bench</strong> para el análisis clínico de curvas de desenfoque. Los informes generados son <strong>únicamente un apoyo diagnóstico</strong> y no reemplazan el criterio del profesional de la salud visual.
           </p>
         </div>
 
-        <div style={{ fontSize:'0.82rem', color:'#334155', lineHeight:1.7, marginBottom:'1rem' }}>
-          <p><strong>Al usar esta aplicación usted acepta que:</strong></p>
+        <div style={{ fontSize:'0.82rem', color:'#334155', lineHeight:1.75, marginBottom:'1rem' }}>
+          <p><strong>Al usar esta aplicación usted acepta:</strong></p>
           <ul style={{ paddingLeft:'1.2rem', margin:'6px 0' }}>
-            <li>Los análisis generados por IA son orientativos y deben ser interpretados por un profesional calificado.</li>
-            <li>Los datos clínicos ingresados se almacenan de forma segura en una base de datos encriptada.</li>
-            <li>La información no se comparte con terceros sin autorización.</li>
-            <li>El uso indebido de la información clínica es responsabilidad del usuario.</li>
-            <li>PROLENS no se hace responsable por decisiones clínicas basadas únicamente en el análisis de IA.</li>
+            <li>Los informes clínicos son orientativos y deben ser validados por un profesional calificado.</li>
+            <li>Los datos clínicos se almacenan de forma segura y no se comparten con terceros.</li>
+            <li>El uso de la información clínica es responsabilidad del profesional tratante.</li>
+            <li>PROLENS no se hace responsable por decisiones clínicas basadas únicamente en los informes generados.</li>
+            <li>Esta herramienta es de uso exclusivo para profesionales de la salud visual.</li>
           </ul>
         </div>
 
-        <div style={{ background:'#f0f9ff', border:'1px solid #bae6fd', borderRadius:'8px', padding:'0.75rem', marginBottom:'1rem', fontSize:'0.8rem', color:'#0369a1' }}>
-          <strong>🔒 Privacidad:</strong> Los datos se procesan bajo los estándares de Anthropic y se almacenan en servidores seguros (Neon PostgreSQL). No se usan para entrenar modelos de IA.
+        <div style={{ background:'#f0f9ff', border:'1px solid #bae6fd', borderRadius:'8px', padding:'0.75rem', marginBottom:'1.25rem', fontSize:'0.8rem', color:'#0369a1', lineHeight:1.6 }}>
+          <strong>🔒 Privacidad de datos:</strong> La información ingresada se almacena en servidores seguros y encriptados. No se utiliza para entrenar ningún modelo ni se comparte con terceros sin autorización expresa.
         </div>
 
         <button
           onClick={() => { setAceptoTerminos(true); setMostrarTerminos(false) }}
-          style={{ width:'100%', padding:'0.85rem', background:'#1e40af', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:'pointer', fontWeight:600, marginBottom:'8px' }}>
-          ✅ Acepto los términos y condiciones
+          style={{ width:'100%', padding:'0.9rem', background:'#1e40af', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:'pointer', fontWeight:700, marginBottom:'8px', touchAction:'manipulation' }}>
+          ✅ Acepto — Ingresar a la app
         </button>
-        <p style={{ textAlign:'center', fontSize:'0.75rem', color:'#94a3b8', margin:0 }}>
-          Dr. Leonardo Orjuela · PROLENS Medellín
+        <p style={{ textAlign:'center', fontSize:'0.72rem', color:'#94a3b8', margin:0 }}>
+          Dr. Leonardo Orjuela · PROLENS · Medellín, Colombia
         </p>
       </div>
     </div>
@@ -142,30 +141,35 @@ export default function Home() {
     return (
       <>
         {mostrarTerminos && <ModalTerminos />}
-        <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'linear-gradient(135deg, #0c2461 0%, #1e40af 100%)', padding:'1.5rem' }}>
-          <div style={{ textAlign:'center', color:'white', maxWidth:'400px', width:'100%' }}>
-            <div style={{ fontSize:'4rem', marginBottom:'0.5rem' }}>👁</div>
-            <h1 style={{ margin:'0 0 4px', fontSize:'1.8rem', fontWeight:700 }}>PROLENS</h1>
-            <p style={{ margin:'0 0 4px', fontSize:'1rem', opacity:0.9 }}>Curvas de Desenfoque</p>
-            <p style={{ margin:'0 0 2rem', fontSize:'0.85rem', opacity:0.7 }}>Análisis de IOL multifocal · Medellín</p>
+        <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'linear-gradient(160deg, #0c2461 0%, #1e40af 60%, #1d4ed8 100%)', padding:'1.5rem' }}>
+          <div style={{ textAlign:'center', color:'white', maxWidth:'380px', width:'100%' }}>
+            <div style={{ fontSize:'5rem', marginBottom:'0.25rem', filter:'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }}>👁</div>
+            <h1 style={{ margin:'0 0 2px', fontSize:'2rem', fontWeight:800, letterSpacing:'1px' }}>PROLENS</h1>
+            <p style={{ margin:'0 0 2px', fontSize:'1rem', fontWeight:500, opacity:0.9 }}>Curvas de Desenfoque</p>
+            <p style={{ margin:'0 0 0.5rem', fontSize:'0.8rem', opacity:0.65 }}>Dr. Leonardo Orjuela · Medellín</p>
 
-            <div style={{ background:'rgba(255,255,255,0.1)', borderRadius:'12px', padding:'1.25rem', marginBottom:'1.5rem', backdropFilter:'blur(10px)' }}>
-              <p style={{ margin:'0 0 0.5rem', fontSize:'0.85rem', opacity:0.9, lineHeight:1.6 }}>
-                App clínica para el análisis y registro de curvas de desenfoque en pacientes con lente intraocular multifocal.
+            <div style={{ display:'inline-block', background:'rgba(255,255,255,0.15)', borderRadius:'20px', padding:'4px 14px', marginBottom:'1.5rem', fontSize:'0.75rem', fontWeight:600, letterSpacing:'0.5px', backdropFilter:'blur(4px)' }}>
+              MAIdx sd Bench
+            </div>
+
+            <div style={{ background:'rgba(255,255,255,0.1)', borderRadius:'14px', padding:'1.25rem', marginBottom:'1.5rem', backdropFilter:'blur(10px)', border:'1px solid rgba(255,255,255,0.15)' }}>
+              <p style={{ margin:'0 0 0.5rem', fontSize:'0.88rem', lineHeight:1.65, opacity:0.92 }}>
+                Herramienta clínica para el análisis, registro y seguimiento de curvas de desenfoque en pacientes con lente intraocular multifocal y EDOF.
               </p>
-              <p style={{ margin:0, fontSize:'0.8rem', opacity:0.7 }}>
-                Incluye análisis clínico con inteligencia artificial.
-              </p>
+              <div style={{ display:'flex', justifyContent:'center', gap:'16px', marginTop:'0.75rem', fontSize:'0.78rem', opacity:0.75 }}>
+                <span>📈 Curvas OD · OI · AO</span>
+                <span>📄 Informes PDF</span>
+              </div>
             </div>
 
             <button
               onClick={() => setMostrarTerminos(true)}
-              style={{ width:'100%', padding:'1rem', background:'white', color:'#1e40af', border:'none', borderRadius:'12px', fontSize:'1.1rem', cursor:'pointer', fontWeight:700, marginBottom:'0.75rem', boxShadow:'0 4px 20px rgba(0,0,0,0.2)' }}>
-              Ingresar a la app
+              style={{ width:'100%', padding:'1rem', background:'white', color:'#1e40af', border:'none', borderRadius:'12px', fontSize:'1.1rem', cursor:'pointer', fontWeight:700, marginBottom:'0.75rem', boxShadow:'0 4px 24px rgba(0,0,0,0.25)', touchAction:'manipulation' }}>
+              Ingresar
             </button>
 
-            <p style={{ margin:0, fontSize:'0.75rem', opacity:0.6 }}>
-              Al ingresar acepta los términos de uso clínico
+            <p style={{ margin:0, fontSize:'0.72rem', opacity:0.5 }}>
+              Uso exclusivo para profesionales de salud visual
             </p>
           </div>
         </div>
@@ -192,7 +196,6 @@ export default function Home() {
       <main style={{ padding:'0.75rem', maxWidth:'1200px', margin:'0 auto', paddingBottom:'2rem' }}>
         {mostrarBuscador && <BuscadorPacientes onCargar={handleCargarExamen} onCerrar={()=>setMostrarBuscador(false)} />}
 
-        {/* Header */}
         <div style={{ marginBottom:'0.75rem', borderBottom:'2px solid #1e40af', paddingBottom:'0.6rem', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'6px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
             <span style={{ fontSize:'1.4rem' }}>👁</span>
@@ -215,7 +218,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Tabs móvil */}
         <div className="mobile-tabs" style={{ display:'none', marginBottom:'0.75rem', background:'#f1f5f9', borderRadius:'10px', padding:'3px', gap:'3px' }}>
           {['formulario','graficas'].map(tab => (
             <button key={tab} onClick={()=>setVistaMovil(tab)}
@@ -225,7 +227,6 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Layout */}
         <div className="layout-grid" style={{ display:'grid', gridTemplateColumns:'460px 1fr', gap:'1rem' }}>
           <div className="panel-formulario">
             <FormularioCurva onMedicionesChange={handleMediciones} onGuardado={handleGuardado} pacienteCargado={pacienteCargado} />
@@ -256,13 +257,12 @@ export default function Home() {
           </div>
         )}
 
-        {/* Footer */}
         <div style={{ marginTop:'1.5rem', textAlign:'center', padding:'0.75rem', borderTop:'1px solid #e2e8f0' }}>
           <p style={{ margin:0, fontSize:'0.72rem', color:'#94a3b8' }}>
             👁 <strong style={{ color:'#1e40af' }}>PROLENS</strong> · Dr. Leonardo Orjuela · Medellín, Colombia
           </p>
           <p style={{ margin:'2px 0 0', fontSize:'0.68rem', color:'#cbd5e1' }}>
-            Análisis AI generado por Claude (Anthropic) · Solo apoyo diagnóstico
+            MAIdx sd Bench · Análisis clínico asistido
           </p>
         </div>
       </main>
