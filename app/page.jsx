@@ -64,19 +64,24 @@ export default function Home() {
       const html = await res.text()
       const blob = new Blob([html], { type: 'text/html; charset=utf-8' })
       const url = URL.createObjectURL(blob)
-      const nombreArchivo = `CurvaDesenfoque_${(datos.paciente||'paciente').replace(/\s+/g,'_')}_${datos.documento||''}`.replace(/[^a-zA-Z0-9_]/g,'')
+      // Nombre legible para el archivo
+      const nombre = `CurvaDesenfoque_${(datos.paciente||'paciente').replace(/\s+/g,'_')}_${datos.documento||new Date().toISOString().split('T')[0]}`
       const win = window.open(url, '_blank')
       if (!win) {
         const a = document.createElement('a')
         a.href = url
-        a.download = nombreArchivo + '.html'
+        a.download = nombre + '.html'
+        document.body.appendChild(a)
         a.click()
+        document.body.removeChild(a)
       } else {
-        win.document.title = nombreArchivo
-        setTimeout(() => win.print(), 800)
+        win.addEventListener('load', () => {
+          win.document.title = nombre
+          setTimeout(() => win.print(), 600)
+        })
       }
     } catch(e) {
-      alert('Error: ' + e.message)
+      alert('Error generando PDF: ' + e.message)
     }
     setGenerandoPDF(false)
   }
@@ -125,7 +130,7 @@ export default function Home() {
       </div>
       {datos && (
         <div style={{ marginTop:'1rem', padding:'0.75rem 1rem', background:'#dcfce7', color:'#166534', borderRadius:'8px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <span>✓ {datos.paciente}</span>
+          <span>✓ {datos.paciente} · {datos.documento}</span>
           <button onClick={generarPDF} disabled={generandoPDF}
             style={{ padding:'4px 14px', background:'#166534', color:'white', border:'none', borderRadius:'6px', cursor:'pointer', fontSize:'0.85rem' }}>
             Imprimir / PDF
