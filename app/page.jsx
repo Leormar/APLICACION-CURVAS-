@@ -20,27 +20,33 @@ export default function Home() {
 
   const handleGuardado = (d) => setDatos(d)
 
-  const handleCargarPaciente = ({ paciente, curva }) => {
-    const mediciones = (curva.mediciones || [])
-      .filter(m => m && m.defocus !== null && m.agudeza !== null)
-      .map(m => ({ defocus: parseFloat(m.defocus), agudeza: parseFloat(m.agudeza) }))
-      .sort((a, b) => a.defocus - b.defocus)
+  const handleCargarExamen = ({ paciente, examenes }) => {
+    const nuevasCurvas = { OD: [], OI: [], AO: [] }
+    const nuevosLentes = { OD: '', OI: '' }
+    let refOD = '', refOI = ''
 
-    const ojoKey = curva.ojo || 'OD'
-    const lenteCurva = curva.iol || ''
-    const refOD = curva.refOD || ''
-    const refOI = curva.refOI || ''
+    examenes.forEach(curva => {
+      const mediciones = (curva.mediciones || [])
+        .filter(m => m && m.defocus !== null && m.agudeza !== null)
+        .map(m => ({ defocus: parseFloat(m.defocus), agudeza: parseFloat(m.agudeza) }))
+        .sort((a, b) => a.defocus - b.defocus)
 
-    setCurvas(prev => ({ ...prev, [ojoKey]: mediciones }))
-    setLentes(prev => ({ ...prev, [ojoKey]: lenteCurva }))
-    setPacienteCargado({ paciente, curva, refOD, refOI })
+      const ojoKey = curva.ojo || 'OD'
+      nuevasCurvas[ojoKey] = mediciones
+      if (ojoKey !== 'AO') nuevosLentes[ojoKey] = curva.iol || ''
+      if (curva.refOD) refOD = curva.refOD
+      if (curva.refOI) refOI = curva.refOI
+    })
+
+    setCurvas(nuevasCurvas)
+    setLentes(nuevosLentes)
     setInterpretacion('')
+    setPacienteCargado({ paciente, examenes, refOD, refOI })
     setDatos({
       paciente: paciente.nombre,
       documento: paciente.documento,
       fechaNac: paciente.fecha_nacimiento?.split?.('T')[0] || '',
-      ojo: ojoKey,
-      lentes: { ...lentes, [ojoKey]: lenteCurva },
+      lentes: nuevosLentes,
       refOD,
       refOI,
       tipoAV: 'logmar'
@@ -68,7 +74,7 @@ export default function Home() {
     <main style={{ padding:'1.5rem', maxWidth:'1200px', margin:'0 auto' }}>
       {mostrarBuscador && (
         <BuscadorPacientes
-          onCargar={handleCargarPaciente}
+          onCargar={handleCargarExamen}
           onCerrar={() => setMostrarBuscador(false)}
         />
       )}
@@ -120,7 +126,7 @@ export default function Home() {
 
       {datos && (
         <div style={{ marginTop:'1rem', padding:'0.75rem 1rem', background:'#dcfce7', color:'#166534', borderRadius:'8px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <span>✓ {datos.paciente} · {datos.ojo}</span>
+          <span>✓ {datos.paciente}</span>
           <button onClick={generarPDF} style={{ padding:'4px 14px', background:'#166534', color:'white', border:'none', borderRadius:'6px', cursor:'pointer', fontSize:'0.85rem' }}>
             Imprimir / PDF
           </button>

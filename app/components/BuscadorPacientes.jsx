@@ -25,17 +25,21 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
   }
 
   const agrupar = (rows) => {
-    const mapa = {}
+    const pacientes = {}
     rows.forEach(r => {
-      if (!mapa[r.id]) mapa[r.id] = {
+      if (!pacientes[r.id]) pacientes[r.id] = {
         id: r.id, nombre: r.nombre, documento: r.documento,
-        fecha_nacimiento: r.fecha_nacimiento, curvas: []
+        fecha_nacimiento: r.fecha_nacimiento, examenes: {}
       }
       if (r.curva_id) {
         let info = {}
         try { info = JSON.parse(r.notas || '{}') } catch(e) { info = {} }
-        mapa[r.id].curvas.push({
-          id: r.curva_id, ojo: r.ojo, fecha: r.fecha,
+        const fechaKey = r.fecha ? r.fecha.split('T')[0] : 'sin-fecha'
+        if (!pacientes[r.id].examenes[fechaKey]) {
+          pacientes[r.id].examenes[fechaKey] = { fecha: fechaKey, curvas: [] }
+        }
+        pacientes[r.id].examenes[fechaKey].curvas.push({
+          id: r.curva_id, ojo: r.ojo,
           iol: info.iol || '—',
           refOD: info.refOD || '',
           refOI: info.refOI || '',
@@ -43,16 +47,25 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
         })
       }
     })
-    return Object.values(mapa)
+    return Object.values(pacientes).map(p => ({
+      ...p,
+      examenes: Object.values(p.examenes).sort((a,b) => b.fecha.localeCompare(a.fecha))
+    }))
   }
 
   const pacientes = agrupar(resultados)
   const colores = { OD:'#1e40af', OI:'#0f766e', AO:'#7c3aed' }
 
+  const formatFecha = (f) => {
+    if (!f || f === 'sin-fecha') return 'Fecha no registrada'
+    const d = new Date(f + 'T12:00:00')
+    return d.toLocaleDateString('es-CO', { weekday:'long', year:'numeric', month:'long', day:'numeric' })
+  }
+
   return (
     <div style={{ position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(15,23,42,0.6)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center' }}
       onClick={e => e.target === e.currentTarget && onCerrar()}>
-      <div style={{ background:'white', borderRadius:'16px', padding:'1.5rem', width:'640px', maxHeight:'85vh', display:'flex', flexDirection:'column', boxShadow:'0 24px 64px rgba(0,0,0,0.4)' }}>
+      <div style={{ background:'white', borderRadius:'16px', padding:'1.5rem', width:'660px', maxHeight:'88vh', display:'flex', flexDirection:'column', boxShadow:'0 24px 64px rgba(0,0,0,0.4)' }}>
 
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem' }}>
           <h2 style={{ margin:0, fontSize:'1.1rem', color:'#1e293b' }}>🔍 Buscar paciente</h2>
@@ -88,8 +101,7 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
           {buscado && pacientes.length === 0 && (
             <div style={{ textAlign:'center', padding:'3rem', color:'#94a3b8' }}>
               <div style={{ fontSize:'2rem', marginBottom:'8px' }}>🔎</div>
-              <p style={{ margin:0, fontSize:'0.9rem' }}>No se encontraron pacientes</p>
-              <p style={{ margin:'4px 0 0', fontSize:'0.8rem' }}>Intenta con otro término de búsqueda</p>
+              <p style={{ margin:0 }}>No se encontraron pacientes</p>
             </div>
           )}
 
@@ -97,6 +109,7 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
             const isOpen = expandido === p.id
             return (
               <div key={p.id} style={{ border:'1px solid #e2e8f0', borderRadius:'10px', marginBottom:'8px', overflow:'hidden' }}>
+                {/* Header paciente */}
                 <div onClick={() => setExpandido(isOpen ? null : p.id)}
                   style={{ padding:'12px 14px', background:isOpen?'#eff6ff':'#f8fafc', cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:isOpen?'1px solid #bfdbfe':'none' }}>
                   <div>
@@ -106,47 +119,58 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
                     </span>
                     {p.fecha_nacimiento && (
                       <span style={{ marginLeft:'8px', fontSize:'0.75rem', color:'#94a3b8' }}>
-                        Nac: {new Date(p.fecha_nacimiento).toLocaleDateString('es-CO')}
+                        Nac: {new Date(p.fecha_nacimiento + 'T12:00:00').toLocaleDateString('es-CO')}
                       </span>
                     )}
                   </div>
                   <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
                     <span style={{ fontSize:'0.72rem', background:'#dbeafe', color:'#1e40af', padding:'2px 8px', borderRadius:'10px' }}>
-                      {p.curvas.length} curva{p.curvas.length!==1?'s':''}
+                      {p.examenes.length} examen{p.examenes.length!==1?'es':''}
                     </span>
                     <span style={{ color:'#94a3b8' }}>{isOpen?'▲':'▼'}</span>
                   </div>
                 </div>
 
+                {/* Exámenes agrupados por fecha */}
                 {isOpen && (
                   <div>
-                    {p.curvas.length === 0 && (
-                      <p style={{ padding:'12px 14px', margin:0, color:'#94a3b8', fontSize:'0.82rem' }}>Sin curvas registradas</p>
+                    {p.examenes.length === 0 && (
+                      <p style={{ padding:'12px 14px', margin:0, color:'#94a3b8', fontSize:'0.82rem' }}>Sin exámenes registrados</p>
                     )}
-                    {p.curvas.map((c, idx) => {
-                      const fechaStr = c.fecha ? new Date(c.fecha).toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'}) : '—'
-                      return (
-                        <div key={c.id} style={{ padding:'10px 14px', display:'flex', justifyContent:'space-between', alignItems:'center', borderTop:'1px solid #f1f5f9', background:idx%2===0?'white':'#fafafa' }}>
-                          <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-                            <span style={{ fontSize:'0.85rem', fontWeight:700, color:colores[c.ojo]||'#1e40af', background:(colores[c.ojo]||'#1e40af')+'18', padding:'3px 10px', borderRadius:'6px' }}>
-                              {c.ojo}
+                    {p.examenes.map((examen, idx) => (
+                      <div key={examen.fecha} style={{ borderTop:'1px solid #f1f5f9', background:idx%2===0?'white':'#fafafa' }}>
+                        {/* Fecha del examen */}
+                        <div style={{ padding:'8px 14px 4px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                          <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+                            <span style={{ fontSize:'0.75rem', color:'#64748b', fontWeight:600 }}>
+                              📅 {formatFecha(examen.fecha)}
                             </span>
-                            <div>
-                              <div style={{ fontSize:'0.82rem', color:'#334155', fontWeight:500 }}>{c.iol}</div>
-                              <div style={{ fontSize:'0.72rem', color:'#94a3b8' }}>
-                                {fechaStr} · {c.mediciones.length} puntos
-                                {c.refOD && ` · OD: ${c.refOD}`}
-                                {c.refOI && ` · OI: ${c.refOI}`}
-                              </div>
+                            <div style={{ display:'flex', gap:'4px' }}>
+                              {examen.curvas.map(c => (
+                                <span key={c.id} style={{ fontSize:'0.7rem', fontWeight:700, color:colores[c.ojo]||'#1e40af', background:(colores[c.ojo]||'#1e40af')+'18', padding:'1px 7px', borderRadius:'4px' }}>
+                                  {c.ojo}
+                                </span>
+                              ))}
                             </div>
                           </div>
-                          <button onClick={() => onCargar({ paciente: p, curva: c })}
-                            style={{ padding:'6px 16px', background:'#1e40af', color:'white', border:'none', borderRadius:'7px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500 }}>
-                            Cargar →
+                          <button
+                            onClick={() => onCargar({ paciente: p, examenes: examen.curvas })}
+                            style={{ padding:'5px 14px', background:'#1e40af', color:'white', border:'none', borderRadius:'7px', fontSize:'0.8rem', cursor:'pointer', fontWeight:600 }}>
+                            Cargar examen →
                           </button>
                         </div>
-                      )
-                    })}
+                        {/* Detalle curvas del examen */}
+                        <div style={{ padding:'4px 14px 8px', display:'flex', gap:'8px', flexWrap:'wrap' }}>
+                          {examen.curvas.map(c => (
+                            <div key={c.id} style={{ fontSize:'0.72rem', color:'#64748b', background:'#f8fafc', padding:'3px 8px', borderRadius:'5px', border:'1px solid #e2e8f0' }}>
+                              <span style={{ color:colores[c.ojo], fontWeight:600 }}>{c.ojo}</span>
+                              {c.iol && c.iol !== '—' && ` · ${c.iol.split('(')[0].trim()}`}
+                              {` · ${c.mediciones.length}pts`}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
