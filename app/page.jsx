@@ -14,13 +14,17 @@ export default function Home() {
   const [interpretacion, setInterpretacion] = useState('')
   const [secciones, setSecciones] = useState(null)
   const [generandoPDF, setGenerandoPDF] = useState(false)
+  const [vistaMovil, setVistaMovil] = useState('formulario')
 
   const handleMediciones = (ojo, mediciones, lente) => {
     setCurvas(prev => ({ ...prev, [ojo]: mediciones }))
     if (ojo !== 'AO') setLentes(prev => ({ ...prev, [ojo]: lente }))
   }
 
-  const handleGuardado = (d) => setDatos(d)
+  const handleGuardado = (d) => {
+    setDatos(d)
+    setVistaMovil('graficas')
+  }
 
   const handleCargarExamen = ({ paciente, examenes }) => {
     const nuevasCurvas = { OD: [], OI: [], AO: [] }
@@ -51,6 +55,7 @@ export default function Home() {
       tipoAV: 'logmar'
     })
     setMostrarBuscador(false)
+    setVistaMovil('graficas')
   }
 
   const generarPDF = async () => {
@@ -88,52 +93,90 @@ export default function Home() {
   const ojosConDatos = Object.entries(curvas).filter(([,m])=>m.length>=2)
 
   return (
-    <main style={{ padding:'1.5rem', maxWidth:'1200px', margin:'0 auto' }}>
-      {mostrarBuscador && <BuscadorPacientes onCargar={handleCargarExamen} onCerrar={()=>setMostrarBuscador(false)} />}
-      <div style={{ marginBottom:'1.5rem', borderBottom:'2px solid #1e40af', paddingBottom:'1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-end' }}>
-        <div>
-          <h1 style={{ margin:0, color:'#1e40af', fontSize:'1.4rem' }}>Curvas de Desenfoque</h1>
-          <p style={{ margin:'4px 0 0', color:'#64748b', fontSize:'0.9rem' }}>Análisis de IOL multifocal · PROLENS Medellín</p>
-        </div>
-        <div style={{ display:'flex', gap:'8px' }}>
-          <button onClick={()=>setMostrarBuscador(true)}
-            style={{ padding:'0.5rem 1rem', background:'white', color:'#1e40af', border:'2px solid #1e40af', borderRadius:'8px', fontSize:'0.9rem', cursor:'pointer', fontWeight:500 }}>
-            🔍 Buscar paciente
-          </button>
-          {datos && (
-            <button onClick={generarPDF} disabled={generandoPDF}
-              style={{ padding:'0.5rem 1rem', background:generandoPDF?'#94a3b8':'#0f766e', color:'white', border:'none', borderRadius:'8px', fontSize:'0.9rem', cursor:'pointer', fontWeight:500 }}>
-              {generandoPDF?'⏳ Generando...':'📄 PDF'}
+    <>
+      <style>{`
+        @media (max-width: 768px) {
+          .layout-grid { grid-template-columns: 1fr !important; }
+          .desktop-only { display: none !important; }
+          .mobile-tabs { display: flex !important; }
+          .panel-formulario { display: ${vistaMovil==='formulario'?'block':'none'} !important; }
+          .panel-graficas { display: ${vistaMovil==='graficas'?'block':'none'} !important; }
+        }
+        @media (min-width: 769px) {
+          .mobile-tabs { display: none !important; }
+          .panel-formulario { display: block !important; }
+          .panel-graficas { display: block !important; }
+        }
+      `}</style>
+
+      <main style={{ padding:'1rem', maxWidth:'1200px', margin:'0 auto' }}>
+        {mostrarBuscador && <BuscadorPacientes onCargar={handleCargarExamen} onCerrar={()=>setMostrarBuscador(false)} />}
+
+        {/* Header */}
+        <div style={{ marginBottom:'1rem', borderBottom:'2px solid #1e40af', paddingBottom:'0.75rem', display:'flex', justifyContent:'space-between', alignItems:'flex-end', flexWrap:'wrap', gap:'8px' }}>
+          <div>
+            <h1 style={{ margin:0, color:'#1e40af', fontSize:'1.2rem' }}>Curvas de Desenfoque</h1>
+            <p style={{ margin:'2px 0 0', color:'#64748b', fontSize:'0.8rem' }}>IOL multifocal · PROLENS Medellín</p>
+          </div>
+          <div style={{ display:'flex', gap:'6px', flexWrap:'wrap' }}>
+            <button onClick={()=>setMostrarBuscador(true)}
+              style={{ padding:'0.4rem 0.8rem', background:'white', color:'#1e40af', border:'2px solid #1e40af', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500 }}>
+              🔍 Buscar
             </button>
-          )}
+            {datos && (
+              <button onClick={generarPDF} disabled={generandoPDF}
+                style={{ padding:'0.4rem 0.8rem', background:generandoPDF?'#94a3b8':'#0f766e', color:'white', border:'none', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500 }}>
+                {generandoPDF?'⏳':'📄 PDF'}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
-      <div style={{ display:'grid', gridTemplateColumns:'460px 1fr', gap:'1.5rem' }}>
-        <FormularioCurva onMedicionesChange={handleMediciones} onGuardado={handleGuardado} pacienteCargado={pacienteCargado} />
-        <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
-          {ojosConDatos.length===0 && (
-            <div style={{ height:'180px', display:'flex', alignItems:'center', justifyContent:'center', color:'#94a3b8', fontSize:'0.9rem', border:'2px dashed #e2e8f0', borderRadius:'12px', flexDirection:'column', gap:'8px' }}>
-              <span style={{ fontSize:'2rem' }}>📈</span>
-              <span>Ingresa valores o busca un paciente</span>
-            </div>
-          )}
-          {ojosConDatos.map(([ojo,med])=>(
-            <GraficaCurva key={ojo} ojo={ojo} mediciones={med} lente={lentes[ojo]} />
+
+        {/* Tabs móvil */}
+        <div className="mobile-tabs" style={{ display:'none', marginBottom:'1rem', background:'#f1f5f9', borderRadius:'10px', padding:'4px', gap:'4px' }}>
+          {['formulario','graficas'].map(tab => (
+            <button key={tab} onClick={()=>setVistaMovil(tab)}
+              style={{ flex:1, padding:'8px', border:'none', borderRadius:'7px', background:vistaMovil===tab?'white':'transparent', color:vistaMovil===tab?'#1e40af':'#64748b', fontWeight:vistaMovil===tab?600:400, fontSize:'0.85rem', cursor:'pointer', boxShadow:vistaMovil===tab?'0 1px 3px rgba(0,0,0,0.1)':'none' }}>
+              {tab==='formulario'?'📋 Formulario':'📈 Gráficas'}
+            </button>
           ))}
-          {ojosConDatos.length>0 && (
-            <InterpretacionAI datos={{...datos,lentes}} curvas={curvas} onInterpretacion={setInterpretacion} onSecciones={setSecciones} />
-          )}
         </div>
-      </div>
-      {datos && (
-        <div style={{ marginTop:'1rem', padding:'0.75rem 1rem', background:'#dcfce7', color:'#166534', borderRadius:'8px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <span>✓ {datos.paciente} · {datos.documento}</span>
-          <button onClick={generarPDF} disabled={generandoPDF}
-            style={{ padding:'4px 14px', background:'#166534', color:'white', border:'none', borderRadius:'6px', cursor:'pointer', fontSize:'0.85rem' }}>
-            Imprimir / PDF
-          </button>
+
+        {/* Layout */}
+        <div className="layout-grid" style={{ display:'grid', gridTemplateColumns:'460px 1fr', gap:'1.25rem' }}>
+
+          {/* Panel formulario */}
+          <div className="panel-formulario">
+            <FormularioCurva onMedicionesChange={handleMediciones} onGuardado={handleGuardado} pacienteCargado={pacienteCargado} />
+          </div>
+
+          {/* Panel gráficas */}
+          <div className="panel-graficas" style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
+            {ojosConDatos.length===0 && (
+              <div style={{ height:'160px', display:'flex', alignItems:'center', justifyContent:'center', color:'#94a3b8', fontSize:'0.9rem', border:'2px dashed #e2e8f0', borderRadius:'12px', flexDirection:'column', gap:'8px' }}>
+                <span style={{ fontSize:'2rem' }}>📈</span>
+                <span>Ingresa valores o busca un paciente</span>
+              </div>
+            )}
+            {ojosConDatos.map(([ojo,med])=>(
+              <GraficaCurva key={ojo} ojo={ojo} mediciones={med} lente={lentes[ojo]} />
+            ))}
+            {ojosConDatos.length>0 && (
+              <InterpretacionAI datos={{...datos,lentes}} curvas={curvas} onInterpretacion={setInterpretacion} onSecciones={setSecciones} />
+            )}
+          </div>
         </div>
-      )}
-    </main>
+
+        {datos && (
+          <div style={{ marginTop:'1rem', padding:'0.6rem 1rem', background:'#dcfce7', color:'#166534', borderRadius:'8px', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'8px' }}>
+            <span style={{ fontSize:'0.85rem' }}>✓ {datos.paciente} · {datos.documento}</span>
+            <button onClick={generarPDF} disabled={generandoPDF}
+              style={{ padding:'4px 14px', background:'#166534', color:'white', border:'none', borderRadius:'6px', cursor:'pointer', fontSize:'0.82rem' }}>
+              Imprimir / PDF
+            </button>
+          </div>
+        )}
+      </main>
+    </>
   )
 }
