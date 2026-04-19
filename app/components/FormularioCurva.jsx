@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { LENTES } from '../data/lentes'
 
 const DEFOCUS = ['-5.00','-4.50','-4.00','-3.50','-3.00','-2.50','-2.00','-1.50','-1.00','-0.50','0.00','+0.50','+1.00']
@@ -20,7 +20,7 @@ const toLogMAR = (valor, tipo) => {
   return null
 }
 
-export default function FormularioCurva({ onMedicionesChange, onGuardado }) {
+export default function FormularioCurva({ onMedicionesChange, onGuardado, pacienteCargado }) {
   const [paciente, setPaciente] = useState('')
   const [documento, setDocumento] = useState('')
   const [fechaNac, setFechaNac] = useState('')
@@ -33,6 +33,40 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado }) {
   const [guardando, setGuardando] = useState(false)
   const inputRefs = useRef({})
 
+  // Cargar datos del paciente cuando se selecciona desde buscador
+  useEffect(() => {
+    if (!pacienteCargado) return
+    const { paciente: p, examenes, refOD: rOD, refOI: rOI } = pacienteCargado
+    setPaciente(p.nombre || '')
+    setDocumento(p.documento || '')
+    const fn = p.fecha_nacimiento
+    if (fn) setFechaNac(fn.split('T')[0])
+    if (rOD) setRefOD(rOD)
+    if (rOI) setRefOI(rOI)
+
+    // Cargar valores de mediciones en la tabla
+    const nuevosValores = { OD: {}, OI: {}, AO: {} }
+    const nuevosLentes = { OD: '', OI: '' }
+    examenes?.forEach(curva => {
+      const ojoKey = curva.ojo
+      if (curva.iol && ojoKey !== 'AO') nuevosLentes[ojoKey] = curva.iol
+      curva.mediciones?.forEach(m => {
+        if (m.defocus !== null && m.agudeza !== null) {
+          const defStr = parseFloat(m.defocus) >= 0 ? '+' + parseFloat(m.defocus).toFixed(2) : parseFloat(m.defocus).toFixed(2)
+          const defKey = DEFOCUS.find(d => parseFloat(d) === parseFloat(m.defocus)) || defStr
+          if (!nuevosValores[ojoKey]) nuevosValores[ojoKey] = {}
+          nuevosValores[ojoKey][defKey] = String(m.agudeza)
+        }
+      })
+    })
+    setValores(nuevosValores)
+    setLentes(nuevosLentes)
+    setTipoAV('logmar')
+    // Activar primer ojo con datos
+    const primerOjo = examenes?.find(c => c.mediciones?.length > 0)?.ojo || 'OD'
+    setOjo(primerOjo)
+  }, [pacienteCargado])
+
   const getMediciones = (vals, tipo) =>
     Object.entries(vals)
       .map(([d, v]) => ({ defocus: parseFloat(d), agudeza: toLogMAR(v, tipo) }))
@@ -42,24 +76,21 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado }) {
   const handleValor = (d, v) => {
     const nuevos = { ...valores, [ojo]: { ...valores[ojo], [d]: v } }
     setValores(nuevos)
-    const lenteActivo = ojo === 'AO' ? `${lentes.OD} / ${lentes.OI}` : lentes[ojo]
+    const lenteActivo = ojo === 'AO' ? `${lentes.OD}/${lentes.OI}` : lentes[ojo]
     onMedicionesChange(ojo, getMediciones(nuevos[ojo], tipoAV), lenteActivo)
   }
 
   const handleOjo = (o) => {
     setOjo(o)
-    const lenteActivo = o === 'AO' ? `${lentes.OD} / ${lentes.OI}` : lentes[o]
+    const lenteActivo = o === 'AO' ? `${lentes.OD}/${lentes.OI}` : lentes[o]
     onMedicionesChange(o, getMediciones(valores[o], tipoAV), lenteActivo)
   }
 
-  const handleLente = (o, val) => {
-    const nuevos = { ...lentes, [o]: val }
-    setLentes(nuevos)
-  }
+  const handleLente = (o, val) => setLentes(prev => ({ ...prev, [o]: val }))
 
   const handleTipoAV = (t) => {
     setTipoAV(t)
-    const lenteActivo = ojo === 'AO' ? `${lentes.OD} / ${lentes.OI}` : lentes[ojo]
+    const lenteActivo = ojo === 'AO' ? `${lentes.OD}/${lentes.OI}` : lentes[ojo]
     onMedicionesChange(ojo, getMediciones(valores[ojo], t), lenteActivo)
   }
 
@@ -92,7 +123,6 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado }) {
   return (
     <div style={{ background:'white', borderRadius:'12px', padding:'1.25rem', boxShadow:'0 1px 4px rgba(0,0,0,0.08)' }}>
       <h2 style={{ margin:'0 0 0.75rem', fontSize:'1rem', color:'#1e293b' }}>Datos del paciente</h2>
-
       <div style={{ marginBottom:'0.5rem' }}>
         <label style={lbl}>Nombre completo</label>
         <input style={inp} value={paciente} onChange={e=>setPaciente(e.target.value)} placeholder="Nombre completo" />
@@ -101,23 +131,21 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado }) {
         <div><label style={lbl}>Documento / ID</label><input style={inp} value={documento} onChange={e=>setDocumento(e.target.value)} placeholder="CC / Pasaporte" /></div>
         <div><label style={lbl}>Fecha de nacimiento</label><input type="date" style={inp} value={fechaNac} onChange={e=>setFechaNac(e.target.value)} /></div>
       </div>
-
       <p style={sec}>Refracción</p>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem' }}>
         <div><label style={lbl}>OD</label><input style={inp} value={refOD} onChange={e=>setRefOD(e.target.value)} placeholder="+1.00 -0.50 x 90" /></div>
         <div><label style={lbl}>OI</label><input style={inp} value={refOI} onChange={e=>setRefOI(e.target.value)} placeholder="+1.00 -0.50 x 90" /></div>
       </div>
-
       <p style={sec}>IOL implantada</p>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem' }}>
         {['OD','OI'].map(o => (
           <div key={o}>
-            <label style={lbl}>{o==='OD'?'Ojo Derecho (OD)':'Ojo Izquierdo (OI)'}</label>
+            <label style={lbl}>{o==='OD'?'Ojo Derecho':'Ojo Izquierdo'}</label>
             <select style={inp} value={lentes[o]} onChange={e=>handleLente(o,e.target.value)}>
               <option value="">— Sin IOL —</option>
-              {Object.entries(LENTES).map(([cat, lista]) => (
+              {Object.entries(LENTES).map(([cat,lista]) => (
                 <optgroup key={cat} label={cat}>
-                  {lista.map(l => <option key={l} value={l}>{l}</option>)}
+                  {lista.map(l=><option key={l} value={l}>{l}</option>)}
                 </optgroup>
               ))}
               <option value="otro">Otro</option>
@@ -125,15 +153,6 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado }) {
           </div>
         ))}
       </div>
-      {(lentes.OD==='otro'||lentes.OI==='otro') && (
-        <input style={{ ...inp, marginTop:'6px' }} placeholder="Especificar IOL" />
-      )}
-      {ojo === 'AO' && lentes.OD && lentes.OI && (
-        <div style={{ marginTop:'6px', padding:'6px 10px', background:'#f0f9ff', borderRadius:'6px', fontSize:'0.78rem', color:'#0369a1' }}>
-          AO: OD {lentes.OD.split('(')[0].trim()} · OI {lentes.OI.split('(')[0].trim()}
-        </div>
-      )}
-
       <p style={sec}>Ojo a evaluar</p>
       <div style={{ display:'flex', gap:'6px', marginBottom:'0.5rem' }}>
         {['OD','OI','AO'].map(o => (
@@ -143,7 +162,6 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado }) {
           </button>
         ))}
       </div>
-
       <p style={sec}>Tipo de AV</p>
       <div style={{ display:'flex', gap:'6px', marginBottom:'0.5rem' }}>
         {['decimal','logmar','snellen'].map(t => (
@@ -153,7 +171,6 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado }) {
           </button>
         ))}
       </div>
-
       <p style={{ ...sec, borderTop:'none', paddingTop:0 }}>AV — {ojo}</p>
       <div style={{ border:'1px solid #e2e8f0', borderRadius:'8px', overflow:'hidden' }}>
         <div style={{ display:'grid', gridTemplateColumns:'80px 1fr 60px', background:'#f8fafc', padding:'5px 10px', fontSize:'0.72rem', color:'#64748b', fontWeight:600 }}>
@@ -164,12 +181,10 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado }) {
           return (
             <div key={d} style={{ display:'grid', gridTemplateColumns:'80px 1fr 60px', alignItems:'center', padding:'2px 10px', background:i%2===0?'white':'#fafafa', borderTop:'1px solid #f1f5f9' }}>
               <span style={{ fontSize:'0.82rem', color:'#334155', fontWeight:500 }}>{d} D</span>
-              <input
-                ref={el=>inputRefs.current[d]=el}
+              <input ref={el=>inputRefs.current[d]=el}
                 type={tipoAV==='snellen'?'text':'number'} step="0.05"
                 style={{ margin:'2px 8px', padding:'3px 6px', border:'1px solid #e2e8f0', borderRadius:'5px', fontSize:'0.85rem', textAlign:'center' }}
-                placeholder={placeholder}
-                value={valsOjo[d]||''}
+                placeholder={placeholder} value={valsOjo[d]||''}
                 onChange={e=>handleValor(d,e.target.value)}
                 onKeyDown={e=>handleKeyDown(e,i)}
                 onFocus={e=>e.target.style.borderColor='#1e40af'}
@@ -182,7 +197,6 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado }) {
           )
         })}
       </div>
-
       <button onClick={handleGuardar} disabled={guardando||!paciente}
         style={{ marginTop:'0.75rem', width:'100%', padding:'0.6rem', background:paciente?'#1e40af':'#94a3b8', color:'white', border:'none', borderRadius:'8px', fontSize:'0.9rem', cursor:paciente?'pointer':'default', fontWeight:500 }}>
         {guardando?'Guardando...':`💾 Guardar curva ${ojo}`}
