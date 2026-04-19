@@ -1,0 +1,19 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f8fafc;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Inputs más grandes en móvil para no hacer zoom */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+@media (min-width: 769px) {
+  input, select, textarea {
+    font-size: 0.85rem !important;
+  }
+}

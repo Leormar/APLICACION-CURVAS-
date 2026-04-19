@@ -20,6 +20,13 @@ const toLogMAR = (valor, tipo) => {
   return null
 }
 
+const defocusToKey = (defVal) => {
+  const num = parseFloat(defVal)
+  const match = DEFOCUS.find(d => Math.abs(parseFloat(d) - num) < 0.001)
+  if (match) return match
+  return num >= 0 ? '+' + num.toFixed(2) : num.toFixed(2)
+}
+
 export default function FormularioCurva({ onMedicionesChange, onGuardado, pacienteCargado }) {
   const [paciente, setPaciente] = useState('')
   const [documento, setDocumento] = useState('')
@@ -33,38 +40,41 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
   const [guardando, setGuardando] = useState(false)
   const inputRefs = useRef({})
 
-  // Cargar datos del paciente cuando se selecciona desde buscador
   useEffect(() => {
     if (!pacienteCargado) return
     const { paciente: p, examenes, refOD: rOD, refOI: rOI } = pacienteCargado
     setPaciente(p.nombre || '')
     setDocumento(p.documento || '')
-    const fn = p.fecha_nacimiento
-    if (fn) setFechaNac(fn.split('T')[0])
+    if (p.fecha_nacimiento) setFechaNac(p.fecha_nacimiento.split('T')[0])
     if (rOD) setRefOD(rOD)
     if (rOI) setRefOI(rOI)
-
-    // Cargar valores de mediciones en la tabla
     const nuevosValores = { OD: {}, OI: {}, AO: {} }
     const nuevosLentes = { OD: '', OI: '' }
     examenes?.forEach(curva => {
       const ojoKey = curva.ojo
-      if (curva.iol && ojoKey !== 'AO') nuevosLentes[ojoKey] = curva.iol
+      if (!nuevosValores[ojoKey]) nuevosValores[ojoKey] = {}
+      if (ojoKey !== 'AO' && curva.iol && curva.iol !== '—') nuevosLentes[ojoKey] = curva.iol
       curva.mediciones?.forEach(m => {
         if (m.defocus !== null && m.agudeza !== null) {
-          const defStr = parseFloat(m.defocus) >= 0 ? '+' + parseFloat(m.defocus).toFixed(2) : parseFloat(m.defocus).toFixed(2)
-          const defKey = DEFOCUS.find(d => parseFloat(d) === parseFloat(m.defocus)) || defStr
-          if (!nuevosValores[ojoKey]) nuevosValores[ojoKey] = {}
-          nuevosValores[ojoKey][defKey] = String(m.agudeza)
+          const key = defocusToKey(m.defocus)
+          nuevosValores[ojoKey][key] = String(parseFloat(m.agudeza).toFixed(2))
         }
       })
     })
     setValores(nuevosValores)
     setLentes(nuevosLentes)
     setTipoAV('logmar')
-    // Activar primer ojo con datos
     const primerOjo = examenes?.find(c => c.mediciones?.length > 0)?.ojo || 'OD'
     setOjo(primerOjo)
+    setTimeout(() => {
+      examenes?.forEach(curva => {
+        const ojoKey = curva.ojo
+        const med = curva.mediciones?.filter(m => m.defocus !== null && m.agudeza !== null)
+          .map(m => ({ defocus: parseFloat(m.defocus), agudeza: parseFloat(m.agudeza) }))
+          .sort((a,b) => a.defocus - b.defocus) || []
+        if (med.length > 0) onMedicionesChange(ojoKey, med, nuevosLentes[ojoKey] || '')
+      })
+    }, 100)
   }, [pacienteCargado])
 
   const getMediciones = (vals, tipo) =>
@@ -76,22 +86,17 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
   const handleValor = (d, v) => {
     const nuevos = { ...valores, [ojo]: { ...valores[ojo], [d]: v } }
     setValores(nuevos)
-    const lenteActivo = ojo === 'AO' ? `${lentes.OD}/${lentes.OI}` : lentes[ojo]
-    onMedicionesChange(ojo, getMediciones(nuevos[ojo], tipoAV), lenteActivo)
+    onMedicionesChange(ojo, getMediciones(nuevos[ojo], tipoAV), ojo === 'AO' ? '' : lentes[ojo])
   }
 
   const handleOjo = (o) => {
     setOjo(o)
-    const lenteActivo = o === 'AO' ? `${lentes.OD}/${lentes.OI}` : lentes[o]
-    onMedicionesChange(o, getMediciones(valores[o], tipoAV), lenteActivo)
+    onMedicionesChange(o, getMediciones(valores[o], tipoAV), o === 'AO' ? '' : lentes[o])
   }
-
-  const handleLente = (o, val) => setLentes(prev => ({ ...prev, [o]: val }))
 
   const handleTipoAV = (t) => {
     setTipoAV(t)
-    const lenteActivo = ojo === 'AO' ? `${lentes.OD}/${lentes.OI}` : lentes[ojo]
-    onMedicionesChange(ojo, getMediciones(valores[ojo], t), lenteActivo)
+    onMedicionesChange(ojo, getMediciones(valores[ojo], t), ojo === 'AO' ? '' : lentes[ojo])
   }
 
   const handleKeyDown = (e, idx) => {
@@ -103,88 +108,98 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
     setGuardando(true)
     try {
       const mediciones = getMediciones(valores[ojo], tipoAV)
-      const iolGuardado = ojo === 'AO' ? `OD:${lentes.OD} OI:${lentes.OI}` : lentes[ojo]
       const res = await fetch('/api/curvas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paciente, documento, fechaNac, ojo, iol: iolGuardado, refOD, refOI, mediciones })
+        body: JSON.stringify({ paciente, documento, fechaNac, ojo, iol: ojo === 'AO' ? '' : lentes[ojo], refOD, refOI, mediciones })
       })
       if (res.ok) onGuardado({ paciente, documento, fechaNac, ojo, lentes, refOD, refOI, tipoAV })
     } catch(e) { console.error(e) }
     setGuardando(false)
   }
 
-  const inp = { width:'100%', padding:'6px 10px', border:'1px solid #cbd5e1', borderRadius:'6px', fontSize:'0.85rem', boxSizing:'border-box' }
-  const lbl = { fontSize:'0.78rem', color:'#475569', marginBottom:'3px', display:'block' }
-  const sec = { fontSize:'0.85rem', fontWeight:600, color:'#1e293b', margin:'0.7rem 0 0.4rem', borderTop:'1px solid #f1f5f9', paddingTop:'0.6rem' }
   const valsOjo = valores[ojo] || {}
   const placeholder = tipoAV==='decimal'?'0.8':tipoAV==='logmar'?'0.1':'20/25'
 
+  const s = {
+    card: { background:'white', borderRadius:'12px', padding:'1rem', boxShadow:'0 1px 4px rgba(0,0,0,0.08)' },
+    inp: { width:'100%', padding:'10px 12px', border:'1px solid #cbd5e1', borderRadius:'8px', fontSize:'16px', boxSizing:'border-box', WebkitAppearance:'none' },
+    lbl: { fontSize:'0.75rem', color:'#475569', marginBottom:'4px', display:'block', fontWeight:500 },
+    sec: { fontSize:'0.85rem', fontWeight:600, color:'#1e293b', margin:'0.8rem 0 0.4rem', borderTop:'1px solid #f1f5f9', paddingTop:'0.6rem' },
+    btn: (active) => ({ flex:1, padding:'10px', border:`2px solid ${active?'#1e40af':'#e2e8f0'}`, borderRadius:'8px', background:active?'#1e40af':'white', color:active?'white':'#64748b', fontSize:'0.9rem', cursor:'pointer', fontWeight:active?700:400, touchAction:'manipulation' })
+  }
+
   return (
-    <div style={{ background:'white', borderRadius:'12px', padding:'1.25rem', boxShadow:'0 1px 4px rgba(0,0,0,0.08)' }}>
+    <div style={s.card}>
       <h2 style={{ margin:'0 0 0.75rem', fontSize:'1rem', color:'#1e293b' }}>Datos del paciente</h2>
-      <div style={{ marginBottom:'0.5rem' }}>
-        <label style={lbl}>Nombre completo</label>
-        <input style={inp} value={paciente} onChange={e=>setPaciente(e.target.value)} placeholder="Nombre completo" />
+
+      <div style={{ marginBottom:'0.6rem' }}>
+        <label style={s.lbl}>Nombre completo</label>
+        <input style={s.inp} value={paciente} onChange={e=>setPaciente(e.target.value)} placeholder="Nombre completo" />
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.5rem' }}>
-        <div><label style={lbl}>Documento / ID</label><input style={inp} value={documento} onChange={e=>setDocumento(e.target.value)} placeholder="CC / Pasaporte" /></div>
-        <div><label style={lbl}>Fecha de nacimiento</label><input type="date" style={inp} value={fechaNac} onChange={e=>setFechaNac(e.target.value)} /></div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.6rem' }}>
+        <div><label style={s.lbl}>Documento / ID</label><input style={s.inp} value={documento} onChange={e=>setDocumento(e.target.value)} placeholder="CC" /></div>
+        <div><label style={s.lbl}>Fecha nacimiento</label><input type="date" style={s.inp} value={fechaNac} onChange={e=>setFechaNac(e.target.value)} /></div>
       </div>
-      <p style={sec}>Refracción</p>
+
+      <p style={s.sec}>Refracción</p>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem' }}>
-        <div><label style={lbl}>OD</label><input style={inp} value={refOD} onChange={e=>setRefOD(e.target.value)} placeholder="+1.00 -0.50 x 90" /></div>
-        <div><label style={lbl}>OI</label><input style={inp} value={refOI} onChange={e=>setRefOI(e.target.value)} placeholder="+1.00 -0.50 x 90" /></div>
+        <div><label style={s.lbl}>OD</label><input style={s.inp} value={refOD} onChange={e=>setRefOD(e.target.value)} placeholder="+1.00 -0.50 x 90" /></div>
+        <div><label style={s.lbl}>OI</label><input style={s.inp} value={refOI} onChange={e=>setRefOI(e.target.value)} placeholder="+1.00 -0.50 x 90" /></div>
       </div>
-      <p style={sec}>IOL implantada</p>
+
+      <p style={s.sec}>IOL implantada</p>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem' }}>
         {['OD','OI'].map(o => (
           <div key={o}>
-            <label style={lbl}>{o==='OD'?'Ojo Derecho':'Ojo Izquierdo'}</label>
-            <select style={inp} value={lentes[o]} onChange={e=>handleLente(o,e.target.value)}>
+            <label style={s.lbl}>{o==='OD'?'Ojo Derecho':'Ojo Izquierdo'}</label>
+            <select style={s.inp} value={lentes[o]} onChange={e=>setLentes(prev=>({...prev,[o]:e.target.value}))}>
               <option value="">— Sin IOL —</option>
               {Object.entries(LENTES).map(([cat,lista]) => (
                 <optgroup key={cat} label={cat}>
                   {lista.map(l=><option key={l} value={l}>{l}</option>)}
                 </optgroup>
               ))}
-              <option value="otro">Otro</option>
             </select>
           </div>
         ))}
       </div>
-      <p style={sec}>Ojo a evaluar</p>
+
+      <p style={s.sec}>Ojo a evaluar</p>
       <div style={{ display:'flex', gap:'6px', marginBottom:'0.5rem' }}>
         {['OD','OI','AO'].map(o => (
-          <button key={o} onClick={()=>handleOjo(o)}
-            style={{ flex:1, padding:'7px', border:`2px solid ${ojo===o?'#1e40af':'#cbd5e1'}`, borderRadius:'7px', background:ojo===o?'#1e40af':'white', color:ojo===o?'white':'#475569', fontSize:'0.9rem', cursor:'pointer', fontWeight:ojo===o?700:400 }}>
-            {o}
-          </button>
+          <button key={o} onClick={()=>handleOjo(o)} style={s.btn(ojo===o)}>{o}</button>
         ))}
       </div>
-      <p style={sec}>Tipo de AV</p>
+
+      <p style={s.sec}>Tipo de AV</p>
       <div style={{ display:'flex', gap:'6px', marginBottom:'0.5rem' }}>
         {['decimal','logmar','snellen'].map(t => (
-          <button key={t} onClick={()=>handleTipoAV(t)}
-            style={{ flex:1, padding:'5px', border:`1px solid ${tipoAV===t?'#1e40af':'#cbd5e1'}`, borderRadius:'6px', background:tipoAV===t?'#1e40af':'white', color:tipoAV===t?'white':'#475569', fontSize:'0.78rem', cursor:'pointer' }}>
+          <button key={t} onClick={()=>handleTipoAV(t)} style={s.btn(tipoAV===t)}>
             {t==='logmar'?'LogMAR':t==='decimal'?'Decimal':'Snellen'}
           </button>
         ))}
       </div>
-      <p style={{ ...sec, borderTop:'none', paddingTop:0 }}>AV — {ojo}</p>
+
+      <p style={{ ...s.sec, borderTop:'none', paddingTop:0 }}>AV — {ojo}</p>
       <div style={{ border:'1px solid #e2e8f0', borderRadius:'8px', overflow:'hidden' }}>
-        <div style={{ display:'grid', gridTemplateColumns:'80px 1fr 60px', background:'#f8fafc', padding:'5px 10px', fontSize:'0.72rem', color:'#64748b', fontWeight:600 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'70px 1fr 60px', background:'#f8fafc', padding:'6px 10px', fontSize:'0.72rem', color:'#64748b', fontWeight:600 }}>
           <span>Defocus</span><span style={{textAlign:'center'}}>AV</span><span style={{textAlign:'right'}}>LogMAR</span>
         </div>
         {DEFOCUS.map((d,i) => {
           const lm = toLogMAR(valsOjo[d], tipoAV)
           return (
-            <div key={d} style={{ display:'grid', gridTemplateColumns:'80px 1fr 60px', alignItems:'center', padding:'2px 10px', background:i%2===0?'white':'#fafafa', borderTop:'1px solid #f1f5f9' }}>
-              <span style={{ fontSize:'0.82rem', color:'#334155', fontWeight:500 }}>{d} D</span>
-              <input ref={el=>inputRefs.current[d]=el}
-                type={tipoAV==='snellen'?'text':'number'} step="0.05"
-                style={{ margin:'2px 8px', padding:'3px 6px', border:'1px solid #e2e8f0', borderRadius:'5px', fontSize:'0.85rem', textAlign:'center' }}
-                placeholder={placeholder} value={valsOjo[d]||''}
+            <div key={d} style={{ display:'grid', gridTemplateColumns:'70px 1fr 60px', alignItems:'center', padding:'3px 10px', background:i%2===0?'white':'#fafafa', borderTop:'1px solid #f1f5f9' }}>
+              <span style={{ fontSize:'0.82rem', color:'#334155', fontWeight:500 }}>{d}D</span>
+              <input
+                ref={el=>inputRefs.current[d]=el}
+                type={tipoAV==='snellen'?'text':'number'}
+                step="0.05"
+                inputMode="decimal"
+                style={{ margin:'2px 8px', padding:'6px 8px', border:'1px solid #e2e8f0', borderRadius:'6px', fontSize:'16px', textAlign:'center', width:'calc(100% - 16px)' }}
+                placeholder={placeholder}
+                value={valsOjo[d]||''}
                 onChange={e=>handleValor(d,e.target.value)}
                 onKeyDown={e=>handleKeyDown(e,i)}
                 onFocus={e=>e.target.style.borderColor='#1e40af'}
@@ -197,8 +212,9 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
           )
         })}
       </div>
+
       <button onClick={handleGuardar} disabled={guardando||!paciente}
-        style={{ marginTop:'0.75rem', width:'100%', padding:'0.6rem', background:paciente?'#1e40af':'#94a3b8', color:'white', border:'none', borderRadius:'8px', fontSize:'0.9rem', cursor:paciente?'pointer':'default', fontWeight:500 }}>
+        style={{ marginTop:'0.75rem', width:'100%', padding:'0.75rem', background:paciente?'#1e40af':'#94a3b8', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:paciente?'pointer':'default', fontWeight:600, touchAction:'manipulation' }}>
         {guardando?'Guardando...':`💾 Guardar curva ${ojo}`}
       </button>
     </div>

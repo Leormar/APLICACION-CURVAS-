@@ -1,3 +1,5 @@
+import './globals.css'
+
 export const metadata = {
   title: 'Curvas de Desenfoque · PROLENS',
   description: 'App clínica para análisis de IOL multifocal',
@@ -6,6 +8,10 @@ export const metadata = {
 
 export const viewport = {
   themeColor: '#1e40af',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({ children }) {
@@ -17,8 +23,9 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="CurvasIOL" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
       </head>
-      <body style={{ margin:0, fontFamily:'system-ui, sans-serif', background:'#f8fafc' }}>
+      <body>
         {children}
       </body>
     </html>
