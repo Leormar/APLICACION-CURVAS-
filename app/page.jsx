@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import GraficaCurva from './components/GraficaCurva'
 import FormularioCurva from './components/FormularioCurva'
+import InterpretacionAI from './components/InterpretacionAI'
 
 export default function Home() {
   const [mediciones, setMediciones] = useState([])
@@ -24,7 +25,7 @@ export default function Home() {
     const win = window.open('', '_blank')
     win.document.write(html)
     win.document.close()
-    win.print()
+    setTimeout(() => win.print(), 500)
   }
 
   return (
@@ -36,21 +37,21 @@ export default function Home() {
         </div>
         {guardado && (
           <button onClick={generarPDF}
-            style={{ padding: '0.5rem 1rem', background: '#0f766e', color: 'white', border: 'none', borderRadius: '8px', fontSize: '0.9rem', cursor: 'pointer' }}>
-            📄 Generar PDF
+            style={{ padding: '0.5rem 1.2rem', background: '#0f766e', color: 'white', border: 'none', borderRadius: '8px', fontSize: '0.9rem', cursor: 'pointer', fontWeight: 500 }}>
+            📄 Imprimir / PDF
           </button>
         )}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
         <FormularioCurva onMedicionesChange={setMediciones} onGuardado={handleGuardado} />
-        <GraficaCurva mediciones={mediciones} />
+        <div>
+          <GraficaCurva mediciones={mediciones} />
+          {guardado && <InterpretacionAI datos={datos} mediciones={mediciones} />}
+        </div>
       </div>
       {guardado && (
-        <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: '#dcfce7', color: '#166534', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>✓ Curva guardada en base de datos</span>
-          <button onClick={generarPDF} style={{ padding: '4px 12px', background: '#166534', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}>
-            Imprimir / PDF
-          </button>
+        <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: '#dcfce7', color: '#166534', borderRadius: '8px' }}>
+          ✓ Curva guardada · Puedes imprimir el informe o solicitar interpretación AI
         </div>
       )}
     </main>
