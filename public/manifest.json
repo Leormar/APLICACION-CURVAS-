@@ -1,0 +1,13 @@
+{
+  "name": "Curvas de Desenfoque - PROLENS",
+  "short_name": "CurvasIOL",
+  "description": "App clinica para analisis de curvas de desenfoque en IOL multifocal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c2461",
+  "theme_color": "#1e40af",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

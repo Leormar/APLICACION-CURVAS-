@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1e40af"/>
+      <stop offset="100%" stop-color="#0c2461"/>
+    </radialGradient>
+  </defs>
+  <circle cx="50" cy="50" r="50" fill="url(#bg)"/>
+  <circle cx="50" cy="50" r="33" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="4"/>
+  <circle cx="50" cy="50" r="24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8"/>
+  <circle cx="50" cy="50" r="17" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <circle cx="50" cy="50" r="10" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>
+  <circle cx="50" cy="50" r="4" fill="rgba(255,255,255,0.95)"/>
+  <path d="M17,50 C10,35 5,38 4,52" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M83,50 C90,65 95,62 96,48" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="50" y="90" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="10" fill="rgba(255,255,255,0.95)">PROLENS</text>
+</svg>
