@@ -9,25 +9,34 @@ const graficaSVG = (med, color) => {
   const datos = [...med].map(m=>({defocus:parseFloat(m.defocus),agudeza:parseFloat(m.agudeza)})).sort((a,b)=>a.defocus-b.defocus)
   const W=340, H=180, pL=35, pR=42, pT=8, pB=44
   const gW=W-pL-pR, gH=H-pT-pB
-  const dMin=-5, dMax=1, aMin=-0.2, aMax=1.4
+  const dMin=-5, dMax=1
+  // Y invertido: 0 LogMAR (mejor) ARRIBA = y pequeño, 1.3 (peor) ABAJO = y grande
+  const aTop=0, aBot=1.4  // aTop arriba, aBot abajo
   const px = d => pL + ((d-dMin)/(dMax-dMin))*gW
-  const py = v => pT + ((v-aMin)/(aMax-aMin))*gH
+  const py = v => pT + ((v-aTop)/(aBot-aTop))*gH  // 0→pT(arriba), 1.4→pT+gH(abajo)
+
   const defTicks = [-5,-4,-3,-2,-1,0,1]
   const avTicks = [0,0.1,0.2,0.3,0.5,0.7,1.0,1.3]
-  const pValidos = datos.filter(m=>m.defocus>=dMin&&m.defocus<=dMax&&m.agudeza>=aMin&&m.agudeza<=aMax)
+  const pValidos = datos.filter(m=>m.defocus>=dMin&&m.defocus<=dMax&&m.agudeza>=0&&m.agudeza<=1.4)
   if (pValidos.length < 2) return ''
+
   const pathD = pValidos.map((m,i)=>`${i===0?'M':'L'}${px(m.defocus).toFixed(1)},${py(m.agudeza).toFixed(1)}`).join(' ')
   const dots = pValidos.map(m=>`<circle cx="${px(m.defocus).toFixed(1)}" cy="${py(m.agudeza).toFixed(1)}" r="3" fill="${color}" stroke="white" stroke-width="1.2"/>`).join('')
   const gridH = avTicks.map(v=>`<line x1="${pL}" y1="${py(v).toFixed(1)}" x2="${W-pR}" y2="${py(v).toFixed(1)}" stroke="#edf2f7" stroke-width="0.8"/>`).join('')
-  const refs = [{v:0.1,c:'#22c55e',l:'20/25'},{v:0.2,c:'#f59e0b',l:'20/32'},{v:0.3,c:'#ef4444',l:'20/40'}].map(r=>
-    `<line x1="${pL}" y1="${py(r.v).toFixed(1)}" x2="${W-pR}" y2="${py(r.v).toFixed(1)}" stroke="${r.c}" stroke-width="0.8" stroke-dasharray="4,3"/>
-     <text x="${W-pR+3}" y="${py(r.v).toFixed(1)}" dominant-baseline="middle" font-family="Arial" font-size="6.5" fill="${r.c}">${r.l}</text>`
-  ).join('')
+  const refs = [
+    {v:0.1,c:'#22c55e',l:'20/25'},
+    {v:0.2,c:'#f59e0b',l:'20/32'},
+    {v:0.3,c:'#ef4444',l:'20/40'}
+  ].map(r=>`
+    <line x1="${pL}" y1="${py(r.v).toFixed(1)}" x2="${W-pR}" y2="${py(r.v).toFixed(1)}" stroke="${r.c}" stroke-width="0.8" stroke-dasharray="4,3"/>
+    <text x="${W-pR+3}" y="${py(r.v).toFixed(1)}" dominant-baseline="middle" font-family="Arial" font-size="6.5" fill="${r.c}">${r.l}</text>
+  `).join('')
   const xLabels = defTicks.map(d=>`
     <text x="${px(d).toFixed(1)}" y="${H-pB+12}" text-anchor="middle" font-family="Arial" font-size="6.5" fill="#475569">${d}</text>
     <text x="${px(d).toFixed(1)}" y="${H-pB+21}" text-anchor="middle" font-family="Arial" font-size="5.5" fill="#94a3b8">${VERGENCIAS[String(d)]||''}</text>
   `).join('')
   const yLabels = avTicks.map(v=>`<text x="${pL-3}" y="${py(v).toFixed(1)}" text-anchor="end" dominant-baseline="middle" font-family="Arial" font-size="6.5" fill="#475569">${v.toFixed(1)}</text>`).join('')
+
   return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" style="display:block">
     <rect width="${W}" height="${H}" fill="white"/>
     ${gridH}${refs}
@@ -47,28 +56,40 @@ export async function POST(req) {
     const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
     const limpiar = t => t ? t.replace(/#{1,6}\s*/g,'').replace(/\*\*/g,'').replace(/\*/g,'').replace(/---/g,'').trim() : ''
 
+    const resumenNumericos = (med) => {
+      if (!med || med.length === 0) return ''
+      const datos = med.map(m=>({defocus:parseFloat(m.defocus),agudeza:parseFloat(m.agudeza)})).sort((a,b)=>a.defocus-b.defocus)
+      const vl = datos.find(m=>Math.abs(m.defocus)<0.01)
+      const vi = datos.filter(m=>m.defocus>=-2&&m.defocus<=-1.5)
+      const vc = datos.filter(m=>m.defocus>=-3&&m.defocus<=-2.5)
+      const funcional = datos.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ') || 'ninguno'
+      const lines = []
+      if (vl) lines.push(`VL (0D): ${vl.agudeza.toFixed(2)} LogMAR`)
+      if (vi.length) lines.push(`VI (67-50cm): ${vi.map(m=>m.agudeza.toFixed(2)).join(' / ')} LogMAR`)
+      if (vc.length) lines.push(`VC (40-33cm): ${vc.map(m=>m.agudeza.toFixed(2)).join(' / ')} LogMAR`)
+      lines.push(`Funcional: ${funcional}`)
+      return lines.map(l=>`<div style="margin-bottom:3px">${l}</div>`).join('')
+    }
+
     const seccion = (med, titulo, color, iol, textoAI) => {
       if (!med || med.length === 0) return ''
       const datos = med.map(m=>({defocus:parseFloat(m.defocus),agudeza:parseFloat(m.agudeza)})).sort((a,b)=>a.defocus-b.defocus)
       const funcional = datos.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ') || 'ninguno'
-      const textoLateral = textoAI
-        ? `<div style="font-size:9px;color:#334155;line-height:1.85;padding-top:2px">${limpiar(textoAI).replace(/\n/g,'<br>')}</div>`
-        : `<div style="font-size:8.5px;color:#64748b;line-height:1.7">
-            ${datos.find(m=>m.defocus===0)?`<div>VL (0D): <strong>${datos.find(m=>m.defocus===0).agudeza.toFixed(2)}</strong> LogMAR</div>`:''}
-            ${datos.filter(m=>m.defocus>=-2&&m.defocus<=-1.5).length?`<div>VI (67-50cm): <strong>${datos.filter(m=>m.defocus>=-2&&m.defocus<=-1.5).map(m=>m.agudeza.toFixed(2)).join(' / ')}</strong> LogMAR</div>`:''}
-            ${datos.filter(m=>m.defocus>=-3&&m.defocus<=-2.5).length?`<div>VC (40-33cm): <strong>${datos.filter(m=>m.defocus>=-3&&m.defocus<=-2.5).map(m=>m.agudeza.toFixed(2)).join(' / ')}</strong> LogMAR</div>`:''}
-            <div style="margin-top:6px;font-size:8px;color:#94a3b8">Interprete la curva con AI para análisis completo</div>
-           </div>`
+
+      const columnaTexto = textoAI
+        ? `<div style="font-size:8.8px;color:#1e293b;line-height:1.85;padding-top:2px">${limpiar(textoAI).replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</div>`
+        : `<div style="font-size:8.5px;color:#475569;line-height:1.8">${resumenNumericos(med)}<div style="margin-top:6px;font-size:8px;color:#94a3b8;font-style:italic">Use "Interpretar curva" para análisis AI</div></div>`
+
       return `<div style="margin-top:12px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;page-break-inside:avoid">
         <div style="background:${color};color:white;padding:6px 14px;font-size:11px;font-weight:bold">${titulo}${iol&&iol!=='—'&&iol?' · '+iol:''}</div>
-        <div style="padding:8px 12px;display:grid;grid-template-columns:350px 1fr;gap:14px;align-items:start">
+        <div style="padding:8px 12px;display:grid;grid-template-columns:355px 1fr;gap:14px;align-items:start">
           <div>
             ${graficaSVG(med, color)}
             <div style="font-size:8.5px;color:#0369a1;margin:3px 0 0;padding:3px 8px;background:#f0f9ff;border-radius:4px;border-left:3px solid #0369a1">
-              Rango funcional (≤0.2): <strong>${funcional}</strong>
+              Rango funcional (≤0.2 LogMAR): <strong>${funcional}</strong>
             </div>
           </div>
-          ${textoLateral}
+          ${columnaTexto}
         </div>
       </div>`
     }
