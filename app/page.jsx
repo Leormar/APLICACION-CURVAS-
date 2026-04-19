@@ -19,22 +19,31 @@ export default function Home() {
 
   const handleGuardado = (d) => setDatos(d)
 
-  const handleCargarPaciente = ({ paciente, curva, refOD, refOI }) => {
-    const mediciones = curva.mediciones || []
-    const ojoKey = curva.ojo
+  const handleCargarPaciente = ({ paciente, curva }) => {
+    const mediciones = (curva.mediciones || [])
+      .filter(m => m && m.defocus !== null && m.agudeza !== null)
+      .map(m => ({ defocus: parseFloat(m.defocus), agudeza: parseFloat(m.agudeza) }))
+      .sort((a, b) => a.defocus - b.defocus)
+
+    const ojoKey = curva.ojo || 'OD'
+    const lenteCurva = curva.iol || ''
+    const refOD = curva.refOD || ''
+    const refOI = curva.refOI || ''
+
     setCurvas(prev => ({ ...prev, [ojoKey]: mediciones }))
+    setLentes(prev => ({ ...prev, [ojoKey]: lenteCurva }))
     setPacienteCargado({ paciente, curva, refOD, refOI })
-    setMostrarBuscador(false)
     setDatos({
       paciente: paciente.nombre,
       documento: paciente.documento,
-      fechaNac: paciente.fecha_nacimiento?.split('T')[0] || '',
+      fechaNac: paciente.fecha_nacimiento?.split?.('T')[0] || '',
       ojo: ojoKey,
-      lentes,
+      lentes: { ...lentes, [ojoKey]: lenteCurva },
       refOD,
       refOI,
       tipoAV: 'logmar'
     })
+    setMostrarBuscador(false)
   }
 
   const generarPDF = async () => {
@@ -97,7 +106,7 @@ export default function Home() {
           {ojosConDatos.map(([ojo, mediciones]) => (
             <GraficaCurva key={ojo} ojo={ojo} mediciones={mediciones} lente={lentes[ojo]} />
           ))}
-          {(datos || ojosConDatos.length > 0) && (
+          {ojosConDatos.length > 0 && (
             <InterpretacionAI datos={{ ...datos, lentes }} curvas={curvas} />
           )}
         </div>
@@ -105,7 +114,7 @@ export default function Home() {
 
       {datos && (
         <div style={{ marginTop:'1rem', padding:'0.75rem 1rem', background:'#dcfce7', color:'#166534', borderRadius:'8px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <span>✓ Curva guardada · {datos.paciente}</span>
+          <span>✓ {datos.paciente} · {datos.ojo}</span>
           <button onClick={generarPDF} style={{ padding:'4px 14px', background:'#166534', color:'white', border:'none', borderRadius:'6px', cursor:'pointer', fontSize:'0.85rem' }}>
             Imprimir / PDF
           </button>
