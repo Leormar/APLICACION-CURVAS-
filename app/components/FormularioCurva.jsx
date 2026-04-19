@@ -28,7 +28,8 @@ const defocusToKey = (defVal) => {
 }
 
 export default function FormularioCurva({ onMedicionesChange, onGuardado, pacienteCargado }) {
-  const [paciente, setPaciente] = useState('')
+  const [nombre, setNombre] = useState('')
+  const [apellido, setApellido] = useState('')
   const [documento, setDocumento] = useState('')
   const [fechaNac, setFechaNac] = useState('')
   const [ojo, setOjo] = useState('OD')
@@ -40,10 +41,20 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
   const [guardando, setGuardando] = useState(false)
   const inputRefs = useRef({})
 
+  const nombreCompleto = `${nombre} ${apellido}`.trim()
+
   useEffect(() => {
     if (!pacienteCargado) return
     const { paciente: p, examenes, refOD: rOD, refOI: rOI } = pacienteCargado
-    setPaciente(p.nombre || '')
+    // Separar nombre y apellido
+    const partes = (p.nombre || '').trim().split(' ')
+    if (partes.length >= 2) {
+      setNombre(partes.slice(0, -1).join(' '))
+      setApellido(partes[partes.length - 1])
+    } else {
+      setNombre(p.nombre || '')
+      setApellido('')
+    }
     setDocumento(p.documento || '')
     if (p.fecha_nacimiento) setFechaNac(p.fecha_nacimiento.split('T')[0])
     if (rOD) setRefOD(rOD)
@@ -111,9 +122,9 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
       const res = await fetch('/api/curvas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paciente, documento, fechaNac, ojo, iol: ojo === 'AO' ? '' : lentes[ojo], refOD, refOI, mediciones })
+        body: JSON.stringify({ paciente: nombreCompleto, documento, fechaNac, ojo, iol: ojo === 'AO' ? '' : lentes[ojo], refOD, refOI, mediciones })
       })
-      if (res.ok) onGuardado({ paciente, documento, fechaNac, ojo, lentes, refOD, refOI, tipoAV })
+      if (res.ok) onGuardado({ paciente: nombreCompleto, documento, fechaNac, ojo, lentes, refOD, refOI, tipoAV })
     } catch(e) { console.error(e) }
     setGuardando(false)
   }
@@ -122,7 +133,6 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
   const placeholder = tipoAV==='decimal'?'0.8':tipoAV==='logmar'?'0.1':'20/25'
 
   const s = {
-    card: { background:'white', borderRadius:'12px', padding:'1rem', boxShadow:'0 1px 4px rgba(0,0,0,0.08)' },
     inp: { width:'100%', padding:'10px 12px', border:'1px solid #cbd5e1', borderRadius:'8px', fontSize:'16px', boxSizing:'border-box', WebkitAppearance:'none' },
     lbl: { fontSize:'0.75rem', color:'#475569', marginBottom:'4px', display:'block', fontWeight:500 },
     sec: { fontSize:'0.85rem', fontWeight:600, color:'#1e293b', margin:'0.8rem 0 0.4rem', borderTop:'1px solid #f1f5f9', paddingTop:'0.6rem' },
@@ -130,17 +140,29 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
   }
 
   return (
-    <div style={s.card}>
+    <div style={{ background:'white', borderRadius:'12px', padding:'1rem', boxShadow:'0 1px 4px rgba(0,0,0,0.08)' }}>
       <h2 style={{ margin:'0 0 0.75rem', fontSize:'1rem', color:'#1e293b' }}>Datos del paciente</h2>
 
-      <div style={{ marginBottom:'0.6rem' }}>
-        <label style={s.lbl}>Nombre completo</label>
-        <input style={s.inp} value={paciente} onChange={e=>setPaciente(e.target.value)} placeholder="Nombre completo" />
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.5rem' }}>
+        <div>
+          <label style={s.lbl}>Nombre</label>
+          <input style={s.inp} value={nombre} onChange={e=>setNombre(e.target.value)} placeholder="Nombre" />
+        </div>
+        <div>
+          <label style={s.lbl}>Apellido</label>
+          <input style={s.inp} value={apellido} onChange={e=>setApellido(e.target.value)} placeholder="Apellido" />
+        </div>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.6rem' }}>
-        <div><label style={s.lbl}>Documento / ID</label><input style={s.inp} value={documento} onChange={e=>setDocumento(e.target.value)} placeholder="CC" /></div>
-        <div><label style={s.lbl}>Fecha nacimiento</label><input type="date" style={s.inp} value={fechaNac} onChange={e=>setFechaNac(e.target.value)} /></div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.5rem' }}>
+        <div>
+          <label style={s.lbl}>Documento / ID</label>
+          <input style={s.inp} value={documento} onChange={e=>setDocumento(e.target.value)} placeholder="CC / Pasaporte" inputMode="numeric" />
+        </div>
+        <div>
+          <label style={s.lbl}>Fecha nacimiento</label>
+          <input type="date" style={s.inp} value={fechaNac} onChange={e=>setFechaNac(e.target.value)} />
+        </div>
       </div>
 
       <p style={s.sec}>Refracción</p>
@@ -213,8 +235,8 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
         })}
       </div>
 
-      <button onClick={handleGuardar} disabled={guardando||!paciente}
-        style={{ marginTop:'0.75rem', width:'100%', padding:'0.75rem', background:paciente?'#1e40af':'#94a3b8', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:paciente?'pointer':'default', fontWeight:600, touchAction:'manipulation' }}>
+      <button onClick={handleGuardar} disabled={guardando||!nombreCompleto}
+        style={{ marginTop:'0.75rem', width:'100%', padding:'0.75rem', background:nombreCompleto?'#1e40af':'#94a3b8', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:nombreCompleto?'pointer':'default', fontWeight:600, touchAction:'manipulation' }}>
         {guardando?'Guardando...':`💾 Guardar curva ${ojo}`}
       </button>
     </div>
