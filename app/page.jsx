@@ -64,24 +64,25 @@ export default function Home() {
       const html = await res.text()
       const blob = new Blob([html], { type: 'text/html; charset=utf-8' })
       const url = URL.createObjectURL(blob)
-      // Nombre legible para el archivo
-      const nombre = `CurvaDesenfoque_${(datos.paciente||'paciente').replace(/\s+/g,'_')}_${datos.documento||new Date().toISOString().split('T')[0]}`
+      const nombrePaciente = (datos.paciente||'paciente').replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'')
+      const nombreDoc = datos.documento || new Date().toISOString().split('T')[0]
+      const titulo = `CurvaDesenfoque_${nombrePaciente}_${nombreDoc}`
       const win = window.open(url, '_blank')
       if (!win) {
         const a = document.createElement('a')
         a.href = url
-        a.download = nombre + '.html'
+        a.download = titulo + '.html'
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
       } else {
         win.addEventListener('load', () => {
-          win.document.title = nombre
-          setTimeout(() => win.print(), 600)
+          try { win.document.title = titulo } catch(e) {}
+          setTimeout(() => win.print(), 700)
         })
       }
     } catch(e) {
-      alert('Error generando PDF: ' + e.message)
+      alert('Error: ' + e.message)
     }
     setGenerandoPDF(false)
   }
