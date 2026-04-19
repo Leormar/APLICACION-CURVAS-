@@ -24,8 +24,8 @@ const graficaSVG = (med, color) => {
      <text x="${W-pR+3}" y="${py(r.v).toFixed(1)}" dominant-baseline="middle" font-family="Arial" font-size="6.5" fill="${r.c}">${r.l}</text>`
   ).join('')
   const xLabels = defTicks.map(d=>`
-    <text x="${px(d).toFixed(1)}" y="${H-pB+11}" text-anchor="middle" font-family="Arial" font-size="6.5" fill="#475569">${d}</text>
-    <text x="${px(d).toFixed(1)}" y="${H-pB+20}" text-anchor="middle" font-family="Arial" font-size="5.5" fill="#94a3b8">${VERGENCIAS[String(d)]||''}</text>
+    <text x="${px(d).toFixed(1)}" y="${H-pB+12}" text-anchor="middle" font-family="Arial" font-size="6.5" fill="#475569">${d}</text>
+    <text x="${px(d).toFixed(1)}" y="${H-pB+21}" text-anchor="middle" font-family="Arial" font-size="5.5" fill="#94a3b8">${VERGENCIAS[String(d)]||''}</text>
   `).join('')
   const yLabels = avTicks.map(v=>`<text x="${pL-3}" y="${py(v).toFixed(1)}" text-anchor="end" dominant-baseline="middle" font-family="Arial" font-size="6.5" fill="#475569">${v.toFixed(1)}</text>`).join('')
   return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" style="display:block">
@@ -41,47 +41,37 @@ const graficaSVG = (med, color) => {
   </svg>`
 }
 
-const analisisOjo = (med, ojo) => {
-  if (!med || med.length < 2) return ''
-  const datos = [...med].map(m=>({defocus:parseFloat(m.defocus),agudeza:parseFloat(m.agudeza)})).sort((a,b)=>a.defocus-b.defocus)
-  const funcional = datos.filter(m=>m.agudeza<=0.2)
-  const vl = datos.find(m=>m.defocus===0)
-  const vi = datos.filter(m=>m.defocus>=-2&&m.defocus<=-1.5)
-  const vc = datos.filter(m=>m.defocus>=-3&&m.defocus<=-2.5)
-  const lines = []
-  if (vl) lines.push(`VL (0D): ${vl.agudeza.toFixed(2)} LogMAR`)
-  if (vi.length) lines.push(`VI (67-50cm): ${vi.map(m=>m.agudeza.toFixed(2)).join(' / ')} LogMAR`)
-  if (vc.length) lines.push(`VC (40-33cm): ${vc.map(m=>m.agudeza.toFixed(2)).join(' / ')} LogMAR`)
-  lines.push(`Rango funcional: ${funcional.length>0?funcional.map(m=>`${m.defocus}D`).join(', '):'ninguno'}`)
-  return lines.join('\n')
-}
-
 export async function POST(req) {
   try {
-    const { paciente, documento, fechaNac, lentes, refOD, refOI, tipoAV, curvas, interpretacion } = await req.json()
+    const { paciente, documento, fechaNac, lentes, refOD, refOI, tipoAV, curvas, interpretacion, secciones } = await req.json()
     const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
+    const limpiar = t => t ? t.replace(/#{1,6}\s*/g,'').replace(/\*\*/g,'').replace(/\*/g,'').replace(/---/g,'').trim() : ''
 
-    const seccion = (med, titulo, color, iol, resumen) => {
+    const seccion = (med, titulo, color, iol, textoAI) => {
       if (!med || med.length === 0) return ''
       const datos = med.map(m=>({defocus:parseFloat(m.defocus),agudeza:parseFloat(m.agudeza)})).sort((a,b)=>a.defocus-b.defocus)
       const funcional = datos.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ') || 'ninguno'
+      const textoLateral = textoAI
+        ? `<div style="font-size:9px;color:#334155;line-height:1.85;padding-top:2px">${limpiar(textoAI).replace(/\n/g,'<br>')}</div>`
+        : `<div style="font-size:8.5px;color:#64748b;line-height:1.7">
+            ${datos.find(m=>m.defocus===0)?`<div>VL (0D): <strong>${datos.find(m=>m.defocus===0).agudeza.toFixed(2)}</strong> LogMAR</div>`:''}
+            ${datos.filter(m=>m.defocus>=-2&&m.defocus<=-1.5).length?`<div>VI (67-50cm): <strong>${datos.filter(m=>m.defocus>=-2&&m.defocus<=-1.5).map(m=>m.agudeza.toFixed(2)).join(' / ')}</strong> LogMAR</div>`:''}
+            ${datos.filter(m=>m.defocus>=-3&&m.defocus<=-2.5).length?`<div>VC (40-33cm): <strong>${datos.filter(m=>m.defocus>=-3&&m.defocus<=-2.5).map(m=>m.agudeza.toFixed(2)).join(' / ')}</strong> LogMAR</div>`:''}
+            <div style="margin-top:6px;font-size:8px;color:#94a3b8">Interprete la curva con AI para análisis completo</div>
+           </div>`
       return `<div style="margin-top:12px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;page-break-inside:avoid">
         <div style="background:${color};color:white;padding:6px 14px;font-size:11px;font-weight:bold">${titulo}${iol&&iol!=='—'&&iol?' · '+iol:''}</div>
-        <div style="padding:8px 12px;display:grid;grid-template-columns:350px 1fr;gap:12px;align-items:start">
+        <div style="padding:8px 12px;display:grid;grid-template-columns:350px 1fr;gap:14px;align-items:start">
           <div>
             ${graficaSVG(med, color)}
             <div style="font-size:8.5px;color:#0369a1;margin:3px 0 0;padding:3px 8px;background:#f0f9ff;border-radius:4px;border-left:3px solid #0369a1">
               Rango funcional (≤0.2): <strong>${funcional}</strong>
             </div>
           </div>
-          <div style="font-size:9px;color:#334155;line-height:1.8;padding-top:4px">
-            ${resumen ? resumen.split('\n').map(l=>`<div>${l}</div>`).join('') : ''}
-          </div>
+          ${textoLateral}
         </div>
       </div>`
     }
-
-    const limpiar = t => t ? t.replace(/#{1,6}\s*/g,'').replace(/\*\*/g,'').replace(/\*/g,'').replace(/---/g,'').trim() : ''
 
     const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
 <title>CurvaDesenfoque_${(paciente||'paciente').replace(/\s+/g,'_')}_${documento||''}</title>
@@ -95,8 +85,8 @@ export async function POST(req) {
   .field{background:#f8fafc;padding:5px 10px;border-radius:4px;border-left:2px solid #dbeafe}
   .field label{font-size:7.5px;color:#94a3b8;display:block;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:1px}
   .field span{font-weight:bold;font-size:10.5px}
-  .ai-box{margin-top:12px;padding:10px 14px;background:#faf5ff;border-radius:8px;border:1px solid #e9d5ff;font-size:9.5px;line-height:1.85;white-space:pre-wrap}
-  .disclaimer{margin-top:6px;padding:4px 8px;background:#fef3c7;border-radius:4px;border-left:3px solid #f59e0b;font-size:8px;color:#92400e}
+  .ai-final{margin-top:12px;padding:10px 14px;background:#faf5ff;border-radius:8px;border:1px solid #e9d5ff;font-size:9px;line-height:1.85;white-space:pre-wrap}
+  .disclaimer{margin-top:6px;padding:4px 8px;background:#fef3c7;border-radius:4px;border-left:3px solid #f59e0b;font-size:7.5px;color:#92400e}
   .footer{margin-top:12px;text-align:center;font-size:8px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px}
   @media print{body{padding:8px 12px}@page{margin:0.5cm;size:A4}}
 </style></head><body>
@@ -112,18 +102,18 @@ export async function POST(req) {
 <div class="grid">
   <div class="field"><label>Paciente</label><span>${paciente||'—'}</span></div>
   <div class="field"><label>Documento</label><span>${documento||'—'}</span></div>
-  <div class="field"><label>Fecha de nacimiento</label><span>${fechaNac||'—'}</span></div>
+  <div class="field"><label>Fecha nacimiento</label><span>${fechaNac||'—'}</span></div>
   <div class="field"><label>Tipo AV</label><span>${tipoAV||'logmar'}</span></div>
   <div class="field"><label>Refraccion OD</label><span>${refOD||'—'}</span></div>
   <div class="field"><label>Refraccion OI</label><span>${refOI||'—'}</span></div>
   <div class="field"><label>IOL OD</label><span>${lentes?.OD||'—'}</span></div>
   <div class="field"><label>IOL OI</label><span>${lentes?.OI||'—'}</span></div>
 </div>
-${seccion(curvas?.OD,'Ojo Derecho (OD)','#1e40af',lentes?.OD,analisisOjo(curvas?.OD,'OD'))}
-${seccion(curvas?.OI,'Ojo Izquierdo (OI)','#0f766e',lentes?.OI,analisisOjo(curvas?.OI,'OI'))}
-${seccion(curvas?.AO,'Ambos Ojos (AO)','#7c3aed','',analisisOjo(curvas?.AO,'AO'))}
-${interpretacion?`<div class="ai-box">
-  <div style="color:#7c3aed;font-size:10.5px;font-weight:bold;margin-bottom:6px">Analisis clinico AI</div>
+${seccion(curvas?.OD,'Ojo Derecho (OD)','#1e40af',lentes?.OD,secciones?.OD)}
+${seccion(curvas?.OI,'Ojo Izquierdo (OI)','#0f766e',lentes?.OI,secciones?.OI)}
+${seccion(curvas?.AO,'Ambos Ojos (AO)','#7c3aed','',secciones?.AO)}
+${interpretacion?`<div class="ai-final">
+  <div style="color:#7c3aed;font-size:10px;font-weight:bold;margin-bottom:6px">Analisis clinico completo AI</div>
   ${limpiar(interpretacion)}
   <div class="disclaimer">Analisis generado por inteligencia artificial como apoyo diagnostico. La interpretacion clinica final es responsabilidad del profesional tratante.</div>
 </div>`:''}

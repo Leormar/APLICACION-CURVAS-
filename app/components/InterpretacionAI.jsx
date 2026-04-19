@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-export default function InterpretacionAI({ datos, curvas, onInterpretacion }) {
+export default function InterpretacionAI({ datos, curvas, onInterpretacion, onSecciones }) {
   const [interpretacion, setInterpretacion] = useState('')
   const [cargando, setCargando] = useState(false)
 
@@ -15,10 +15,11 @@ export default function InterpretacionAI({ datos, curvas, onInterpretacion }) {
         body: JSON.stringify({ datos, curvas })
       })
       const json = await res.json()
-      const texto = json.interpretacion || json.error || 'Error al interpretar'
+      const texto = json.interpretacion || json.error || 'Error'
       const limpio = texto.replace(/#{1,6}\s*/g,'').replace(/\*\*/g,'').replace(/\*/g,'').replace(/---/g,'').trim()
       setInterpretacion(limpio)
       if (onInterpretacion) onInterpretacion(limpio)
+      if (onSecciones && json.secciones) onSecciones(json.secciones)
     } catch(e) {
       setInterpretacion('Error: ' + e.message)
     }

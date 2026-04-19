@@ -8,7 +8,7 @@ export async function POST(req) {
       '-3.5':'29cm','-4':'25cm','-4.5':'22cm','-5':'20cm'
     }
 
-    const formatearCurva = (med, ojo) => {
+    const formatearOjo = (med, ojo) => {
       if (!med || med.length === 0) return ''
       const lente = datos?.lentes?.[ojo] || 'no especificado'
       const lineas = med.sort((a,b)=>a.defocus-b.defocus).map(m => {
@@ -20,34 +20,39 @@ export async function POST(req) {
     }
 
     const ojosConDatos = ['OD','OI','AO'].filter(o => curvas[o] && curvas[o].length >= 2)
-    const seccionesOjo = ojosConDatos.map(o => formatearCurva(curvas[o], o)).join('\n\n')
+    const seccionesOjo = ojosConDatos.map(o => formatearOjo(curvas[o], o)).join('\n\n')
 
-    const prompt = `Eres un optometrista especialista en lentes intraoculares multifocales y EDOF. Analiza estas curvas de desenfoque y genera un informe clínico en español. Escribe en texto plano sin símbolos markdown, sin asteriscos, sin numerales, sin guiones como viñetas. Usa solo texto corrido con saltos de línea para separar secciones.
+    const prompt = `Eres un optometrista especialista en lentes intraoculares multifocales y EDOF. Analiza estas curvas de desenfoque y genera un informe clínico estructurado en español. Escribe en texto plano sin simbolos markdown.
 
 DATOS DEL PACIENTE:
 Nombre: ${datos?.paciente || 'No especificado'}
-Refracción OD: ${datos?.refOD || 'no registrada'}
-Refracción OI: ${datos?.refOI || 'no registrada'}
+Refraccion OD: ${datos?.refOD || 'no registrada'}
+Refraccion OI: ${datos?.refOI || 'no registrada'}
+IOL OD: ${datos?.lentes?.OD || 'no especificado'}
+IOL OI: ${datos?.lentes?.OI || 'no especificado'}
 
 CURVAS DE DESENFOQUE:
 ${seccionesOjo}
 
-Genera el informe con estas secciones claramente separadas, en texto plano:
+Genera el informe con este formato exacto en texto plano:
 
-RENDIMIENTO POR DISTANCIA
-Describe visión lejana, intermedia, cercana y muy cercana con los valores LogMAR y equivalente Snellen aproximado para cada ojo evaluado.
+ANALISIS OJO DERECHO (OD)
+[Analisis de vision lejana, intermedia, cercana y muy cercana para OD. Comportamiento del IOL. Una sola columna de texto corrido, 3-4 oraciones.]
 
-ANÁLISIS POR VERGENCIAS
-Para cada ojo, indica el rendimiento en cada rango vergencial en texto corrido.
+ANALISIS OJO IZQUIERDO (OI)
+[Analisis de vision lejana, intermedia, cercana y muy cercana para OI. Comportamiento del IOL. Una sola columna de texto corrido, 3-4 oraciones.]
+
+ANALISIS BINOCULAR (AO)
+[Como se complementan ambos ojos. Sumacion binocular. 2-3 oraciones.]
 
 COMPORTAMIENTO DEL IOL
-Describe si el perfil de la curva es típico para el tipo de IOL implantado, si hay predominancia para alguna distancia, y si hay diferencia significativa entre OD y OI.
+[Tipo de curva observada, si corresponde al IOL implantado, predominancia visual. 2-3 oraciones.]
 
 IMPACTO REFRACTIVO
-Evalúa si la refracción registrada puede estar afectando el rendimiento visual y si se sugiere ajuste.
+[Si la refraccion afecta los resultados. 2 oraciones.]
 
-RECOMENDACIONES CLÍNICAS
-Indica conducta a seguir, si requiere control, corrección adicional o neuroadaptación.`
+RECOMENDACIONES
+[Conducta clinica, seguimiento, neuroadaptacion. 3-4 oraciones concisas.]`
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -65,8 +70,23 @@ Indica conducta a seguir, si requiere control, corrección adicional o neuroadap
 
     const json = await response.json()
     if (json.error) return Response.json({ error: json.error.message }, { status: 500 })
-    const interpretacion = json.content?.[0]?.text || 'No se pudo generar la interpretación.'
-    return Response.json({ interpretacion })
+    const interpretacion = json.content?.[0]?.text || 'No se pudo generar.'
+
+    // Extraer secciones por ojo para el PDF
+    const extraerSeccion = (texto, seccion) => {
+      const regex = new RegExp(`${seccion}[\\s\\S]*?(?=\\n[A-Z]{2,}|$)`, 'i')
+      const match = texto.match(regex)
+      return match ? match[0].replace(/^[^\n]+\n/, '').trim() : ''
+    }
+
+    const secciones = {
+      OD: extraerSeccion(interpretacion, 'ANALISIS OJO DERECHO'),
+      OI: extraerSeccion(interpretacion, 'ANALISIS OJO IZQUIERDO'),
+      AO: extraerSeccion(interpretacion, 'ANALISIS BINOCULAR'),
+      completo: interpretacion
+    }
+
+    return Response.json({ interpretacion, secciones })
   } catch(e) {
     return Response.json({ error: e.message }, { status: 500 })
   }

@@ -12,6 +12,7 @@ export default function Home() {
   const [mostrarBuscador, setMostrarBuscador] = useState(false)
   const [pacienteCargado, setPacienteCargado] = useState(null)
   const [interpretacion, setInterpretacion] = useState('')
+  const [secciones, setSecciones] = useState(null)
   const [generandoPDF, setGenerandoPDF] = useState(false)
 
   const handleMediciones = (ojo, mediciones, lente) => {
@@ -39,6 +40,7 @@ export default function Home() {
     setCurvas(nuevasCurvas)
     setLentes(nuevosLentes)
     setInterpretacion('')
+    setSecciones(null)
     setPacienteCargado({ paciente, examenes, refOD, refOI })
     setDatos({
       paciente: paciente.nombre,
@@ -58,32 +60,28 @@ export default function Home() {
       const res = await fetch('/api/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...datos, curvas, lentes, interpretacion })
+        body: JSON.stringify({ ...datos, curvas, lentes, interpretacion, secciones })
       })
       if (!res.ok) throw new Error('Error ' + res.status)
       const html = await res.text()
       const blob = new Blob([html], { type: 'text/html; charset=utf-8' })
       const url = URL.createObjectURL(blob)
-      const nombrePaciente = (datos.paciente||'paciente').replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'')
-      const nombreDoc = datos.documento || new Date().toISOString().split('T')[0]
-      const titulo = `CurvaDesenfoque_${nombrePaciente}_${nombreDoc}`
+      const nombre = `CurvaDesenfoque_${(datos.paciente||'p').replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'')}_${datos.documento||''}`
       const win = window.open(url, '_blank')
       if (!win) {
         const a = document.createElement('a')
         a.href = url
-        a.download = titulo + '.html'
+        a.download = nombre + '.html'
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
       } else {
         win.addEventListener('load', () => {
-          try { win.document.title = titulo } catch(e) {}
+          try { win.document.title = nombre } catch(e){}
           setTimeout(() => win.print(), 700)
         })
       }
-    } catch(e) {
-      alert('Error: ' + e.message)
-    }
+    } catch(e) { alert('Error: ' + e.message) }
     setGenerandoPDF(false)
   }
 
@@ -91,9 +89,7 @@ export default function Home() {
 
   return (
     <main style={{ padding:'1.5rem', maxWidth:'1200px', margin:'0 auto' }}>
-      {mostrarBuscador && (
-        <BuscadorPacientes onCargar={handleCargarExamen} onCerrar={()=>setMostrarBuscador(false)} />
-      )}
+      {mostrarBuscador && <BuscadorPacientes onCargar={handleCargarExamen} onCerrar={()=>setMostrarBuscador(false)} />}
       <div style={{ marginBottom:'1.5rem', borderBottom:'2px solid #1e40af', paddingBottom:'1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-end' }}>
         <div>
           <h1 style={{ margin:0, color:'#1e40af', fontSize:'1.4rem' }}>Curvas de Desenfoque</h1>
@@ -125,7 +121,7 @@ export default function Home() {
             <GraficaCurva key={ojo} ojo={ojo} mediciones={med} lente={lentes[ojo]} />
           ))}
           {ojosConDatos.length>0 && (
-            <InterpretacionAI datos={{...datos,lentes}} curvas={curvas} onInterpretacion={setInterpretacion} />
+            <InterpretacionAI datos={{...datos,lentes}} curvas={curvas} onInterpretacion={setInterpretacion} onSecciones={setSecciones} />
           )}
         </div>
       </div>
