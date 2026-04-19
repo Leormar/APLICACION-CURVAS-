@@ -11,6 +11,7 @@ export default function Home() {
   const [datos, setDatos] = useState(null)
   const [mostrarBuscador, setMostrarBuscador] = useState(false)
   const [pacienteCargado, setPacienteCargado] = useState(null)
+  const [interpretacion, setInterpretacion] = useState('')
 
   const handleMediciones = (ojo, mediciones, lente) => {
     setCurvas(prev => ({ ...prev, [ojo]: mediciones }))
@@ -33,6 +34,7 @@ export default function Home() {
     setCurvas(prev => ({ ...prev, [ojoKey]: mediciones }))
     setLentes(prev => ({ ...prev, [ojoKey]: lenteCurva }))
     setPacienteCargado({ paciente, curva, refOD, refOI })
+    setInterpretacion('')
     setDatos({
       paciente: paciente.nombre,
       documento: paciente.documento,
@@ -51,7 +53,7 @@ export default function Home() {
     const res = await fetch('/api/pdf', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...datos, curvas, lentes })
+      body: JSON.stringify({ ...datos, curvas, lentes, interpretacion })
     })
     const html = await res.text()
     const win = window.open('', '_blank')
@@ -107,7 +109,11 @@ export default function Home() {
             <GraficaCurva key={ojo} ojo={ojo} mediciones={mediciones} lente={lentes[ojo]} />
           ))}
           {ojosConDatos.length > 0 && (
-            <InterpretacionAI datos={{ ...datos, lentes }} curvas={curvas} />
+            <InterpretacionAI
+              datos={{ ...datos, lentes }}
+              curvas={curvas}
+              onInterpretacion={setInterpretacion}
+            />
           )}
         </div>
       </div>

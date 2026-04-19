@@ -3,63 +3,51 @@ export async function POST(req) {
     const { datos, curvas } = await req.json()
 
     const VERGENCIAS = {
-      '1': 'VP extrema', '0.5': 'VP', '0': 'VL',
-      '-0.5': '2m', '-1': '1m', '-1.5': '67cm',
-      '-2': '50cm', '-2.5': '40cm', '-3': '33cm',
-      '-3.5': '29cm', '-4': '25cm', '-4.5': '22cm', '-5': '20cm'
+      '1':'VP extrema','0.5':'VP','0':'VL','-0.5':'2m','-1':'1m',
+      '-1.5':'67cm','-2':'50cm','-2.5':'40cm','-3':'33cm',
+      '-3.5':'29cm','-4':'25cm','-4.5':'22cm','-5':'20cm'
     }
 
     const formatearCurva = (med, ojo) => {
       if (!med || med.length === 0) return ''
+      const lente = datos?.lentes?.[ojo] || 'no especificado'
       const lineas = med.sort((a,b)=>a.defocus-b.defocus).map(m => {
         const v = VERGENCIAS[String(parseFloat(m.defocus))] || ''
         return `  ${m.defocus}D (${v}): ${m.agudeza} LogMAR`
       }).join('\n')
-      const funcional = med.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ')
-      const lente = datos.lentes?.[ojo] || 'no especificado'
-      return `${ojo} — IOL: ${lente}\n${lineas}\nRango funcional (≤0.2 LogMAR): ${funcional || 'ninguno'}`
+      const funcional = med.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ') || 'ninguno'
+      return `${ojo} — IOL: ${lente}\n${lineas}\nRango funcional: ${funcional}`
     }
 
-    const seccionesOjo = ['OD','OI','AO']
-      .filter(o => curvas[o] && curvas[o].length >= 2)
-      .map(o => formatearCurva(curvas[o], o))
-      .join('\n\n')
+    const ojosConDatos = ['OD','OI','AO'].filter(o => curvas[o] && curvas[o].length >= 2)
+    const seccionesOjo = ojosConDatos.map(o => formatearCurva(curvas[o], o)).join('\n\n')
 
-    const prompt = `Eres un optometrista especialista en lentes intraoculares (IOL) multifocales y EDOF. Analiza estas curvas de desenfoque y genera un informe clínico detallado en español.
+    const prompt = `Eres un optometrista especialista en lentes intraoculares multifocales y EDOF. Analiza estas curvas de desenfoque y genera un informe clínico en español. Escribe en texto plano sin símbolos markdown, sin asteriscos, sin numerales, sin guiones como viñetas. Usa solo texto corrido con saltos de línea para separar secciones.
 
 DATOS DEL PACIENTE:
-Nombre: ${datos.paciente}
-Refracción OD: ${datos.refOD || 'no registrada'}
-Refracción OI: ${datos.refOI || 'no registrada'}
+Nombre: ${datos?.paciente || 'No especificado'}
+Refracción OD: ${datos?.refOD || 'no registrada'}
+Refracción OI: ${datos?.refOI || 'no registrada'}
 
 CURVAS DE DESENFOQUE:
 ${seccionesOjo}
 
-Genera un informe clínico con estas secciones:
+Genera el informe con estas secciones claramente separadas, en texto plano:
 
-1. RENDIMIENTO POR DISTANCIA
-   - Visión lejana (VL, 0D): calidad y simetría OD/OI
-   - Visión intermedia (-1.5D a -2D, 67-50cm): funcionalidad
-   - Visión cercana (-2.5D a -3D, 40-33cm): lectura y detalle
-   - Visión muy cercana (-3.5D a -5D): limitaciones
+RENDIMIENTO POR DISTANCIA
+Describe visión lejana, intermedia, cercana y muy cercana con los valores LogMAR y equivalente Snellen aproximado para cada ojo evaluado.
 
-2. ANÁLISIS POR VERGENCIAS
-   Para cada rango vergencial indica AV LogMAR y equivalente Snellen aproximado
+ANÁLISIS POR VERGENCIAS
+Para cada ojo, indica el rendimiento en cada rango vergencial en texto corrido.
 
-3. COMPORTAMIENTO DEL IOL
-   - Predominancia visual (¿para qué distancia está optimizado?)
-   - ¿El perfil de la curva es típico para este tipo de IOL?
-   - Comparación OD vs OI si hay diferencia clínica significativa
+COMPORTAMIENTO DEL IOL
+Describe si el perfil de la curva es típico para el tipo de IOL implantado, si hay predominancia para alguna distancia, y si hay diferencia significativa entre OD y OI.
 
-4. IMPACTO REFRACTIVO
-   - ¿La refracción registrada puede estar afectando el rendimiento?
-   - ¿Se sugiere ajuste refractivo o es el resultado esperado post-implante?
+IMPACTO REFRACTIVO
+Evalúa si la refracción registrada puede estar afectando el rendimiento visual y si se sugiere ajuste.
 
-5. RECOMENDACIONES CLÍNICAS
-   - Conducta a seguir
-   - ¿Requiere control, corrección adicional o neuroadaptación?
-
-Sé preciso, usa terminología optométrica apropiada y basa el análisis en los datos reales de la curva.`
+RECOMENDACIONES CLÍNICAS
+Indica conducta a seguir, si requiere control, corrección adicional o neuroadaptación.`
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

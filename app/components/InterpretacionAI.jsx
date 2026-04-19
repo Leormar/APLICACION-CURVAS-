@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-export default function InterpretacionAI({ datos, curvas }) {
+export default function InterpretacionAI({ datos, curvas, onInterpretacion }) {
   const [interpretacion, setInterpretacion] = useState('')
   const [cargando, setCargando] = useState(false)
 
@@ -15,9 +15,12 @@ export default function InterpretacionAI({ datos, curvas }) {
         body: JSON.stringify({ datos, curvas })
       })
       const json = await res.json()
-      setInterpretacion(json.interpretacion || json.error || 'Error al interpretar')
+      const texto = json.interpretacion || json.error || 'Error al interpretar'
+      const limpio = texto.replace(/#{1,6}\s*/g,'').replace(/\*\*/g,'').replace(/\*/g,'').replace(/---/g,'').trim()
+      setInterpretacion(limpio)
+      if (onInterpretacion) onInterpretacion(limpio)
     } catch(e) {
-      setInterpretacion('Error de conexión: ' + e.message)
+      setInterpretacion('Error: ' + e.message)
     }
     setCargando(false)
   }
@@ -37,7 +40,7 @@ export default function InterpretacionAI({ datos, curvas }) {
         </div>
       ) : (
         <p style={{ color:'#94a3b8', fontSize:'0.85rem', margin:0 }}>
-          Haz click en "Interpretar curva" para obtener análisis clínico por vergencias, predominancia visual y efecto refractivo.
+          Click en "Interpretar curva" para análisis clínico por vergencias, predominancia visual y efecto refractivo. La interpretación se incluirá en el PDF.
         </p>
       )}
     </div>
