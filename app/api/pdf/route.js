@@ -57,9 +57,39 @@ export async function POST(req) {
     const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
     const edad = calcEdad(fechaNac)
     const limpiar = (t) => {
-  if (!t) return ''
   return t
     .replace(/#{1,6}\s*/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/---/g, '')
+    .replace(/(ANALISIS OJO DERECHO[^\n]*)/gi, '<strong></strong>')
+    .replace(/(ANALISIS OJO IZQUIERDO[^\n]*)/gi, '<strong></strong>')
+    .replace(/(ANALISIS BINOCULAR[^\n]*)/gi, '<strong></strong>')
+    .replace(/(COMPORTAMIENTO DEL IOL[^\n]*)/gi, '<strong></strong>')
+    .replace(/(IMPACTO REFRACTIVO[^\n]*)/gi, '<strong></strong>')
+    .replace(/(RECOMENDACIONES[^\n]*)/gi, '<strong></strong>')
+    .trim()
+}
+
+const limpiarFinal = (t) => {
+  const lineas = t.split('\n')
+  let incluir = false
+  const resultado = []
+  for (const linea of lineas) {
+    const upper = linea.toUpperCase()
+    if (upper.includes('COMPORTAMIENTO DEL IOL') || upper.includes('IMPACTO REFRACTIVO') || upper.includes('RECOMENDACIONES')) {
+      incluir = true
+    } else if (upper.includes('ANALISIS OJO') || upper.includes('ANALISIS BINOCULAR')) {
+      incluir = false
+    }
+    if (incluir) resultado.push(linea)
+  }
+  return resultado.join('\n')
+    .replace(/(COMPORTAMIENTO DEL IOL[^\n]*)/gi, '<strong></strong>')
+    .replace(/(IMPACTO REFRACTIVO[^\n]*)/gi, '<strong></strong>')
+    .replace(/(RECOMENDACIONES[^\n]*)/gi, '<strong></strong>')
+    .trim()
+}\s*/g, '')
     .replace(/\*\*/g, '')
     .replace(/\*/g, '')
     .replace(/---/g, '')
@@ -149,7 +179,7 @@ ${seccion(curvas?.AO,'Ambos Ojos (AO)','#7c3aed','',secciones?.AO)}
 
 ${interpretacion?`<div class="ai-final">
   
-  ${limpiar(interpretacion).replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}
+  ${limpiarFinal(interpretacion).replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}
   <div class="disclaimer">Análisis generado por MAIdx sd Bench como apoyo diagnóstico. La interpretación clínica final es responsabilidad del profesional tratante.</div>
 </div>`:''}
 
