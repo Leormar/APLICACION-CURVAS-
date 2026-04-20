@@ -56,7 +56,21 @@ export async function POST(req) {
     const { paciente, documento, fechaNac, lentes, refOD, refOI, tipoAV, curvas, interpretacion, secciones } = await req.json()
     const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
     const edad = calcEdad(fechaNac)
-    const limpiar = t => t ? t.replace(/#{1,6}\s*/g,'').replace(/\*\*/g,'').replace(/\*/g,'').replace(/---/g,'').trim() : ''
+    const limpiar = t => {
+    // Poner en negrilla los encabezados de secciones
+    return t
+      .replace(/#{1,6}\s*/g,'')
+      .replace(/\*\*/g,'')
+      .replace(/\*/g,'')
+      .replace(/---/g,'')
+      .replace(/(ANALISIS OJO DERECHO[^\n]*)/gi, '<strong style="font-size:11px;color:#1e40af"></strong>')
+      .replace(/(ANALISIS OJO IZQUIERDO[^\n]*)/gi, '<strong style="font-size:11px;color:#0f766e"></strong>')
+      .replace(/(ANALISIS BINOCULAR[^\n]*)/gi, '<strong style="font-size:11px;color:#7c3aed"></strong>')
+      .replace(/(COMPORTAMIENTO DEL IOL[^\n]*)/gi, '<strong style="font-size:11px;color:#1e293b"></strong>')
+      .replace(/(IMPACTO REFRACTIVO[^\n]*)/gi, '<strong style="font-size:11px;color:#1e293b"></strong>')
+      .replace(/(RECOMENDACIONES[^\n]*)/gi, '<strong style="font-size:11px;color:#dc2626"></strong>')
+      .trim()
+  }
 
     const seccion = (med, titulo, color, iol, textoAI) => {
       if (!med || med.length === 0) return ''
@@ -96,7 +110,7 @@ export async function POST(req) {
   .refraccion-bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
   .ref-item{background:white;border:1px solid #e2e8f0;border-radius:6px;padding:5px 10px;font-size:10px;color:#475569;flex:1;min-width:120px}
   .ref-item strong{display:block;font-size:11px;color:#1e293b}
-  .ai-final{margin-top:14px;padding:12px 16px;background:#faf5ff;border-radius:8px;border:1px solid #e9d5ff;font-size:11px;line-height:1.9;white-space:pre-wrap}
+  .ai-final{margin-top:14px;padding:12px 16px;background:#faf5ff;border-radius:8px;border:1px solid #e9d5ff;font-size:11px;line-height:1.9}
   .disclaimer{margin-top:8px;padding:5px 10px;background:#fef3c7;border-radius:4px;border-left:3px solid #f59e0b;font-size:8.5px;color:#92400e}
   .footer{margin-top:14px;text-align:center;font-size:8px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px}
   @media print{body{padding:10px 16px}@page{margin:0.5cm;size:A4}}
@@ -133,8 +147,8 @@ ${seccion(curvas?.OI,'Ojo Izquierdo (OI)','#0f766e',lentes?.OI,secciones?.OI)}
 ${seccion(curvas?.AO,'Ambos Ojos (AO)','#7c3aed','',secciones?.AO)}
 
 ${interpretacion?`<div class="ai-final">
-  <div style="color:#7c3aed;font-size:12px;font-weight:bold;margin-bottom:8px">Análisis clínico completo — MAIdx sd Bench</div>
-  ${limpiar(interpretacion)}
+  
+  ${limpiar(interpretacion).replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}
   <div class="disclaimer">Análisis generado por MAIdx sd Bench como apoyo diagnóstico. La interpretación clínica final es responsabilidad del profesional tratante.</div>
 </div>`:''}
 
