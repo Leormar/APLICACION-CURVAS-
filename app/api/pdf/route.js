@@ -76,8 +76,9 @@ export async function POST(req) {
       if (!med || med.length === 0) return ''
       const datos = med.map(m=>({defocus:parseFloat(m.defocus),agudeza:parseFloat(m.agudeza)})).sort((a,b)=>a.defocus-b.defocus)
       const funcional = datos.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ') || 'ninguno'
+      const tituloSeccion = titulo.includes("OD") ? "Análisis OD" : titulo.includes("OI") ? "Análisis OI" : "Análisis Binocular"
       const columnaTexto = textoAI
-        ? `<div style="font-size:11px;color:#1e293b;line-height:1.9;padding-top:4px">${limpiar(textoAI).replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</div>`
+        ? `<div><div style="font-size:11px;font-weight:bold;color:#1e293b;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #e2e8f0">${tituloSeccion}</div><div style="font-size:11px;color:#1e293b;line-height:1.9">${limpiar(textoAI).replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</div></div>`
         : `<div style="font-size:10px;color:#64748b;line-height:1.8;padding-top:4px;font-style:italic">Presiona "Interpretar curva" antes de generar el PDF para obtener el análisis clínico al lado de la gráfica.</div>`
       return `<div style="margin-top:14px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;page-break-inside:avoid">
         <div style="background:${color};color:white;padding:9px 16px;font-size:14px;font-weight:bold;letter-spacing:0.3px">
