@@ -57,7 +57,6 @@ export default function GraficaCurva({ ojo, mediciones, lente }) {
           </XAxis>
           <YAxis
             domain={[1.3, -0.1]}
-            reversed={false}
             ticks={[1.3, 1.0, 0.7, 0.5, 0.3, 0.2, 0.1, 0.0]}
             tick={{ fontSize:10 }}
             width={35}
