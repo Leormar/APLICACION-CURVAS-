@@ -57,9 +57,25 @@ export async function POST(req) {
     const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
     const edad = calcEdad(fechaNac)
     const limpiar = t => {
-    // Poner en negrilla los encabezados de secciones
     return t
-      .replace(/#{1,6}\s*/g,'')
+      .replace(/#{1,6}s*/g,'')
+      .replace(/**/g,'')
+      .replace(/*/g,'')
+      .replace(/---/g,'')
+      .replace(/(ANALISIS OJO DERECHO[^
+]*)/gi, '<strong></strong>')
+      .replace(/(ANALISIS OJO IZQUIERDO[^
+]*)/gi, '<strong></strong>')
+      .replace(/(ANALISIS BINOCULAR[^
+]*)/gi, '<strong></strong>')
+      .replace(/(COMPORTAMIENTO DEL IOL[^
+]*)/gi, '<strong></strong>')
+      .replace(/(IMPACTO REFRACTIVO[^
+]*)/gi, '<strong></strong>')
+      .replace(/(RECOMENDACIONES[^
+]*)/gi, '<strong></strong>')
+      .trim()
+  }\s*/g,'')
       .replace(/\*\*/g,'')
       .replace(/\*/g,'')
       .replace(/---/g,'')
