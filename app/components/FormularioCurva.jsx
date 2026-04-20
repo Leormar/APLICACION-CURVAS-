@@ -23,7 +23,7 @@ const toLogMAR = (valor, tipo) => {
       const parts = str.split('/')
       dec = parseFloat(parts[0]) / parseFloat(parts[1])
     } else {
-      const denom = parseFloat(str)
+      const denom = parseFloat(str.replace('20/',''))
       dec = isNaN(denom) || denom <= 0 ? 0 : 20 / denom
     }
     if (dec <= 0 || isNaN(dec)) return 1.3
@@ -45,7 +45,7 @@ const fromLogMAR = (logmar, tipo) => {
   if (tipo === 'snellen') {
     const dec = Math.pow(10, -v)
     const denom = Math.round(20 / dec)
-    return String(denom)
+    return '20/' + denom
   }
   return ''
 }
@@ -181,7 +181,7 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
 
   const valsDisplay = valoresDisplay[ojo] || {}
   const valsLM = valoresLogMAR[ojo] || {}
-  const placeholder = tipoAV==='decimal'?'0.8':tipoAV==='logmar'?'0.1':'25'
+  const placeholder = tipoAV==='decimal'?'0.8':tipoAV==='logmar'?'0.1':'20/40'
 
   const s = {
     inp: { width:'100%', padding:'10px 12px', border:'1px solid #cbd5e1', borderRadius:'8px', fontSize:'16px', boxSizing:'border-box', WebkitAppearance:'none' },
@@ -252,7 +252,7 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
         <div style={{ display:'grid', gridTemplateColumns:'70px 1fr 70px', background:'#f8fafc', padding:'6px 10px', fontSize:'0.72rem', color:'#64748b', fontWeight:600 }}>
           <span>Defocus</span>
           <span style={{textAlign:'center'}}>
-            {tipoAV==='snellen'?'20/X (denominador)':tipoAV==='decimal'?'Decimal':'LogMAR'}
+            {tipoAV==='snellen'?'Snellen (20/X)':tipoAV==='decimal'?'Decimal':'LogMAR'}
           </span>
           <span style={{textAlign:'right'}}>LogMAR</span>
         </div>
@@ -264,7 +264,7 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
               <span style={{ fontSize:'0.82rem', color:'#334155', fontWeight:500 }}>{d}D</span>
               <input
                 ref={el=>inputRefs.current[d]=el}
-                type="number"
+                type={tipoAV==='snellen'?'text':'number'}
                 step="0.05"
                 inputMode="decimal"
                 style={{ margin:'2px 8px', padding:'6px 8px', border:'1px solid #e2e8f0', borderRadius:'6px', fontSize:'16px', textAlign:'center', width:'calc(100% - 16px)' }}
