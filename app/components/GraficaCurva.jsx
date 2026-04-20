@@ -31,6 +31,12 @@ export default function GraficaCurva({ ojo, mediciones, lente }) {
 
   const cat = categoriaLente(lente)
 
+  // Invertir datos para que 0 quede arriba: usar valor negativo internamente
+  const datosInvertidos = datos.map(d => ({ ...d, avInvertido: -d.agudeza }))
+
+  const ticksInvertidos = [-1.3, -1.0, -0.7, -0.5, -0.3, -0.2, -0.1, 0]
+  const tickFormatter = (v) => (-v).toFixed(1)
+
   return (
     <div style={{ background:'white', borderRadius:'12px', padding:'1rem 1.25rem', boxShadow:'0 1px 4px rgba(0,0,0,0.08)' }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'0.5rem' }}>
@@ -50,24 +56,28 @@ export default function GraficaCurva({ ojo, mediciones, lente }) {
       </div>
 
       <ResponsiveContainer width="100%" height={250}>
-        <LineChart data={datos} margin={{ top:5, right:50, left:10, bottom:50 }}>
+        <LineChart data={datosInvertidos} margin={{ top:5, right:50, left:10, bottom:50 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
           <XAxis dataKey="defocus" tick={<CustomTick />} height={55} interval={0}>
             <Label value="Defocus (D)" offset={-8} position="insideBottom" style={{ fontSize:11, fill:'#475569' }} />
           </XAxis>
           <YAxis
-            domain={[1.3, -0.1]}
-            ticks={[1.3, 1.0, 0.7, 0.5, 0.3, 0.2, 0.1, 0.0]}
+            domain={[-1.3, 0.1]}
+            ticks={ticksInvertidos}
+            tickFormatter={tickFormatter}
             tick={{ fontSize:10 }}
             width={35}
           >
             <Label value="LogMAR" angle={-90} position="insideLeft" offset={10} style={{ fontSize:11, fill:'#475569' }} />
           </YAxis>
-          <Tooltip formatter={v=>[v+' LogMAR','AV']} labelFormatter={l=>`${l}D — ${verg(l)}`} />
-          <ReferenceLine y={0.1} stroke="#22c55e" strokeDasharray="4 4" label={{ value:'20/25', position:'right', fontSize:9, fill:'#22c55e' }} />
-          <ReferenceLine y={0.2} stroke="#f59e0b" strokeDasharray="4 4" label={{ value:'20/32', position:'right', fontSize:9, fill:'#f59e0b' }} />
-          <ReferenceLine y={0.3} stroke="#ef4444" strokeDasharray="4 4" label={{ value:'20/40', position:'right', fontSize:9, fill:'#ef4444' }} />
-          <Line type="monotone" dataKey="agudeza" stroke={color} strokeWidth={2.5} dot={{ r:3, fill:color }} activeDot={{ r:5 }} />
+          <Tooltip
+            formatter={(v, name) => [(-v).toFixed(2)+' LogMAR', 'AV']}
+            labelFormatter={l=>`${l}D — ${verg(l)}`}
+          />
+          <ReferenceLine y={-0.1} stroke="#22c55e" strokeDasharray="4 4" label={{ value:'20/25', position:'right', fontSize:9, fill:'#22c55e' }} />
+          <ReferenceLine y={-0.2} stroke="#f59e0b" strokeDasharray="4 4" label={{ value:'20/32', position:'right', fontSize:9, fill:'#f59e0b' }} />
+          <ReferenceLine y={-0.3} stroke="#ef4444" strokeDasharray="4 4" label={{ value:'20/40', position:'right', fontSize:9, fill:'#ef4444' }} />
+          <Line type="monotone" dataKey="avInvertido" stroke={color} strokeWidth={2.5} dot={{ r:3, fill:color }} activeDot={{ r:5 }} />
         </LineChart>
       </ResponsiveContainer>
 
