@@ -10,12 +10,17 @@ const toLogMAR = (valor, tipo) => {
   if (tipo === 'logmar') return parseFloat(v.toFixed(2))
   if (tipo === 'decimal') return v <= 0 ? 1.3 : parseFloat((-Math.log10(v)).toFixed(2))
   if (tipo === 'snellen') {
-    const parts = String(valor).split('/')
-    if (parts.length === 2) {
-      const dec = parseFloat(parts[0]) / parseFloat(parts[1])
-      return dec <= 0 || isNaN(dec) ? 1.3 : parseFloat((-Math.log10(dec)).toFixed(2))
+    const str = String(valor).trim()
+    let dec
+    if (str.includes('/')) {
+      const parts = str.split('/')
+      dec = parseFloat(parts[0]) / parseFloat(parts[1])
+    } else {
+      // Solo denominador — asumir 20/X
+      const denom = parseFloat(str)
+      dec = isNaN(denom) || denom <= 0 ? 0 : 20 / denom
     }
-    return null
+    return dec <= 0 || isNaN(dec) ? 1.3 : parseFloat((-Math.log10(dec)).toFixed(2))
   }
   return null
 }
@@ -130,7 +135,7 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
   }
 
   const valsOjo = valores[ojo] || {}
-  const placeholder = tipoAV==='decimal'?'0.8':tipoAV==='logmar'?'0.1':'20/25'
+  const placeholder = tipoAV==='decimal'?'0.8':tipoAV==='logmar'?'0.1':'25'
 
   const s = {
     inp: { width:'100%', padding:'10px 12px', border:'1px solid #cbd5e1', borderRadius:'8px', fontSize:'16px', boxSizing:'border-box', WebkitAppearance:'none' },
