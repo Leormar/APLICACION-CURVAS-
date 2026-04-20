@@ -77,11 +77,11 @@ export async function POST(req) {
       const funcional = datos.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ') || 'ninguno'
 
       const columnaTexto = textoAI
-        ? `<div style="font-size:8.8px;color:#1e293b;line-height:1.85;padding-top:2px">${limpiar(textoAI).replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</div>`
+        ? `<div style="font-size:10px;color:#1e293b;line-height:1.8;padding-top:2px">${limpiar(textoAI).replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</div>`
         : `<div style="font-size:8.5px;color:#475569;line-height:1.8">${resumenNumericos(med)}<div style="margin-top:6px;font-size:8px;color:#94a3b8;font-style:italic">Use "Interpretar curva" para análisis AI</div></div>`
 
       return `<div style="margin-top:12px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;page-break-inside:avoid">
-        <div style="background:${color};color:white;padding:6px 14px;font-size:11px;font-weight:bold">${titulo}${iol&&iol!=='—'&&iol?' · '+iol:''}</div>
+        <div style="background:${color};color:white;padding:8px 14px;font-size:13px;font-weight:bold">${titulo}${iol&&iol!=='—'&&iol?' · '+iol:''}</div>
         <div style="padding:8px 12px;display:grid;grid-template-columns:355px 1fr;gap:14px;align-items:start">
           <div>
             ${graficaSVG(med, color)}
@@ -99,13 +99,13 @@ export async function POST(req) {
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Arial,sans-serif;font-size:11px;color:#1e293b;padding:20px 26px}
-  .header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1e40af;padding-bottom:10px;margin-bottom:12px}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1e40af;padding-bottom:7px;margin-bottom:8px}
   .logo{font-size:15px;font-weight:bold;color:#1e40af;line-height:1.4}
   .logo small{display:block;font-size:8.5px;font-weight:normal;color:#64748b;margin-top:1px}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px}
-  .field{background:#f8fafc;padding:5px 10px;border-radius:4px;border-left:2px solid #dbeafe}
-  .field label{font-size:7.5px;color:#94a3b8;display:block;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:1px}
-  .field span{font-weight:bold;font-size:10.5px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:8px}
+  .field{background:#f8fafc;padding:3px 8px;border-radius:4px;border-left:2px solid #dbeafe}
+  .field label{font-size:7px;color:#94a3b8;display:block;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0px}
+  .field span{font-weight:bold;font-size:10px}
   .ai-final{margin-top:12px;padding:10px 14px;background:#faf5ff;border-radius:8px;border:1px solid #e9d5ff;font-size:9px;line-height:1.85;white-space:pre-wrap}
   .disclaimer{margin-top:6px;padding:4px 8px;background:#fef3c7;border-radius:4px;border-left:3px solid #f59e0b;font-size:7.5px;color:#92400e}
   .footer{margin-top:12px;text-align:center;font-size:8px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px}
