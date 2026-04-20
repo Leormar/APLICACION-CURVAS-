@@ -104,8 +104,8 @@ export async function POST(req) {
 
 <div class="header">
   <div class="logo">PROLENS
-    <small>Especialistas en Contactologia y Cirugia Refractiva · Medellin</small>
-    <small>Dr. Leonardo Orjuela · lorjuela7@gmail.com</small>
+    <small>Contactologia Especializada y Optometria Especializada</small>
+    <small>drorjuela@lentesespecializados.com</small>
   </div>
   <div style="text-align:right;font-size:10px;color:#64748b;line-height:1.7">
     <strong style="font-size:13px;color:#1e293b;display:block">Curva de Desenfoque</strong>
