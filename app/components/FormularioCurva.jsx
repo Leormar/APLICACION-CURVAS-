@@ -81,10 +81,16 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
     if (!pacienteCargado) return
     const { paciente: p, examenes, refOD: rOD, refOI: rOI } = pacienteCargado
     const partes = (p.nombre || '').trim().split(' ')
-    if (partes.length >= 3) {
+    if (partes.length >= 4) {
+      // 4+ palabras: ultimas 2 apellidos, resto nombre
+      setNombre(partes.slice(0,-2).join(' '))
+      setApellido1(partes[partes.length-2])
+      setApellido2(partes[partes.length-1])
+    } else if (partes.length === 3) {
+      // 3 palabras: ultima = apellido2, penultima = apellido1, primera = nombre
       setNombre(partes[0])
       setApellido1(partes[1])
-      setApellido2(partes.slice(2).join(' '))
+      setApellido2(partes[2])
     } else if (partes.length === 2) {
       setNombre(partes[0])
       setApellido1(partes[1])
