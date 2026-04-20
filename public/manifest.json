@@ -1,13 +1,31 @@
 {
   "name": "PROLENS Curvas de Desenfoque",
   "short_name": "CurvasIOL",
-  "description": "App clínica para análisis de curvas de desenfoque en IOL multifocal",
+  "description": "App clinica para analisis de curvas de desenfoque en IOL multifocal y EDOF",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0c2461",
   "theme_color": "#1e40af",
   "orientation": "portrait",
+  "lang": "es",
+  "categories": ["medical", "health"],
   "icons": [
+    { "src": "/icons/icon-72.svg", "sizes": "72x72", "type": "image/svg+xml" },
+    { "src": "/icons/icon-96.svg", "sizes": "96x96", "type": "image/svg+xml" },
+    { "src": "/icons/icon-128.svg", "sizes": "128x128", "type": "image/svg+xml" },
+    { "src": "/icons/icon-144.svg", "sizes": "144x144", "type": "image/svg+xml" },
+    { "src": "/icons/icon-152.svg", "sizes": "152x152", "type": "image/svg+xml" },
+    { "src": "/icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "maskable" },
+    { "src": "/icons/icon-384.svg", "sizes": "384x384", "type": "image/svg+xml" },
+    { "src": "/icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" },
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nueva curva",
+      "url": "/",
+      "description": "Ingresar nueva curva de desenfoque"
+    }
   ]
 }
