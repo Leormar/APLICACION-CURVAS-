@@ -106,16 +106,16 @@ export async function POST(req) {
       const columnaTexto = textoAI
         ? `<div>
             <div style="font-size:11px;font-weight:bold;color:#1e293b;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #e2e8f0">${tituloAI}</div>
-            <div style="font-size:11px;color:#1e293b;line-height:1.9">${limpiarLateral(textoAI)}</div>
+            <div style="font-size:11px;color:#1e293b;line-height:1.9;flex:1;min-width:0">${limpiarLateral(textoAI)}</div>
            </div>`
         : `<div style="font-size:10px;color:#94a3b8;font-style:italic;padding-top:4px">Presiona "Interpretar curva" antes de generar el PDF para obtener el análisis clínico.</div>`
       return `<div style="margin-top:14px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;page-break-inside:avoid">
         <div style="background:${color};color:white;padding:9px 16px;font-size:14px;font-weight:bold">
           ${titulo}${iol&&iol!=='—'&&iol?' · <span style="font-weight:400;font-size:12px">${iol}</span>':''}
         </div>
-        <div style="padding:10px 14px;display:grid;grid-template-columns:355px 1fr;gap:16px;align-items:start">
+        <div style="padding:10px 14px;display:flex;flex-direction:row;gap:14px;align-items:flex-start">
           <div>
-            ${graficaSVG(med, color)}
+            <div style="flex-shrink:0;width:340px">${graficaSVG(med, color)}</div>
             <div style="font-size:9px;color:#0369a1;margin:4px 0 0;padding:4px 8px;background:#f0f9ff;border-radius:4px;border-left:3px solid #0369a1">
               Rango funcional (≤0.2 LogMAR): <strong>${funcional}</strong>
             </div>
