@@ -59,7 +59,8 @@ const defocusToKey = (defVal) => {
 
 export default function FormularioCurva({ onMedicionesChange, onGuardado, pacienteCargado }) {
   const [nombre, setNombre] = useState('')
-  const [apellido, setApellido] = useState('')
+  const [apellido1, setApellido1] = useState('')
+  const [apellido2, setApellido2] = useState('')
   const [documento, setDocumento] = useState('')
   const [fechaNac, setFechaNac] = useState('')
   const [ojo, setOjo] = useState('OD')
@@ -74,14 +75,25 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
   const [guardando, setGuardando] = useState(false)
   const inputRefs = useRef({})
 
-  const nombreCompleto = `${nombre} ${apellido}`.trim()
+  const nombreCompleto = `${nombre} ${apellido1} ${apellido2}`.trim().replace(/\s+/g,' ')
 
   useEffect(() => {
     if (!pacienteCargado) return
     const { paciente: p, examenes, refOD: rOD, refOI: rOI } = pacienteCargado
     const partes = (p.nombre || '').trim().split(' ')
-    if (partes.length >= 2) { setNombre(partes.slice(0,-1).join(' ')); setApellido(partes[partes.length-1]) }
-    else { setNombre(p.nombre||''); setApellido('') }
+    if (partes.length >= 3) {
+      setNombre(partes[0])
+      setApellido1(partes[1])
+      setApellido2(partes.slice(2).join(' '))
+    } else if (partes.length === 2) {
+      setNombre(partes[0])
+      setApellido1(partes[1])
+      setApellido2('')
+    } else {
+      setNombre(p.nombre||'')
+      setApellido1('')
+      setApellido2('')
+    }
     setDocumento(p.documento||'')
     if (p.fecha_nacimiento) setFechaNac(p.fecha_nacimiento.split('T')[0])
     if (rOD) setRefOD(rOD)
@@ -194,9 +206,13 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
     <div style={{ background:'white', borderRadius:'12px', padding:'1rem', boxShadow:'0 1px 4px rgba(0,0,0,0.08)' }}>
       <h2 style={{ margin:'0 0 0.75rem', fontSize:'1rem', color:'#1e293b' }}>Datos del paciente</h2>
 
+      <div style={{ marginBottom:'0.5rem' }}>
+        <label style={s.lbl}>Nombre</label>
+        <input style={s.inp} value={nombre} onChange={e=>setNombre(e.target.value)} placeholder="Nombre(s)" />
+      </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.5rem' }}>
-        <div><label style={s.lbl}>Nombre</label><input style={s.inp} value={nombre} onChange={e=>setNombre(e.target.value)} placeholder="Nombre" /></div>
-        <div><label style={s.lbl}>Apellido</label><input style={s.inp} value={apellido} onChange={e=>setApellido(e.target.value)} placeholder="Apellido" /></div>
+        <div><label style={s.lbl}>Primer apellido</label><input style={s.inp} value={apellido1} onChange={e=>setApellido1(e.target.value)} placeholder="Primer apellido" /></div>
+        <div><label style={s.lbl}>Segundo apellido</label><input style={s.inp} value={apellido2} onChange={e=>setApellido2(e.target.value)} placeholder="Opcional" /></div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.5rem' }}>
         <div><label style={s.lbl}>Documento / ID</label><input style={s.inp} value={documento} onChange={e=>setDocumento(e.target.value)} placeholder="CC / Pasaporte" inputMode="numeric" /></div>
