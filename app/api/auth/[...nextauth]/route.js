@@ -1,6 +1,9 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import pool from '../../../../lib/db'
+import { Resend } from 'resend'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 const handler = NextAuth({
   providers: [
@@ -13,16 +16,31 @@ const handler = NextAuth({
     async signIn({ user }) {
       try {
         const { email, name, image } = user
-        // Buscar usuario
         const existing = await pool.query('SELECT * FROM usuarios WHERE email=$1', [email])
+
         if (existing.rows.length === 0) {
-          // Crear usuario pendiente
           await pool.query(
             'INSERT INTO usuarios (email, nombre, foto, estado) VALUES ($1,$2,$3,$4)',
             [email, name, image, 'pendiente']
           )
+          // Email al admin
+          await resend.emails.send({
+            from: 'PROLENS <onboarding@resend.dev>',
+            to: 'lorjuela7@gmail.com',
+            subject: '🔔 Nueva solicitud de acceso - PROLENS',
+            html: `<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:24px">
+              <h2 style="color:#1e40af">Nueva solicitud de acceso</h2>
+              <p><strong>Nombre:</strong> ${name}</p>
+              <p><strong>Email:</strong> ${email}</p>
+              <p>Ingresa al panel de administración para aprobar o rechazar.</p>
+              <a href="https://aplicacion-curvas.vercel.app/admin" style="display:inline-block;padding:10px 20px;background:#1e40af;color:white;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:12px">
+                Ver panel de admin
+              </a>
+            </div>`
+          })
           return '/pendiente'
         }
+
         const u = existing.rows[0]
         if (u.estado === 'aprobado') return true
         if (u.estado === 'rechazado') return '/rechazado'
