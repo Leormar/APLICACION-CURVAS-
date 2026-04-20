@@ -56,37 +56,21 @@ export async function POST(req) {
     const { paciente, documento, fechaNac, lentes, refOD, refOI, tipoAV, curvas, interpretacion, secciones } = await req.json()
     const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
     const edad = calcEdad(fechaNac)
-    const limpiar = t => {
-    return t
-      .replace(/#{1,6}s*/g,'')
-      .replace(/**/g,'')
-      .replace(/*/g,'')
-      .replace(/---/g,'')
-      .replace(/(ANALISIS OJO DERECHO[^
-]*)/gi, '<strong></strong>')
-      .replace(/(ANALISIS OJO IZQUIERDO[^
-]*)/gi, '<strong></strong>')
-      .replace(/(ANALISIS BINOCULAR[^
-]*)/gi, '<strong></strong>')
-      .replace(/(COMPORTAMIENTO DEL IOL[^
-]*)/gi, '<strong></strong>')
-      .replace(/(IMPACTO REFRACTIVO[^
-]*)/gi, '<strong></strong>')
-      .replace(/(RECOMENDACIONES[^
-]*)/gi, '<strong></strong>')
-      .trim()
-  }\s*/g,'')
-      .replace(/\*\*/g,'')
-      .replace(/\*/g,'')
-      .replace(/---/g,'')
-      .replace(/(ANALISIS OJO DERECHO[^\n]*)/gi, '<strong style="font-size:11px;color:#1e40af"></strong>')
-      .replace(/(ANALISIS OJO IZQUIERDO[^\n]*)/gi, '<strong style="font-size:11px;color:#0f766e"></strong>')
-      .replace(/(ANALISIS BINOCULAR[^\n]*)/gi, '<strong style="font-size:11px;color:#7c3aed"></strong>')
-      .replace(/(COMPORTAMIENTO DEL IOL[^\n]*)/gi, '<strong style="font-size:11px;color:#1e293b"></strong>')
-      .replace(/(IMPACTO REFRACTIVO[^\n]*)/gi, '<strong style="font-size:11px;color:#1e293b"></strong>')
-      .replace(/(RECOMENDACIONES[^\n]*)/gi, '<strong style="font-size:11px;color:#dc2626"></strong>')
-      .trim()
-  }
+    const limpiar = (t) => {
+  if (!t) return ''
+  return t
+    .replace(/#{1,6}\s*/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/---/g, '')
+    .replace(/(ANALISIS OJO DERECHO[^\n]*)/gi, '<strong>$1</strong>')
+    .replace(/(ANALISIS OJO IZQUIERDO[^\n]*)/gi, '<strong>$1</strong>')
+    .replace(/(ANALISIS BINOCULAR[^\n]*)/gi, '<strong>$1</strong>')
+    .replace(/(COMPORTAMIENTO DEL IOL[^\n]*)/gi, '<strong>$1</strong>')
+    .replace(/(IMPACTO REFRACTIVO[^\n]*)/gi, '<strong>$1</strong>')
+    .replace(/(RECOMENDACIONES[^\n]*)/gi, '<strong>$1</strong>')
+    .trim()
+}
 
     const seccion = (med, titulo, color, iol, textoAI) => {
       if (!med || med.length === 0) return ''
