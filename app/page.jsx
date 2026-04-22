@@ -19,6 +19,8 @@ export default function Home() {
   const [interpretacion, setInterpretacion] = useState('')
   const [secciones, setSecciones] = useState(null)
   const [generandoPDF, setGenerandoPDF] = useState(false)
+  const [perfil, setPerfil] = useState(null)
+  const [mostrarPerfil, setMostrarPerfil] = useState(false)
   const [vistaMovil, setVistaMovil] = useState('formulario')
   const [aceptoTerminos, setAceptoTerminos] = useState(false)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
