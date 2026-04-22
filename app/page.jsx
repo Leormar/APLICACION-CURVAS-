@@ -27,10 +27,6 @@ export default function Home() {
   useEffect(() => {
     if (session?.user?.estado === 'aprobado') {
       setAceptoTerminos(true)
-      if (session.user.tutorial_completado !== true) {
-        router.push('/tutorial')
-        return
-      }
       fetch('/api/perfil').then(r=>r.json()).then(d => {
         if (d.perfil) setPerfil(d.perfil)
         else setMostrarPerfil(true)
