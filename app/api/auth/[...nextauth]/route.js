@@ -63,7 +63,10 @@ const handler = NextAuth({
       } catch(e) {}
       return session
     },
-    async jwt({ token }) { return token }
+    async jwt({ token, trigger }) {
+      // Forzar reload en cada session update
+      return { ...token, iat: Date.now() }
+    }
   },
   pages: { signIn: '/login', error: '/login' },
   secret: process.env.NEXTAUTH_SECRET,
