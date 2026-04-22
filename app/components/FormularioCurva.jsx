@@ -113,7 +113,6 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
       const ojoKey = curva.ojo
       if (!nuevosLogMAR[ojoKey]) { nuevosLogMAR[ojoKey] = {}; nuevosDisplay[ojoKey] = {} }
       if (ojoKey !== 'AO' && curva.iol && curva.iol !== '—') nuevosLentes[ojoKey] = curva.iol
-      console.log("mediciones:", JSON.stringify(curva.mediciones?.slice(0,2)))
       curva.mediciones?.forEach(m => {
         if (m.defocus !== null && m.agudeza !== null) {
           const key = defocusToKey(m.defocus)
