@@ -9,15 +9,11 @@ export async function GET(req) {
     const session = await getServerSession()
     const usuarioEmail = session?.user?.email
     const esAdmin = session?.user?.rol === 'admin'
-
     const campo = tipo === 'documento' ? 'p.documento' : 'p.nombre'
 
-    let whereClause
-    if (esAdmin) {
-      whereClause = `WHERE ${campo} ILIKE $1`
-    } else {
-      whereClause = `WHERE ${campo} ILIKE $1 AND (p.creado_por = $2 OR p.creado_por IS NULL OR p.creado_por = 'sistema')`
-    }
+    const whereClause = esAdmin
+      ? `WHERE ${campo} ILIKE $1`
+      : `WHERE ${campo} ILIKE $1 AND (p.creado_por = $2 OR p.creado_por IS NULL OR p.creado_por = 'sistema')`
 
     const params = esAdmin ? [`%${q}%`] : [`%${q}%`, usuarioEmail]
 
