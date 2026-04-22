@@ -171,7 +171,7 @@ export default function Home() {
           <h2 style={{ margin:'1rem 0 0.5rem', fontSize:'1.5rem' }}>Solicitud pendiente</h2>
           <p style={{ opacity:0.85, lineHeight:1.7 }}>Hola <strong>{session.user.name}</strong>, tu solicitud está pendiente de aprobación por el administrador.</p>
           <p style={{ opacity:0.6, fontSize:'0.85rem', marginTop:'0.75rem' }}>Contacta al Dr. Leonardo Orjuela si necesitas acceso urgente.</p>
-          <button onClick={() => signOut({ callbackUrl: '/' })} style={{ marginTop:'1.5rem', padding:'0.75rem 2rem', background:'white', color:'#1e40af', border:'none', borderRadius:'10px', fontWeight:700, cursor:'pointer' }}>
+          <button onClick={() => signOut({ callbackUrl: '/login' })} style={{ marginTop:'1.5rem', padding:'0.75rem 2rem', background:'white', color:'#1e40af', border:'none', borderRadius:'10px', fontWeight:700, cursor:'pointer' }}>
             Cerrar sesión
           </button>
         </div>
@@ -186,7 +186,7 @@ export default function Home() {
           <LogoProlens size={80} />
           <h2 style={{ margin:'1rem 0 0.5rem' }}>Acceso denegado</h2>
           <p style={{ opacity:0.85 }}>Tu solicitud fue rechazada. Contacta al administrador.</p>
-          <button onClick={() => signOut({ callbackUrl: '/' })} style={{ marginTop:'1.5rem', padding:'0.75rem 2rem', background:'white', color:'#991b1b', border:'none', borderRadius:'10px', fontWeight:700, cursor:'pointer' }}>
+          <button onClick={() => signOut({ callbackUrl: '/login' })} style={{ marginTop:'1.5rem', padding:'0.75rem 2rem', background:'white', color:'#991b1b', border:'none', borderRadius:'10px', fontWeight:700, cursor:'pointer' }}>
             Cerrar sesión
           </button>
         </div>
@@ -238,7 +238,7 @@ export default function Home() {
             )}
             <div style={{ display:'flex', alignItems:'center', gap:'6px' }}>
               {session.user.image && <img src={session.user.image} style={{ width:28, height:28, borderRadius:'50%', border:'2px solid #1e40af' }} />}
-              <button onClick={() => signOut({ callbackUrl: '/' })}
+              <button onClick={() => signOut({ callbackUrl: '/login' })}
                 style={{ padding:'4px 10px', background:'#f1f5f9', color:'#64748b', border:'none', borderRadius:'6px', fontSize:'0.75rem', cursor:'pointer' }}>
                 Salir
               </button>
