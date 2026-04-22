@@ -58,6 +58,7 @@ const handler = NextAuth({
           session.user.estado = res.rows[0].estado
           session.user.rol = res.rows[0].rol
           session.user.id = res.rows[0].id
+          session.user.tutorial_completado = res.rows[0].tutorial_completado
         }
       } catch(e) {}
       return session

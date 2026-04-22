@@ -7,8 +7,8 @@ export async function POST() {
     const email = session?.user?.email
     if (!email) return Response.json({ error: 'No autenticado' }, { status: 401 })
     await pool.query(
-      'UPDATE usuarios SET notas=$1 WHERE email=$2',
-      ['tutorial_completado', email]
+      'UPDATE usuarios SET tutorial_completado=TRUE WHERE email=$1',
+      [email]
     )
     return Response.json({ ok: true })
   } catch(e) {
