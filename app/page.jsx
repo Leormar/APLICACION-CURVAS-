@@ -27,6 +27,7 @@ export default function Home() {
   useEffect(() => {
     if (session?.user?.estado === 'aprobado') {
       setAceptoTerminos(true)
+      if (session.user.tutorial_completado !== true) {
         router.push('/tutorial')
         return
       }
