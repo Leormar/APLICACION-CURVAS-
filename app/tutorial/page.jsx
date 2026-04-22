@@ -245,7 +245,9 @@ export default function Tutorial() {
               </div>
 
               <div style={{ background:'#f8fafc', borderRadius:'12px', padding:'1.25rem', marginBottom:'1.25rem', borderLeft:`4px solid ${tema.color}` }}>
-                <div style={{ fontSize:'2.5rem', marginBottom:'0.75rem', textAlign:'center' }}>{paso.imagen}</div>
+                <div style={{ display:'flex', justifyContent:'center', marginBottom:'0.75rem' }} dangerouslySetInnerHTML={{__html: 
+    paso.svgIcon || '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/></svg>'
+  }} />
                 <h2 style={{ margin:'0 0 0.75rem', fontSize:'1.1rem', color:'#1e293b', fontWeight:700 }}>{paso.titulo}</h2>
                 <p style={{ margin:0, fontSize:'0.92rem', color:'#475569', lineHeight:1.75 }}>{paso.contenido}</p>
               </div>
