@@ -15,7 +15,7 @@ export async function GET(req) {
     // Admin ve todos, usuario solo los suyos
     const filtroUsuario = esAdmin
       ? ''
-      : `AND (p.creado_por = '${usuarioEmail}' OR p.creado_por IS NULL)`
+      : `AND (p.creado_por = '${usuarioEmail}' OR p.creado_por IS NULL OR p.creado_por = 'sistema')`
 
     const res = await pool.query(
       `SELECT
