@@ -154,7 +154,7 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
                             </div>
                           </div>
                           <button
-                            onClick={() => onCargar({ paciente: p, examenes: examen.curvas })}
+                            onClick={() => onCargar({ paciente: p, examenes: examen.curvas, refOD: examen.curvas[0]?.refOD||"", refOI: examen.curvas[0]?.refOI||"" })}
                             style={{ padding:'5px 14px', background:'#1e40af', color:'white', border:'none', borderRadius:'7px', fontSize:'0.8rem', cursor:'pointer', fontWeight:600 }}>
                             Cargar examen →
                           </button>
