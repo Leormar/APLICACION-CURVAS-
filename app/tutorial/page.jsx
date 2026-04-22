@@ -7,23 +7,23 @@ import LogoProlens from '../components/LogoProlens'
 const TUTORIAL = [
   {
     tema: 'Medición por vergencias',
-    icono: '🔬',
+    icono: '📐',
     color: '#1e40af',
     pasos: [
       {
         titulo: 'Corrección subjetiva',
         contenido: 'El examen se realiza con la mejor corrección subjetiva del paciente. Se refracta al paciente y si mejora la AV en visión lejana por encima de 20/25, se usa esa corrección durante toda la medición de la curva de desenfoque.',
-        imagen: '👓'
+        imagen: '🩺'
       },
       {
         titulo: 'Orden de medición',
         contenido: 'Se mide desde visión próxima (-5D) hacia visión lejana (0D) en pasos de 0.50D usando lentes de prueba o foróptero. Luego se continúa con vergencias positivas (+0.50D y +1.00D).',
-        imagen: '📏'
+        imagen: '📐'
       },
       {
         titulo: 'Registro de AV',
         contenido: 'En cada vergencia se registra la mejor agudeza visual lograda en escala Decimal, LogMAR o Snellen. Se deben esperar 3-5 segundos de adaptación antes de anotar el valor.',
-        imagen: '📋'
+        imagen: '✍️'
       }
     ],
     preguntas: [
@@ -61,23 +61,23 @@ const TUTORIAL = [
   },
   {
     tema: 'Interpretación de la curva',
-    icono: '📈',
+    icono: '📊',
     color: '#7c3aed',
     pasos: [
       {
         titulo: 'Rango funcional',
         contenido: 'El rango funcional corresponde a todas las vergencias donde el paciente logra una AV de 0.2 LogMAR o mejor (equivalente a 20/32 en Snellen). Este rango indica las distancias donde el paciente tiene visión funcionalmente útil para las actividades diarias.',
-        imagen: '✅'
+        imagen: '🎯'
       },
       {
         titulo: 'Tipos de curva según IOL',
         contenido: 'Una curva trifocal muestra 3 picos definidos (lejos, intermedio y cerca). Una EDOF muestra una meseta extendida sin caídas bruscas. Una multifocal full range combina ambas características mostrando una curva amplia y continua desde visión lejana hasta muy próxima sin valles significativos.',
-        imagen: '🔭'
+        imagen: '📊'
       },
       {
         titulo: 'Comparación OD vs OI vs AO',
         contenido: 'La comparación entre ojo derecho, ojo izquierdo y ambos ojos permite detectar asimetrías entre los dos ojos. La curva binocular (AO) debe mostrar sumación binocular positiva, es decir, un rendimiento igual o superior al mejor ojo individual.',
-        imagen: '👁'
+        imagen: '⚖️'
       }
     ],
     preguntas: [
