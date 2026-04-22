@@ -31,6 +31,26 @@ export default function Home() {
         if (d.perfil) setPerfil(d.perfil)
         else setMostrarPerfil(true)
       })
+      // Cargar paciente de prueba automaticamente
+      fetch('/api/pacientes?q=Paciente+de+Prueba&tipo=apellido')
+        .then(r=>r.json())
+        .then(data => {
+          if (!data.pacientes || data.pacientes.length === 0) return
+          const rows = data.pacientes
+          const pac = { nombre: rows[0].nombre, documento: rows[0].documento, fecha_nacimiento: rows[0].fecha_nacimiento }
+          const examenes = rows.map(r => ({
+            ojo: r.ojo,
+            iol: r.notas ? (()=>{ try{ return JSON.parse(r.notas).iol||'' }catch(e){ return '' } })() : '',
+            mediciones: r.mediciones || [],
+            refOD: r.notas ? (()=>{ try{ return JSON.parse(r.notas).refOD||'' }catch(e){ return '' } })() : '',
+            refOI: r.notas ? (()=>{ try{ return JSON.parse(r.notas).refOI||'' }catch(e){ return '' } })() : ''
+          }))
+          const refOD = examenes[0]?.refOD || ''
+          const refOI = examenes[0]?.refOI || ''
+          setPacienteCargado({ paciente: pac, examenes, refOD, refOI })
+          setDatos({ paciente: pac.nombre, documento: pac.documento, fechaNac: pac.fecha_nacimiento?.split?.('T')[0]||'', lentes:{OD:'',OI:''}, refOD, refOI, tipoAV:'logmar' })
+        })
+        .catch(()=>{})
       // Cargar paciente de prueba si es primera vez
       const yaVioPrueba = sessionStorage.getItem('prueba_cargada')
       if (!yaVioPrueba) {
@@ -260,6 +280,10 @@ export default function Home() {
                 ⚙️ Admin
               </a>
             )}
+            <a href="/tutorial"
+              style={{padding:'0.45rem 0.8rem',background:'#f1f5f9',color:'#475569',border:'1px solid #e2e8f0',borderRadius:'8px',fontSize:'0.78rem',textDecoration:'none',fontWeight:500,whiteSpace:'nowrap'}}>
+              📚 Tutorial
+            </a>
             <button onClick={()=>setMostrarBuscador(true)}
               style={{ padding:'0.45rem 0.8rem', background:'white', color:'#1e40af', border:'2px solid #1e40af', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500 }}>
               🔍 Buscar
