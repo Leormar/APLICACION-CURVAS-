@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react'
 import LogoProlens from './LogoProlens'
 
-export default function ModalPerfil({ onGuardado, perfilInicial }) {
+export default function ModalPerfil({ onGuardado, perfilInicial, obligatorio }) {
   const [nombre, setNombre] = useState(perfilInicial?.nombre_completo || '')
   const [especialidad, setEspecialidad] = useState(perfilInicial?.especialidad || '')
   const [emailProf, setEmailProf] = useState(perfilInicial?.email_profesional || '')
@@ -52,7 +52,9 @@ export default function ModalPerfil({ onGuardado, perfilInicial }) {
         <div style={{ textAlign:'center', marginBottom:'1.25rem' }}>
           <LogoProlens size={56} />
           <h2 style={{ margin:'10px 0 4px', color:'#1e40af', fontSize:'1.2rem', fontWeight:800 }}>Perfil del profesional</h2>
-          <p style={{ margin:0, fontSize:'0.82rem', color:'#64748b' }}>Esta información aparecerá en los informes PDF</p>
+          <p style={{ margin:0, fontSize:'0.82rem', color:obligatorio?'#dc2626':'#64748b', fontWeight:obligatorio?600:400 }}>
+    {obligatorio ? '⚠️ Completa tu perfil para continuar — aparecerá en tus informes PDF' : 'Esta información aparecerá en los informes PDF'}
+  </p>
         </div>
 
         {/* Logo */}
@@ -98,6 +100,11 @@ export default function ModalPerfil({ onGuardado, perfilInicial }) {
           </div>
         </div>
 
+        {obligatorio && (
+          <div style={{ background:'#fef3c7', border:'1px solid #f59e0b', borderRadius:'8px', padding:'10px 12px', marginBottom:'0.75rem', fontSize:'0.82rem', color:'#92400e' }}>
+            <strong>Primera vez en la app</strong> — necesitas completar tu perfil profesional para generar informes PDF correctamente.
+          </div>
+        )}
         {error && <p style={{ color:'#ef4444', fontSize:'0.82rem', margin:'0 0 0.75rem', padding:'8px', background:'#fef2f2', borderRadius:'6px' }}>{error}</p>}
 
         <button onClick={handleGuardar} disabled={guardando}
