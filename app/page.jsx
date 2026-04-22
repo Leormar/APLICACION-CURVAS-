@@ -20,7 +20,6 @@ export default function Home() {
   const [secciones, setSecciones] = useState(null)
   const [generandoPDF, setGenerandoPDF] = useState(false)
   const [vistaMovil, setVistaMovil] = useState('formulario')
-  const [verificandoTutorial, setVerificandoTutorial] = useState(true)
   const [aceptoTerminos, setAceptoTerminos] = useState(false)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
 
@@ -120,8 +119,8 @@ export default function Home() {
 
   const ojosConDatos = Object.entries(curvas).filter(([,m])=>m.length>=2)
 
-  // Cargando sesión o verificando tutorial
-  if (status === 'loading' || (session && verificandoTutorial)) {
+  // Cargando sesión
+  if (status === 'loading') {
     return (
       <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(160deg, #0c2461 0%, #1e40af 100%)' }}>
         <div style={{ textAlign:'center', color:'white' }}>
