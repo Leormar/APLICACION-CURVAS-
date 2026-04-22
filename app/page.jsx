@@ -25,7 +25,17 @@ export default function Home() {
 
   // Si el usuario está autenticado y aprobado, no necesita aceptar términos manualmente
   useEffect(() => {
-    if (session?.user?.estado === 'aprobado') setAceptoTerminos(true)
+    if (session?.user?.estado === 'aprobado') {
+      setAceptoTerminos(true)
+      const tutorialOk = localStorage.getItem('tutorial_' + session.user.email)
+        router.push('/tutorial')
+        return
+      }
+      fetch('/api/perfil').then(r=>r.json()).then(d=>{
+        if (d.perfil) setPerfil(d.perfil)
+        else setMostrarPerfil(true)
+      })
+    }
   }, [session])
 
   const handleMediciones = (ojo, mediciones, lente) => {
