@@ -27,7 +27,7 @@ export default function Home() {
   useEffect(() => {
     if (session?.user?.estado === 'aprobado') {
       setAceptoTerminos(true)
-undefined    fetch('/api/perfil').then(r=>r.json()).then(d => {
+      fetch('/api/perfil').then(r=>r.json()).then(d => {
         if (d.perfil) setPerfil(d.perfil)
         else setMostrarPerfil(true)
       })
