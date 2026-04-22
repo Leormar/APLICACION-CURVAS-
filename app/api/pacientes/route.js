@@ -12,10 +12,14 @@ export async function GET(req) {
 
     const campo = tipo === 'documento' ? 'p.documento' : 'p.nombre'
 
-    // Admin ve todos, usuario solo los suyos
-    const filtroUsuario = esAdmin
-      ? ''
-      : `AND (p.creado_por = '${usuarioEmail}' OR p.creado_por IS NULL OR p.creado_por = 'sistema')`
+    let whereClause
+    if (esAdmin) {
+      whereClause = `WHERE ${campo} ILIKE $1`
+    } else {
+      whereClause = `WHERE ${campo} ILIKE $1 AND (p.creado_por = $2 OR p.creado_por IS NULL OR p.creado_por = 'sistema')`
+    }
+
+    const params = esAdmin ? [`%${q}%`] : [`%${q}%`, usuarioEmail]
 
     const res = await pool.query(
       `SELECT
@@ -31,11 +35,11 @@ export async function GET(req) {
        FROM pacientes p
        LEFT JOIN curvas c ON c.paciente_id = p.id
        LEFT JOIN mediciones m ON m.curva_id = c.id
-       WHERE ${campo} ILIKE $1 ${filtroUsuario}
+       ${whereClause}
        GROUP BY p.id, p.nombre, p.documento, p.fecha_nacimiento, p.creado_por,
                 c.id, c.ojo, c.notas, c.fecha, c.usuario_email
        ORDER BY p.nombre, c.fecha DESC`,
-      [`%${q}%`]
+      params
     )
     return Response.json({ pacientes: res.rows })
   } catch(e) {
