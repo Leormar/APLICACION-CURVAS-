@@ -28,10 +28,7 @@ export default function Home() {
     if (session?.user?.estado === 'aprobado') {
       setAceptoTerminos(true)
       const tutorialOk = localStorage.getItem('tutorial_' + session.user.email)
-        router.push('/tutorial')
-        return
-      }
-      fetch('/api/perfil').then(r=>r.json()).then(d=>{
+      fetch('/api/perfil').then(r=>r.json()).then(d => {
         if (d.perfil) setPerfil(d.perfil)
         else setMostrarPerfil(true)
       })
