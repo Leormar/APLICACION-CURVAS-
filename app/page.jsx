@@ -236,11 +236,12 @@ export default function Home() {
                 {generandoPDF?'⏳':'📄 PDF'}
               </button>
             )}
-            <div style={{ display:'flex', alignItems:'center', gap:'6px' }}>
-              {session.user.image && <img src={session.user.image} style={{ width:28, height:28, borderRadius:'50%', border:'2px solid #1e40af' }} />}
+            <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'4px 10px', background:'#f1f5f9', borderRadius:'20px' }}>
+              {session.user.image && <img src={session.user.image} style={{ width:26, height:26, borderRadius:'50%' }} />}
+              <span style={{ fontSize:'0.72rem', color:'#475569', fontWeight:500, maxWidth:'120px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.user.email}</span>
               <button onClick={() => signOut({ callbackUrl: '/login' })}
-                style={{ padding:'4px 10px', background:'#f1f5f9', color:'#64748b', border:'none', borderRadius:'6px', fontSize:'0.75rem', cursor:'pointer' }}>
-                Salir
+                style={{ padding:'5px 12px', background:'#ef4444', color:'white', border:'none', borderRadius:'14px', fontSize:'0.75rem', cursor:'pointer', fontWeight:600 }}>
+                Cerrar sesión
               </button>
             </div>
           </div>
