@@ -20,6 +20,7 @@ export default function Home() {
   const [secciones, setSecciones] = useState(null)
   const [generandoPDF, setGenerandoPDF] = useState(false)
   const [vistaMovil, setVistaMovil] = useState('formulario')
+  const [verificandoTutorial, setVerificandoTutorial] = useState(true)
   const [aceptoTerminos, setAceptoTerminos] = useState(false)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
 
@@ -31,10 +32,40 @@ export default function Home() {
         router.push('/tutorial')
         return
       }
+      setVerificandoTutorial(false)
       fetch('/api/perfil').then(r=>r.json()).then(d => {
         if (d.perfil) setPerfil(d.perfil)
         else setMostrarPerfil(true)
       })
+      // Cargar paciente de prueba si es primera vez
+      const yaVioPrueba = sessionStorage.getItem('prueba_cargada')
+      if (!yaVioPrueba) {
+        sessionStorage.setItem('prueba_cargada', 'true')
+        fetch('/api/pacientes?q=Paciente+de+Prueba&tipo=apellido')
+          .then(r=>r.json())
+          .then(data => {
+            if (data.pacientes && data.pacientes.length > 0) {
+              // Agrupar por paciente
+              const p = data.pacientes[0]
+              const examenes = data.pacientes.filter(x=>x.nombre===p.nombre)
+              if (examenes.length > 0) {
+                setPacienteCargado({
+                  paciente: { nombre: p.nombre, documento: p.documento, fecha_nacimiento: p.fecha_nacimiento },
+                  examenes: examenes.map(e=>({
+                    ojo: e.ojo,
+                    iol: e.notas ? JSON.parse(e.notas||'{}').iol : '',
+                    mediciones: e.mediciones || [],
+                    refOD: '', refOI: ''
+                  })),
+                  refOD: '', refOI: ''
+                })
+              }
+            }
+          })
+          .catch(()=>{})
+      }
+    } else {
+      setVerificandoTutorial(false)
     }
   }, [session])
 
@@ -89,8 +120,8 @@ export default function Home() {
 
   const ojosConDatos = Object.entries(curvas).filter(([,m])=>m.length>=2)
 
-  // Cargando sesión
-  if (status === 'loading') {
+  // Cargando sesión o verificando tutorial
+  if (status === 'loading' || (session && verificandoTutorial)) {
     return (
       <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(160deg, #0c2461 0%, #1e40af 100%)' }}>
         <div style={{ textAlign:'center', color:'white' }}>
