@@ -31,7 +31,6 @@ export default function Home() {
         router.push('/tutorial')
         return
       }
-      setVerificandoTutorial(false)
       fetch('/api/perfil').then(r=>r.json()).then(d => {
         if (d.perfil) setPerfil(d.perfil)
         else setMostrarPerfil(true)
@@ -64,7 +63,6 @@ export default function Home() {
           .catch(()=>{})
       }
     } else {
-      setVerificandoTutorial(false)
     }
   }, [session])
 
