@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soporte · Curvas de Desenfoque</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
+  body {
+    font-family: 'Nunito Sans', -apple-system, sans-serif;
+    background: #f8f9fa;
+    color: #1a1a1a;
+    line-height: 1.7;
+  }
+  header {
+    background: #1a237e;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .logo-wrap { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 8px; }
+  .logo-circle { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; }
+  header h1 { font-size: 22px; font-weight: 800; color: white; letter-spacing: 0.04em; }
+  header p { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+  main { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .page-title { font-size: 28px; font-weight: 800; color: #1a237e; margin-bottom: 8px; }
+  .subtitle { font-size: 15px; color: #666; margin-bottom: 40px; }
+
+  /* Contact card */
+  .contact-card {
+    background: #1a237e;
+    border-radius: 18px;
+    padding: 32px;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+  .contact-card h2 { font-size: 20px; font-weight: 800; color: white; margin-bottom: 6px; }
+  .contact-card p { font-size: 15px; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+  .contact-card a {
+    display: inline-block;
+    margin-top: 16px;
+    background: white;
+    color: #1a237e;
+    font-size: 16px;
+    font-weight: 800;
+    padding: 14px 32px;
+    border-radius: 12px;
+    text-decoration: none;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a237e;
+    margin: 36px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e8eaf6;
+  }
+
+  .faq-item {
+    background: white;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    border: 1px solid #e8eaf6;
+  }
+
+  .faq-q {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a237e;
+    margin-bottom: 8px;
+  }
+
+  .faq-a {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.6;
+  }
+
+  .steps {
+    counter-reset: steps;
+    list-style: none;
+    margin: 0 0 20px;
+    padding: 0;
+  }
+
+  .steps li {
+    counter-increment: steps;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    font-size: 15px;
+    color: #333;
+  }
+
+  .steps li::before {
+    content: counter(steps);
+    background: #1a237e;
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: #e8eaf6;
+    color: #1a237e;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+
+  .badge.green { background: #e8f5e9; color: #2e7d32; }
+  .badge.orange { background: #fff8e1; color: #e65100; }
+
+  footer {
+    text-align: center;
+    padding: 32px;
+    background: #1a237e;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <div class="logo-circle">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="11" stroke="white" stroke-width="1.5" opacity="0.4"/>
+        <circle cx="14" cy="14" r="7" stroke="white" stroke-width="1.5" opacity="0.7"/>
+        <circle cx="14" cy="14" r="3" fill="white"/>
+      </svg>
+    </div>
+    <h1>PROLENS · Curvas de Desenfoque</h1>
+  </div>
+  <p>Dr. Leonardo Orjuela · Medellín, Colombia</p>
+</header>
+
+<main>
+  <div class="page-title">Centro de Soporte</div>
+  <div class="subtitle">Ayuda para profesionales de salud visual · Oftalmólogos y optómetras</div>
+
+  <div class="contact-card">
+    <h2>¿Necesita ayuda directa?</h2>
+    <p>Respondemos en menos de 24 horas hábiles</p>
+    <p>Dr. Leonardo Orjuela · Medellín, Colombia</p>
+    <a href="mailto:drorjuela@lentesesspecializados.com">drorjuela@lentesesspecializados.com</a>
+  </div>
+
+  <h2>Preguntas frecuentes</h2>
+
+  <div class="faq-item">
+    <div class="badge green">Cuenta</div>
+    <div class="faq-q">¿Cómo inicio sesión en la app?</div>
+    <div class="faq-a">La app usa autenticación segura con Google. Toque el botón "Ingresar" y seleccione su cuenta de Google institucional o personal registrada.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="badge">Funcionalidad</div>
+    <div class="faq-q">¿Qué incluye la prueba gratuita?</div>
+    <div class="faq-a">La prueba gratuita permite explorar la interfaz, el formulario de ingreso y visualizar las gráficas. El registro de curvas en la base de datos y el análisis clínico con inteligencia artificial requieren suscripción activa.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="badge">Funcionalidad</div>
+    <div class="faq-q">¿Cómo genero el análisis AI de una curva?</div>
+    <div class="faq-a">Una vez ingresados los datos del paciente y las mediciones de agudeza visual, vaya a la pestaña "Gráficas" y toque el botón "✨ Interpretar curva". El análisis se genera en segundos e incluye comportamiento del IOL, vergencias, predominancia visual y recomendaciones.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="badge">Funcionalidad</div>
+    <div class="faq-q">¿Cómo exporto el informe PDF?</div>
+    <div class="faq-a">Desde la pantalla de gráficas, toque "Imprimir / PDF" en la parte inferior. El informe incluye las curvas OD, OI y AO, el análisis AI y los datos del profesional.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="badge orange">Suscripción</div>
+    <div class="faq-q">¿Cómo cancelo mi suscripción?</div>
+    <div class="faq-a">Puede cancelar su suscripción en cualquier momento desde Configuración → Apple ID → Suscripciones en su iPhone, o contactándonos directamente por correo.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="badge">Datos</div>
+    <div class="faq-q">¿Qué pasa con los datos de mis pacientes si cancelo?</div>
+    <div class="faq-a">Sus datos permanecen disponibles para exportación durante 30 días tras la cancelación. Puede solicitar la eliminación completa de sus datos escribiéndonos a nuestro correo de soporte.</div>
+  </div>
+
+  <h2>Cómo registrar una curva paso a paso</h2>
+  <ol class="steps">
+    <li>Toque "+ Nuevo examen" en la pantalla principal</li>
+    <li>Ingrese los datos del paciente: nombre, ID, fecha de nacimiento</li>
+    <li>Registre la refracción residual (OD / OI) y el tipo de IOL implantada</li>
+    <li>Seleccione el ojo a evaluar: OD, OI o AO (ambos ojos)</li>
+    <li>Ingrese los valores de agudeza visual por cada vergencia</li>
+    <li>Vaya a "Gráficas" para visualizar la curva generada</li>
+    <li>Toque "Interpretar curva" para el análisis AI</li>
+    <li>Exporte el informe PDF con "Imprimir / PDF"</li>
+  </ol>
+
+  <h2>Compatibilidad</h2>
+  <div class="faq-item">
+    <div class="faq-a">
+      La aplicación es compatible con iPhone (iOS 15 o superior) y Android. También disponible como Progressive Web App (PWA) en <strong>aplicacion-curvas.vercel.app</strong> desde cualquier navegador moderno.
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  PROLENS · Curvas de Desenfoque · MAIdx sd Bench · Medellín, Colombia
+</footer>
+
+</body>
+</html>
