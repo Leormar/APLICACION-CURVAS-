@@ -84,6 +84,16 @@ export default function Home() {
     }
   }, [session])
 
+  const handleNuevoExamen = () => {
+    setCurvas({ OD: [], OI: [], AO: [] })
+    setLentes({ OD: '', OI: '' })
+    setDatos(null)
+    setPacienteCargado(null)
+    setInterpretacion('')
+    setSecciones(null)
+    setVistaMovil('formulario')
+  }
+
   const handleMediciones = (ojo, mediciones, lente) => {
     setCurvas(prev => ({ ...prev, [ojo]: mediciones }))
     if (ojo !== 'AO') setLentes(prev => ({ ...prev, [ojo]: lente }))
@@ -281,6 +291,12 @@ export default function Home() {
               <a href="/admin" style={{ padding:'0.4rem 0.8rem', background:'#7c3aed', color:'white', borderRadius:'8px', fontSize:'0.78rem', textDecoration:'none', fontWeight:500 }}>
                 ⚙️ Admin
               </a>
+            )}
+            {datos && (
+              <button onClick={handleNuevoExamen}
+                style={{padding:'0.45rem 0.8rem',background:'#f0fdf4',color:'#166534',border:'2px solid #166534',borderRadius:'8px',fontSize:'0.82rem',cursor:'pointer',fontWeight:600,touchAction:'manipulation',whiteSpace:'nowrap'}}>
+                ➕ Nuevo examen
+              </button>
             )}
             <a href="/tutorial"
               style={{padding:'0.45rem 0.8rem',background:'#f1f5f9',color:'#475569',border:'1px solid #e2e8f0',borderRadius:'8px',fontSize:'0.78rem',textDecoration:'none',fontWeight:500,whiteSpace:'nowrap'}}>
