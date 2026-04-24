@@ -22,6 +22,7 @@ export default function Home() {
   const [perfil, setPerfil] = useState(null)
   const [mostrarPerfil, setMostrarPerfil] = useState(false)
   const [vistaMovil, setVistaMovil] = useState('formulario')
+  const [formKey, setFormKey] = useState(0)
   const [aceptoTerminos, setAceptoTerminos] = useState(false)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
 
@@ -92,6 +93,7 @@ export default function Home() {
     setInterpretacion('')
     setSecciones(null)
     setVistaMovil('formulario')
+    setFormKey(k => k + 1)
   }
 
   const handleMediciones = (ojo, mediciones, lente) => {
@@ -332,7 +334,7 @@ export default function Home() {
         </div>
         <div className="layout-grid" style={{ display:'grid', gridTemplateColumns:'460px 1fr', gap:'1rem' }}>
           <div className="panel-formulario">
-            <FormularioCurva onMedicionesChange={handleMediciones} onGuardado={handleGuardado} pacienteCargado={pacienteCargado} />
+            <FormularioCurva key={formKey} onMedicionesChange={handleMediciones} onGuardado={handleGuardado} pacienteCargado={pacienteCargado} />
           </div>
           <div className="panel-graficas" style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
             {ojosConDatos.length===0 && (
