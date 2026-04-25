@@ -111,7 +111,7 @@ export async function POST(req) {
         : `<div style="font-size:10px;color:#94a3b8;font-style:italic;padding-top:4px">Presiona "Interpretar curva" antes de generar el PDF para obtener el análisis clínico.</div>`
       return `<div style="margin-top:14px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;page-break-inside:avoid">
         <div style="background:${color};color:white;padding:9px 16px;font-size:14px;font-weight:bold">
-          ${titulo}${iol&&iol!=='—'&&iol?' · <span style="font-weight:400;font-size:12px">${iol}</span>':''}
+          ${titulo}${iol&&iol!=='—'&&iol?` · <span style="font-weight:400;font-size:12px">${iol}</span>`:''}
         </div>
         <div style="padding:10px 14px;display:flex;flex-direction:row;gap:14px;align-items:flex-start">
           <div>
