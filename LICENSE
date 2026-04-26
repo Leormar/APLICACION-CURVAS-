@@ -1,0 +1,67 @@
+LICENCIA DE USO PROPIETARIO - PROLENS
+Copyright (c) 2026 Leonardo Orjuela - PROLENS · Lentes Especializados
+Medellín, Colombia · curvasdesenfoque.com
+
+TODOS LOS DERECHOS RESERVADOS
+
+Este software, incluyendo su código fuente, algoritmos, modelos clínicos,
+diseño de interfaz, base de datos de IOLs de referencia y el modelo MAIdx sd Bench,
+es propiedad exclusiva de Leonardo Orjuela (en adelante "el Autor").
+
+TÉRMINOS Y CONDICIONES:
+
+1. PROPIEDAD INTELECTUAL
+   Todo el contenido de este repositorio, incluyendo pero no limitado a:
+   - Código fuente y compilado
+   - Modelo clínico MAIdx sd Bench
+   - Base de datos de curvas de desenfoque de IOLs
+   - Algoritmo de clasificación de IOLs por morfología de curva
+   - Diseño visual e interfaz de usuario
+   - Documentación clínica y técnica
+   es propiedad exclusiva del Autor y está protegido por las leyes de
+   derechos de autor de Colombia (Ley 23 de 1982, Ley 44 de 1993 y
+   Decisión Andina 351 de 1993) y los tratados internacionales aplicables.
+
+2. RESTRICCIONES
+   Queda expresamente prohibido, sin autorización escrita previa del Autor:
+   a) Copiar, reproducir o distribuir el código fuente total o parcialmente
+   b) Modificar, adaptar o crear obras derivadas
+   c) Usar el software o cualquier parte del mismo con fines comerciales
+   d) Sublicenciar, vender, alquilar o transferir el software
+   e) Realizar ingeniería inversa o descompilar el software
+   f) Usar el nombre PROLENS, MAIdx sd Bench o cualquier marca asociada
+      sin autorización expresa del Autor
+
+3. USO AUTORIZADO
+   El acceso a este repositorio no otorga ningún derecho de uso, reproducción
+   o distribución. El uso del software está exclusivamente autorizado a través
+   de la plataforma oficial curvasdesenfoque.com bajo los términos de servicio
+   vigentes.
+
+4. PROPIEDAD DE DATOS
+   Los datos clínicos ingresados por los usuarios son propiedad de cada
+   profesional de salud visual registrado. El Autor se compromete a proteger
+   dichos datos conforme a la Ley 1581 de 2012 (Habeas Data) y el
+   Decreto 1377 de 2013 de la República de Colombia.
+
+5. MODELO MAIdx sd Bench
+   El modelo clínico MAIdx sd Bench, incluyendo su metodología, parámetros
+   de clasificación y algoritmos de análisis de curvas de desenfoque,
+   constituye un desarrollo original del Autor y está protegido como
+   secreto industrial y obra de autoría conforme a la legislación colombiana.
+
+6. EXENCIÓN DE RESPONSABILIDAD
+   El software se proporciona para apoyo diagnóstico únicamente. El Autor
+   no asume responsabilidad por decisiones clínicas basadas exclusivamente
+   en los resultados generados por la aplicación.
+
+7. JURISDICCIÓN
+   Este acuerdo se rige por las leyes de la República de Colombia.
+   Cualquier disputa será resuelta ante los tribunales competentes
+   de la ciudad de Medellín, Antioquia, Colombia.
+
+Para solicitar autorizaciones o información adicional:
+Leonardo Orjuela
+drorjuela@lentesespecializados.com
+curvasdesenfoque.com
+Medellín, Colombia
