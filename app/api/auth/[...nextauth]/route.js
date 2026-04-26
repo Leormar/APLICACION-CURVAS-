@@ -69,6 +69,30 @@ const handler = NextAuth({
     }
   },
   pages: { signIn: '/login', error: '/login' },
+events: {
+  async signInError({ error, user }) {
+    try {
+      await enviarEmail({
+        to: 'lorjuela7@gmail.com',
+        subject: '⚠️ Error de acceso - PROLENS',
+        html: `<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:24px;background:#f8fafc">
+          <div style="background:#991b1b;padding:16px 20px;border-radius:12px 12px 0 0">
+            <h2 style="color:white;margin:0;font-size:18px">⚠️ Error de acceso en PROLENS</h2>
+          </div>
+          <div style="background:white;padding:20px;border-radius:0 0 12px 12px;border:1px solid #e2e8f0">
+            <p><strong>Error:</strong> ${error || 'redirect_uri_mismatch u otro error OAuth'}</p>
+            <p><strong>Usuario:</strong> ${user?.email || 'desconocido'}</p>
+            <p><strong>Hora:</strong> ${new Date().toLocaleString('es-CO', {timeZone:'America/Bogota'})}</p>
+            <p style="color:#64748b;font-size:13px;margin-top:16px">Verifica la configuración OAuth en Google Cloud Console si el error persiste.</p>
+            <a href="https://console.cloud.google.com" style="display:inline-block;padding:10px 20px;background:#1e40af;color:white;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:12px">
+              Ir a Google Cloud Console
+            </a>
+          </div>
+        </div>`
+      })
+    } catch(e) { console.error('Error enviando notificación:', e) }
+  }
+},
   secret: process.env.NEXTAUTH_SECRET,
 })
 
