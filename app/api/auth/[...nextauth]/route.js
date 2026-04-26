@@ -35,7 +35,7 @@ const handler = NextAuth({
               <p><strong>Nombre:</strong> ${name}</p>
               <p><strong>Email:</strong> ${email}</p>
               <p>Ingresa al panel de administración para aprobar o rechazar.</p>
-              <a href="https://aplicacion-curvas.vercel.app/admin" style="display:inline-block;padding:12px 24px;background:#1e40af;color:white;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:12px">
+              <a href="https://curvasdesenfoque.com/admin" style="display:inline-block;padding:12px 24px;background:#1e40af;color:white;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:12px">
                 Ver panel de admin
               </a>
             </div>`
