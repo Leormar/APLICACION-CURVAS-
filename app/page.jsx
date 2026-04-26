@@ -347,7 +347,15 @@ export default function Home() {
                 <span>Ingresa valores o busca un paciente</span>
               </div>
             )}
-            {ojosConDatos.map(([ojo,med])=>(<GraficaCurva key={ojo} ojo={ojo} mediciones={med} lente={lentes[ojo]} />))}
+            {ojosConDatos.map(([ojo,med])=>(
+  <div key={ojo}>
+    <GraficaCurva ojo={ojo} mediciones={med} lente={lentes[ojo]} />
+    <button onClick={() => setMostrarBiblioteca(ojo)}
+      style={{ width:'100%', marginTop:'6px', padding:'7px', background:'#eff6ff', color:'#1e40af', border:'1.5px solid #1e40af', borderRadius:'8px', fontSize:'0.78rem', cursor:'pointer', fontWeight:600 }}>
+      📚 Ver referencia IOL · {ojo}
+    </button>
+  </div>
+))}
             {ojosConDatos.length >= 2 && (
   <GraficaComparativa curvas={curvas} lentes={lentes} />
 )}
