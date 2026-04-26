@@ -334,7 +334,6 @@ function ModalPropuesta({ onCerrar, onEnviado }) {
             <div style={{ fontSize:'2rem', marginBottom:'8px' }}>✅</div>
             <h3 style={{ color:'#166534' }}>Propuesta enviada</h3>
             <p style={{ color:'#475569', fontSize:'0.85rem' }}>El Dr. Orjuela revisará y validará el IOL para incluirlo en la biblioteca.</p>
-            <button
 <button onClick={onEnviado} style={{ marginTop:'16px', padding:'10px 24px', background:'#1e40af', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontWeight:700 }}>Cerrar</button>
           </div>
         ) : (
