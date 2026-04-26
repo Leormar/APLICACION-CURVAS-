@@ -5,14 +5,7 @@ import { useRouter } from 'next/navigation'
 import GraficaCurva from './components/GraficaCurva'
 import FormularioCurva from './components/FormularioCurva'
 import InterpretacionAI from './components/InterpretacionAI'
-{mostrarBiblioteca && (
-  <BibliotecaIOL
-    curvaActual={curvas[mostrarBiblioteca]}
-    nombreIOL={lentes[mostrarBiblioteca]}
-    ojo={mostrarBiblioteca}
-    onCerrar={() => setMostrarBiblioteca(null)}
-  />
-)}
+
 import GraficaComparativa from './components/GraficaComparativa'
 import BuscadorPacientes from './components/BuscadorPacientes'
 import LogoProlens from './components/LogoProlens'
@@ -382,6 +375,14 @@ export default function Home() {
           <p style={{ margin:0, fontSize:'0.72rem', color:'#94a3b8' }}><strong style={{ color:'#1e40af' }}>PROLENS</strong> · Dr. Leonardo Orjuela · Medellín</p>
           <p style={{ margin:0, fontSize:'0.68rem', color:'#cbd5e1' }}>MAIdx sd Bench · Análisis clínico asistido</p>
         </div>
+      {mostrarBiblioteca && (
+          <BibliotecaIOL
+            curvaActual={curvas[mostrarBiblioteca]}
+            nombreIOL={lentes[mostrarBiblioteca]}
+            ojo={mostrarBiblioteca}
+            onCerrar={() => setMostrarBiblioteca(null)}
+          />
+        )}
       </main>
     </>
   )
