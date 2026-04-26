@@ -49,7 +49,7 @@ const IconoComparar = ({color='#7c3aed'}) => <svg width="56" height="56" viewBox
   <path d="M3 18l4-6 3 3 2-4 4 4" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeDasharray="2,1"/>
   <line x1="3" y1="14" x2="21" y2="14" stroke="#94a3b8" strokeWidth="0.8" strokeDasharray="3,2"/>
   <path d="M3 4v16M3 20h18" stroke="#94a3b8" strokeWidth="1"/>
-</svg>7" cy="12" r="4"/><path d="M11 12h2"/></svg>
+</svg>
 
 const TUTORIAL = [
   {
