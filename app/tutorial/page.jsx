@@ -4,17 +4,52 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import LogoProlens from '../components/LogoProlens'
 
-const IconoOjo = ({color='#1e40af'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+const IconoOjo = ({color='#1e40af'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <path d="M12 5C7 5 2.5 9.5 1.5 12c1 2.5 5.5 7 10.5 7s9.5-4.5 10.5-7C21.5 9.5 17 5 12 5z"/>
+  <circle cx="12" cy="12" r="3.5"/>
+  <circle cx="12" cy="12" r="1.5" fill={color}/>
+  <path d="M12 8.5V7M12 17v-1.5M7.5 12H6M18 12h-1.5" strokeWidth="1"/>
+</svg>
 
-const IconoRegla = ({color='#1e40af'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h4M3 15h4M9 3v4M15 3v4"/></svg>
+const IconoRegla = ({color='#1e40af'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <rect x="2" y="6" width="20" height="12" rx="2"/>
+  <path d="M6 6v3M9 6v2M12 6v3M15 6v2M18 6v3"/>
+  <path d="M2 12h20" strokeWidth="0.75" strokeDasharray="2,1"/>
+</svg>
 
-const IconoClipboard = ({color='#1e40af'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+const IconoClipboard = ({color='#1e40af'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+  <rect x="9" y="3" width="6" height="4" rx="1.5"/>
+  <path d="M9 12h6M9 16h4"/>
+  <circle cx="7.5" cy="12" r="0.75" fill={color}/>
+  <circle cx="7.5" cy="16" r="0.75" fill={color}/>
+</svg>
 
-const IconoGrafica = ({color='#7c3aed'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+const IconoGrafica = ({color='#7c3aed'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <path d="M3 20h18M3 20V4"/>
+  <path d="M3 16l4-4 3 3 4-5 4 2" strokeWidth="2" strokeLinejoin="round"/>
+  <circle cx="7" cy="12" r="1.5" fill={color}/>
+  <circle cx="10" cy="15" r="1.5" fill={color}/>
+  <circle cx="14" cy="10" r="1.5" fill={color}/>
+  <circle cx="18" cy="12" r="1.5" fill={color}/>
+  <line x1="3" y1="14" x2="21" y2="14" stroke={color} strokeWidth="0.6" strokeDasharray="3,2" opacity="0.5"/>
+</svg>
 
-const IconoLente = ({color='#7c3aed'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/><path d="M4 12H2M22 12h-2M12 4V2M12 22v-2"/></svg>
+const IconoLente = ({color='#7c3aed'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <ellipse cx="12" cy="12" rx="10" ry="6"/>
+  <ellipse cx="12" cy="12" rx="6" ry="6"/>
+  <circle cx="12" cy="12" r="2.5" fill={color} opacity="0.3"/>
+  <circle cx="12" cy="12" r="1" fill={color}/>
+  <path d="M2 12h3M19 12h3" strokeWidth="1.2"/>
+  <path d="M9.5 6.5l1 1M14.5 6.5l-1 1" strokeWidth="1" opacity="0.6"/>
+</svg>
 
-const IconoComparar = ({color='#7c3aed'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="7" cy="12" r="4"/><circle cx="17" cy="12" r="4"/><path d="M11 12h2"/></svg>
+const IconoComparar = ({color='#7c3aed'}) => <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <path d="M3 18l4-8 3 5 2-3 4 6" stroke="#1e40af" strokeWidth="2" strokeLinejoin="round"/>
+  <path d="M3 18l4-6 3 3 2-4 4 4" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeDasharray="2,1"/>
+  <line x1="3" y1="14" x2="21" y2="14" stroke="#94a3b8" strokeWidth="0.8" strokeDasharray="3,2"/>
+  <path d="M3 4v16M3 20h18" stroke="#94a3b8" strokeWidth="1"/>
+</svg>7" cy="12" r="4"/><path d="M11 12h2"/></svg>
 
 const TUTORIAL = [
   {
