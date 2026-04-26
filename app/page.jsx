@@ -345,6 +345,9 @@ export default function Home() {
               </div>
             )}
             {ojosConDatos.map(([ojo,med])=>(<GraficaCurva key={ojo} ojo={ojo} mediciones={med} lente={lentes[ojo]} />))}
+            {ojosConDatos.length >= 2 && (
+  <GraficaComparativa curvas={curvas} lentes={lentes} />
+)}
             {ojosConDatos.length>0 && (<InterpretacionAI datos={{...datos,lentes}} curvas={curvas} onInterpretacion={setInterpretacion} onSecciones={setSecciones} />)}
           </div>
         </div>
