@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import GraficaCurva from './components/GraficaCurva'
 import FormularioCurva from './components/FormularioCurva'
 import InterpretacionAI from './components/InterpretacionAI'
+import GraficaComparativa from './components/GraficaComparativa'
 import BuscadorPacientes from './components/BuscadorPacientes'
 import LogoProlens from './components/LogoProlens'
 
