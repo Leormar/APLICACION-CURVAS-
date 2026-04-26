@@ -8,6 +8,7 @@ import InterpretacionAI from './components/InterpretacionAI'
 import GraficaComparativa from './components/GraficaComparativa'
 import BuscadorPacientes from './components/BuscadorPacientes'
 import LogoProlens from './components/LogoProlens'
+import BibliotecaIOL from './components/BibliotecaIOL'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -26,6 +27,8 @@ export default function Home() {
   const [formKey, setFormKey] = useState(0)
   const [aceptoTerminos, setAceptoTerminos] = useState(false)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
+  const [mostrarBiblioteca, setMostrarBiblioteca] = useState(null)
+// null = cerrada, 'OD' / 'OI' / 'AO' = ojo activo
 
   // Si el usuario está autenticado y aprobado, no necesita aceptar términos manualmente
   useEffect(() => {
