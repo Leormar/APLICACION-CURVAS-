@@ -335,3 +335,45 @@ function ModalPropuesta({ onCerrar, onEnviado }) {
             <h3 style={{ color:'#166534' }}>Propuesta enviada</h3>
             <p style={{ color:'#475569', fontSize:'0.85rem' }}>El Dr. Orjuela revisará y validará el IOL para incluirlo en la biblioteca.</p>
             <button
+<button onClick={onEnviado} style={{ marginTop:'16px', padding:'10px 24px', background:'#1e40af', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontWeight:700 }}>Cerrar</button>
+          </div>
+        ) : (
+          <>
+            <h3 style={{ margin:'0 0 16px', color:'#1e293b' }}>Proponer nuevo IOL</h3>
+            {[
+              ['nombre', 'Nombre del IOL *'],
+              ['casa_comercial', 'Casa comercial *'],
+              ['tecnologia', 'Tecnología'],
+              ['referencia_bibliografica', 'Referencia bibliográfica']
+            ].map(([key, label]) => (
+              <div key={key} style={{ marginBottom:'10px' }}>
+                <label style={{ fontSize:'0.78rem', color:'#475569', display:'block', marginBottom:'3px' }}>{label}</label>
+                <input value={form[key]} onChange={e => setForm(f => ({...f, [key]: e.target.value}))}
+                  style={{ width:'100%', border:'1px solid #ddd', borderRadius:'8px', padding:'8px 10px', fontSize:'0.85rem', boxSizing:'border-box' }}/>
+              </div>
+            ))}
+            <div style={{ marginBottom:'16px' }}>
+              <label style={{ fontSize:'0.78rem', color:'#475569', display:'block', marginBottom:'3px' }}>Categoría *</label>
+              <select value={form.categoria} onChange={e => setForm(f => ({...f, categoria: e.target.value}))}
+                style={{ width:'100%', border:'1px solid #ddd', borderRadius:'8px', padding:'8px', fontSize:'0.85rem', boxSizing:'border-box' }}>
+                <option value="monofocal_plus">Monofocal Plus</option>
+                <option value="edof_refractivo">EDOF Refractivo</option>
+                <option value="edof_difractivo">EDOF Difractivo</option>
+                <option value="trifocal">Trifocal</option>
+                <option value="full_range">Full Range</option>
+                <option value="binocular_complementario">Binocular Complementario</option>
+              </select>
+            </div>
+            <div style={{ display:'flex', gap:'10px' }}>
+              <button onClick={onCerrar} style={{ flex:1, padding:'10px', background:'#f1f5f9', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.85rem' }}>Cancelar</button>
+              <button onClick={enviar} disabled={enviando || !form.nombre || !form.casa_comercial}
+                style={{ flex:1, padding:'10px', background:enviando?'#94a3b8':'#1e40af', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontWeight:700, fontSize:'0.85rem' }}>
+                {enviando ? 'Enviando...' : 'Enviar propuesta'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
