@@ -36,8 +36,6 @@ export default function Home() {
   const [mostrarBiblioteca, setMostrarBiblioteca] = useState(null)
   const [aceptoTerminos, setAceptoTerminos] = useState(false)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
-  const [mostrarBiblioteca, setMostrarBiblioteca] = useState(null)
-// null = cerrada, 'OD' / 'OI' / 'AO' = ojo activo
 
   // Si el usuario está autenticado y aprobado, no necesita aceptar términos manualmente
   useEffect(() => {
