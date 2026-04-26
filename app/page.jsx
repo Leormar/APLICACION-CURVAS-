@@ -33,6 +33,7 @@ export default function Home() {
   const [mostrarPerfil, setMostrarPerfil] = useState(false)
   const [vistaMovil, setVistaMovil] = useState('formulario')
   const [formKey, setFormKey] = useState(0)
+  const [mostrarBiblioteca, setMostrarBiblioteca] = useState(null)
   const [aceptoTerminos, setAceptoTerminos] = useState(false)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
   const [mostrarBiblioteca, setMostrarBiblioteca] = useState(null)
