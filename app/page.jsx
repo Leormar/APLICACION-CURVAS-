@@ -5,6 +5,14 @@ import { useRouter } from 'next/navigation'
 import GraficaCurva from './components/GraficaCurva'
 import FormularioCurva from './components/FormularioCurva'
 import InterpretacionAI from './components/InterpretacionAI'
+{mostrarBiblioteca && (
+  <BibliotecaIOL
+    curvaActual={curvas[mostrarBiblioteca]}
+    nombreIOL={lentes[mostrarBiblioteca]}
+    ojo={mostrarBiblioteca}
+    onCerrar={() => setMostrarBiblioteca(null)}
+  />
+)}
 import GraficaComparativa from './components/GraficaComparativa'
 import BuscadorPacientes from './components/BuscadorPacientes'
 import LogoProlens from './components/LogoProlens'
