@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
   }
 ` }} />
       </head>
-      <body><div id="google_translate_element" style={{position:'fixed',top:'8px',right:'8px',zIndex:9999,opacity:0.85}}></div>
+      <body><div id="google_translate_element" style={{position:'fixed',top:'12px',right:'12px',zIndex:9999,background:'white',padding:'4px 10px',borderRadius:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.15)',border:'1px solid #e2e8f0'}}></div>
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
