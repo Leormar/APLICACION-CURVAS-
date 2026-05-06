@@ -105,7 +105,24 @@ export default function Home() {
     if (ojo !== 'AO') setLentes(prev => ({ ...prev, [ojo]: lente }))
   }
 
-  const handleGuardado = (d) => { setDatos(d); setVistaMovil('graficas') }
+  const handleGuardado = async (d) => {
+  setDatos(d)
+  setVistaMovil('graficas')
+  // Enviar email de feedback si es la primera curva
+  if (session?.user?.id && session?.user?.email) {
+    try {
+      await fetch('/api/feedback-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuarioId: session.user.id,
+          usuarioEmail: session.user.email,
+          usuarioNombre: session.user.name || session.user.email
+        })
+      })
+    } catch(e) { console.error('feedback email error:', e) }
+  }
+}
 
   const handleCargarExamen = ({ paciente, examenes }) => {
     const nuevasCurvas = { OD: [], OI: [], AO: [] }
