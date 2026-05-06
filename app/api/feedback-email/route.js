@@ -19,22 +19,20 @@ export async function POST(req) {
       to: usuarioEmail,
       subject: 'Su opinion sobre PROLENS - Curvas de Desenfoque',
       useInfo: true,
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px">
-          <h2 style="color:#1e40af">Estimado/a ${usuarioNombre},</h2>
-          <p>Gracias por usar <strong>PROLENS - Curvas de Desenfoque</strong>. Nos gustaria conocer su experiencia.</p>
-          <p>Por favor responda estas breves preguntas respondiendo directamente a este correo:</p>
-          <ol style="line-height:2">
-            <li>La aplicacion curvasdesenfoque.com le parecio facil de usar? (Si / No / Podria mejorar)</li>
-            <li>Completo el tutorial clinico? (Si / No)</li>
-            <li>Probo el paciente de prueba? (Si / No)</li>
-            <li>Registro una curva de desenfoque real? (Si / No)</li>
-            <li>El analisis con IA MAIdx sd Bench le aporto al diagnostico? (Si / No / Podria mejorar)</li>
-            <li>Que piensa de la herramienta? (Comentario libre)</li>
-          </ol>
-          <p style="color:#64748b;font-size:0.85rem">Su opinion es muy valiosa para mejorar la plataforma.</p>
-          <p>Atentamente,<br><strong>Dr. Leonardo Orjuela</strong><br>PROLENS - curvasdesenfoque.com</p>
-        </div>
+    html: `
+  <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px">
+    <h2 style="color:#1e40af">Estimado/a ${usuarioNombre},</h2>
+    <p>Gracias por usar <strong>PROLENS - Curvas de Desenfoque</strong>. Nos gustaria conocer su experiencia.</p>
+    <p>Por favor complete nuestra breve encuesta haciendo clic en el boton:</p>
+    <div style="text-align:center;margin:2rem 0">
+      <a href="https://curvasdesenfoque.com/feedback?token=${usuarioId}"
+        style="display:inline-block;padding:14px 32px;background:#1e40af;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:1rem">
+        Responder encuesta
+      </a>
+    </div>
+    <p style="color:#64748b;font-size:0.85rem">Solo toma 2 minutos. Su opinion es muy valiosa para mejorar la plataforma.</p>
+    <p>Atentamente,<br><strong>Dr. Leonardo Orjuela</strong><br>PROLENS - curvasdesenfoque.com</p>
+  </div>
       `
     })
 
