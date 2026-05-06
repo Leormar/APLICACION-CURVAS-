@@ -1,7 +1,7 @@
 'use client'
 import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import LogoProlens from '../components/LogoProlens'
+import LogoProlens from '../../components/LogoProlens'
 
 function FeedbackForm() {
   const searchParams = useSearchParams()
