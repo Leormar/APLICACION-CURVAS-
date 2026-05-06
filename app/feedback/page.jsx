@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import LogoProlens from '../components/LogoProlens'
 
-export default function FeedbackPage() {
+function FeedbackForm() {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
   const [form, setForm] = useState({ facil_usar:'', completo_tutorial:'', probo_paciente:'', registro_curva:'', aporto_ia:'', comentario:'' })
