@@ -33,9 +33,9 @@ function FeedbackForm() {
   if (enviado) return (
     <div style={{minHeight:'100vh',background:'linear-gradient(160deg,#0c2461,#1e40af)',display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
       <div style={{background:'white',borderRadius:'20px',padding:'2.5rem',maxWidth:'480px',width:'100%',textAlign:'center'}}>
-        <div style={{fontSize:'4rem',marginBottom:'1rem'}}>🎉</div>
+        <div style={{fontSize:'4rem',marginBottom:'1rem'}}>🎉</div>cc
         <h2 style={{color:'#166534',margin:'0 0 1rem'}}>Gracias por su opinion</h2>
-        <p style={{color:'#475569',lineHeight:1.7}}>Su feedback es muy valioso para mejorar PROLENS.</p>
+        <p style={{color:'#475569',lineHeight:1.7}}>Su feedback es muy valioso para mejorar CURVASDESENFOQUE.COM.</p>
         <a href="/" style={{display:'inline-block',marginTop:'1.5rem',padding:'0.75rem 2rem',background:'#1e40af',color:'white',borderRadius:'10px',textDecoration:'none',fontWeight:700}}>Volver a la app</a>
       </div>
     </div>
