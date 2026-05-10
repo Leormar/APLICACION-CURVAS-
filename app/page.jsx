@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import GraficaCurva from './components/GraficaCurva'
 import FormularioCurva from './components/FormularioCurva'
 import InterpretacionAI from './components/InterpretacionAI'
+
 import GraficaComparativa from './components/GraficaComparativa'
 import BuscadorPacientes from './components/BuscadorPacientes'
 import LogoProlens from './components/LogoProlens'
@@ -29,6 +30,7 @@ export default function Home() {
   const [aceptoTerminos, setAceptoTerminos] = useState(false)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
 
+  // Si el usuario está autenticado y aprobado, no necesita aceptar términos manualmente
   useEffect(() => {
     if (session?.user?.estado === 'aprobado') {
       setAceptoTerminos(true)
@@ -36,6 +38,7 @@ export default function Home() {
         if (d.perfil) setPerfil(d.perfil)
         else setMostrarPerfil(true)
       })
+      // Cargar paciente de prueba automaticamente
       fetch('/api/pacientes?q=Paciente+de+Prueba&tipo=apellido')
         .then(r=>r.json())
         .then(data => {
@@ -55,6 +58,34 @@ export default function Home() {
           setDatos({ paciente: pac.nombre, documento: pac.documento, fechaNac: pac.fecha_nacimiento?.split?.('T')[0]||'', lentes:{OD:'',OI:''}, refOD, refOI, tipoAV:'logmar' })
         })
         .catch(()=>{})
+      // Cargar paciente de prueba si es primera vez
+      const yaVioPrueba = sessionStorage.getItem('prueba_cargada')
+      if (!yaVioPrueba) {
+        sessionStorage.setItem('prueba_cargada', 'true')
+        fetch('/api/pacientes?q=Paciente+de+Prueba&tipo=apellido')
+          .then(r=>r.json())
+          .then(data => {
+            if (data.pacientes && data.pacientes.length > 0) {
+              // Agrupar por paciente
+              const p = data.pacientes[0]
+              const examenes = data.pacientes.filter(x=>x.nombre===p.nombre)
+              if (examenes.length > 0) {
+                setPacienteCargado({
+                  paciente: { nombre: p.nombre, documento: p.documento, fecha_nacimiento: p.fecha_nacimiento },
+                  examenes: examenes.map(e=>({
+                    ojo: e.ojo,
+                    iol: e.notas ? JSON.parse(e.notas||'{}').iol : '',
+                    mediciones: e.mediciones || [],
+                    refOD: '', refOI: ''
+                  })),
+                  refOD: '', refOI: ''
+                })
+              }
+            }
+          })
+          .catch(()=>{})
+      }
+    } else {
     }
   }, [session])
 
@@ -75,22 +106,23 @@ export default function Home() {
   }
 
   const handleGuardado = async (d) => {
-    setDatos(d)
-    setVistaMovil('graficas')
-    if (session?.user?.id && session?.user?.email) {
-      try {
-        await fetch('/api/feedback-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            usuarioId: session.user.id,
-            usuarioEmail: session.user.email,
-            usuarioNombre: session.user.name || session.user.email
-          })
+  setDatos(d)
+  setVistaMovil('graficas')
+  // Enviar email de feedback si es la primera curva
+  if (session?.user?.id && session?.user?.email) {
+    try {
+      await fetch('/api/feedback-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuarioId: session.user.id,
+          usuarioEmail: session.user.email,
+          usuarioNombre: session.user.name || session.user.email
         })
-      } catch(e) { console.error('feedback email error:', e) }
-    }
+      })
+    } catch(e) { console.error('feedback email error:', e) }
   }
+}
 
   const handleCargarExamen = ({ paciente, examenes }) => {
     const nuevasCurvas = { OD: [], OI: [], AO: [] }
@@ -136,6 +168,7 @@ export default function Home() {
 
   const ojosConDatos = Object.entries(curvas).filter(([,m])=>m.length>=2)
 
+  // Cargando sesión
   if (status === 'loading') {
     return (
       <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(160deg, #0c2461 0%, #1e40af 100%)' }}>
@@ -147,6 +180,7 @@ export default function Home() {
     )
   }
 
+  // No autenticado → pantalla de login
   if (!session) {
     return (
       <>
@@ -159,33 +193,27 @@ export default function Home() {
                 <p style={{ margin:0, fontSize:'0.8rem', color:'#64748b' }}>Curvas de Desenfoque · MAIdx sd Bench</p>
               </div>
               <div style={{ background:'#fef3c7', border:'1px solid #f59e0b', borderRadius:'8px', padding:'0.75rem', marginBottom:'1rem', fontSize:'0.82rem', color:'#92400e', lineHeight:1.65 }}>
-                <strong>Terminos de uso clinico</strong>
-                <p style={{ margin:'6px 0 0' }}>Esta aplicacion esta disenada con el modelo <strong>MAIdx sd Bench</strong> para analisis clinico de curvas de desenfoque. Los informes son <strong>unicamente apoyo diagnostico</strong> y no reemplazan el criterio del profesional.</p>
+                <strong>⚠️ Términos de uso clínico</strong>
+                <p style={{ margin:'6px 0 0' }}>Esta aplicación está diseñada con el modelo <strong>MAIdx sd Bench</strong> para análisis clínico de curvas de desenfoque. Los informes son <strong>únicamente apoyo diagnóstico</strong> y no reemplazan el criterio del profesional.</p>
               </div>
               <div style={{ fontSize:'0.82rem', color:'#334155', lineHeight:1.75, marginBottom:'1rem' }}>
-                <p><strong>Al usar esta aplicacion usted acepta:</strong></p>
+                <p><strong>Al usar esta aplicación usted acepta:</strong></p>
                 <ul style={{ paddingLeft:'1.2rem', margin:'6px 0' }}>
                   <li>Los informes son orientativos y deben ser validados por un profesional.</li>
                   <li>Los datos se almacenan de forma segura y no se comparten con terceros.</li>
-                  <li>El uso de la informacion es responsabilidad del profesional tratante.</li>
+                  <li>El uso de la información es responsabilidad del profesional tratante.</li>
                   <li>PROLENS no se responsabiliza por decisiones basadas solo en los informes.</li>
                   <li>Uso exclusivo para profesionales de la salud visual.</li>
                 </ul>
               </div>
               <div style={{ background:'#f0f9ff', border:'1px solid #bae6fd', borderRadius:'8px', padding:'0.75rem', marginBottom:'1.25rem', fontSize:'0.8rem', color:'#0369a1', lineHeight:1.6 }}>
-                <strong>Privacidad:</strong> Informacion en servidores seguros. No se comparte ni usa para entrenar modelos.
+                <strong>🔒 Privacidad:</strong> Información en servidores seguros. No se comparte ni usa para entrenar modelos.
               </div>
               <button
                 onClick={() => { setMostrarTerminos(false); signIn('google', { callbackUrl: '/', redirect: true }) }}
                 style={{ width:'100%', padding:'0.9rem', background:'#1e40af', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:'pointer', fontWeight:700, marginBottom:'8px', display:'flex', alignItems:'center', justifyContent:'center', gap:'10px' }}>
                 <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.6-8 19.6-20 0-1.3-.1-2.7-.4-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5.1l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.6-3.3-11.3-8H6.3C9.7 35.8 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.2C40.9 35.4 44 30.1 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
                 Acepto · Ingresar con Google
-              </button>
-              <button
-                onClick={() => { setMostrarTerminos(false); signIn('apple', { callbackUrl: '/' }) }}
-                style={{ width:'100%', padding:'0.9rem', background:'black', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:'pointer', fontWeight:700, marginBottom:'8px', display:'flex', alignItems:'center', justifyContent:'center', gap:'10px' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                Ingresar con Apple
               </button>
               <button onClick={() => setMostrarTerminos(false)} style={{ width:'100%', padding:'8px', background:'none', border:'none', color:'#94a3b8', cursor:'pointer', fontSize:'0.85rem' }}>Cancelar</button>
             </div>
@@ -198,16 +226,16 @@ export default function Home() {
             </div>
             <h1 style={{ margin:'0 0 4px', fontSize:'2.8rem', fontWeight:900, letterSpacing:'3px', textShadow:'0 2px 16px rgba(0,0,0,0.3)' }}>PROLENS</h1>
             <p style={{ margin:'0 0 4px', fontSize:'1.2rem', fontWeight:600, opacity:0.92 }}>Curvas de Desenfoque</p>
-            <p style={{ margin:'0 0 8px', fontSize:'0.85rem', opacity:0.7 }}>Dr. Leonardo Orjuela · Medellin</p>
+            <p style={{ margin:'0 0 8px', fontSize:'0.85rem', opacity:0.7 }}>Dr. Leonardo Orjuela · Medellín</p>
             <div style={{ display:'inline-block', background:'rgba(255,255,255,0.2)', borderRadius:'20px', padding:'5px 18px', marginBottom:'1.5rem', fontSize:'0.82rem', fontWeight:700, letterSpacing:'1px', border:'1px solid rgba(255,255,255,0.3)' }}>
               MAIdx sd Bench
             </div>
             <div style={{ background:'rgba(255,255,255,0.1)', borderRadius:'14px', padding:'1.25rem', marginBottom:'1.5rem', border:'1px solid rgba(255,255,255,0.18)', textAlign:'left' }}>
               <p style={{ margin:'0 0 0.75rem', fontSize:'0.95rem', lineHeight:1.7, opacity:0.95, textAlign:'center' }}>
-                Herramienta clinica para analisis, registro y seguimiento de curvas de desenfoque en pacientes con IOL multifocal y EDOF.
+                Herramienta clínica para análisis, registro y seguimiento de curvas de desenfoque en pacientes con IOL multifocal y EDOF.
               </p>
               <div style={{ borderTop:'1px solid rgba(255,255,255,0.2)', paddingTop:'0.75rem', display:'flex', flexDirection:'column', gap:'6px' }}>
-                {['Curvas OD · OI · AO','Buscador por nombre o ID','Informes PDF con analisis clinico','App para iPhone y Android'].map((item,i) => (
+                {['📈  Curvas OD · OI · AO','🔍  Buscador por nombre o ID','📄  Informes PDF con análisis clínico','📱  App para iPhone y Android'].map((item,i) => (
                   <div key={i} style={{ fontSize:'0.88rem', opacity:0.88 }}>{item}</div>
                 ))}
               </div>
@@ -223,15 +251,17 @@ export default function Home() {
     )
   }
 
+  // Autenticado pero pendiente/rechazado
   if (session.user.estado === 'pendiente') {
     return (
       <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(160deg, #0c2461 0%, #1e40af 65%)', padding:'1.5rem' }}>
         <div style={{ textAlign:'center', color:'white', maxWidth:'380px' }}>
           <LogoProlens size={80} />
           <h2 style={{ margin:'1rem 0 0.5rem', fontSize:'1.5rem' }}>Solicitud pendiente</h2>
-          <p style={{ opacity:0.85, lineHeight:1.7 }}>Hola <strong>{session.user.name}</strong>, tu solicitud esta pendiente de aprobacion por el administrador.</p>
+          <p style={{ opacity:0.85, lineHeight:1.7 }}>Hola <strong>{session.user.name}</strong>, tu solicitud está pendiente de aprobación por el administrador.</p>
+          <p style={{ opacity:0.6, fontSize:'0.85rem', marginTop:'0.75rem' }}>Contacta al Dr. Leonardo Orjuela si necesitas acceso urgente.</p>
           <button onClick={() => signOut({ callbackUrl: '/login' })} style={{ marginTop:'1.5rem', padding:'0.75rem 2rem', background:'white', color:'#1e40af', border:'none', borderRadius:'10px', fontWeight:700, cursor:'pointer' }}>
-            Cerrar sesion
+            Cerrar sesión
           </button>
         </div>
       </div>
@@ -246,13 +276,14 @@ export default function Home() {
           <h2 style={{ margin:'1rem 0 0.5rem' }}>Acceso denegado</h2>
           <p style={{ opacity:0.85 }}>Tu solicitud fue rechazada. Contacta al administrador.</p>
           <button onClick={() => signOut({ callbackUrl: '/login' })} style={{ marginTop:'1.5rem', padding:'0.75rem 2rem', background:'white', color:'#991b1b', border:'none', borderRadius:'10px', fontWeight:700, cursor:'pointer' }}>
-            Cerrar sesion
+            Cerrar sesión
           </button>
         </div>
       </div>
     )
   }
 
+  // App principal
   return (
     <>
       <style>{`
@@ -275,33 +306,33 @@ export default function Home() {
             <LogoProlens size={36} />
             <div>
               <h1 style={{ margin:0, color:'#1e40af', fontSize:'1.1rem', lineHeight:1.2, fontWeight:800 }}>PROLENS</h1>
-              <p style={{ margin:0, color:'#64748b', fontSize:'0.72rem' }}>Dr. Leonardo Orjuela · Medellin</p>
+              <p style={{ margin:0, color:'#64748b', fontSize:'0.72rem' }}>Dr. Leonardo Orjuela · Medellín</p>
             </div>
           </div>
           <div style={{ display:'flex', gap:'6px', alignItems:'center', flexWrap:'wrap' }}>
             {session.user.rol === 'admin' && (
               <a href="/admin" style={{ padding:'0.4rem 0.8rem', background:'#7c3aed', color:'white', borderRadius:'8px', fontSize:'0.78rem', textDecoration:'none', fontWeight:500 }}>
-                Admin
+                ⚙️ Admin
               </a>
             )}
             {datos && (
               <button onClick={handleNuevoExamen}
                 style={{padding:'0.45rem 0.8rem',background:'#f0fdf4',color:'#166534',border:'2px solid #166534',borderRadius:'8px',fontSize:'0.82rem',cursor:'pointer',fontWeight:600,touchAction:'manipulation',whiteSpace:'nowrap'}}>
-                Nuevo examen
+                ➕ Nuevo examen
               </button>
             )}
             <a href="/tutorial"
               style={{padding:'0.45rem 0.8rem',background:'#f1f5f9',color:'#475569',border:'1px solid #e2e8f0',borderRadius:'8px',fontSize:'0.78rem',textDecoration:'none',fontWeight:500,whiteSpace:'nowrap'}}>
-              Tutorial
+              📚 Tutorial
             </a>
             <button onClick={()=>setMostrarBuscador(true)}
               style={{ padding:'0.45rem 0.8rem', background:'white', color:'#1e40af', border:'2px solid #1e40af', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500 }}>
-              Buscar
+              🔍 Buscar
             </button>
             {datos && (
               <button onClick={generarPDF} disabled={generandoPDF}
                 style={{ padding:'0.45rem 0.8rem', background:generandoPDF?'#94a3b8':'#0f766e', color:'white', border:'none', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500 }}>
-                {generandoPDF?'...':'PDF'}
+                {generandoPDF?'⏳':'📄 PDF'}
               </button>
             )}
             <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'4px 10px', background:'#f1f5f9', borderRadius:'20px' }}>
@@ -309,7 +340,7 @@ export default function Home() {
               <span style={{ fontSize:'0.72rem', color:'#475569', fontWeight:500, maxWidth:'120px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.user.email}</span>
               <button onClick={() => signOut({ callbackUrl: '/login' })}
                 style={{ padding:'5px 12px', background:'#ef4444', color:'white', border:'none', borderRadius:'14px', fontSize:'0.75rem', cursor:'pointer', fontWeight:600 }}>
-                Salir
+                Cerrar sesión
               </button>
             </div>
           </div>
@@ -318,7 +349,7 @@ export default function Home() {
           {['formulario','graficas'].map(tab => (
             <button key={tab} onClick={()=>setVistaMovil(tab)}
               style={{ flex:1, padding:'8px', border:'none', borderRadius:'8px', background:vistaMovil===tab?'white':'transparent', color:vistaMovil===tab?'#1e40af':'#64748b', fontWeight:vistaMovil===tab?600:400, fontSize:'0.85rem', cursor:'pointer', boxShadow:vistaMovil===tab?'0 1px 3px rgba(0,0,0,0.1)':'none' }}>
-              {tab==='formulario'?'Formulario':'Graficas'}
+              {tab==='formulario'?'📋 Formulario':'📈 Gráficas'}
             </button>
           ))}
         </div>
@@ -334,16 +365,18 @@ export default function Home() {
               </div>
             )}
             {ojosConDatos.map(([ojo,med])=>(
-              <div key={ojo}>
-                <GraficaCurva ojo={ojo} mediciones={med} lente={lentes[ojo]} />
-                <button onClick={() => setMostrarBiblioteca(ojo)}
-                  style={{ width:'100%', marginTop:'6px', padding:'7px', background:'#eff6ff', color:'#1e40af', border:'1.5px solid #1e40af', borderRadius:'8px', fontSize:'0.78rem', cursor:'pointer', fontWeight:600 }}>
-                  Ver referencia IOL · {ojo}
-                </button>
-              </div>
-            ))}
-            {ojosConDatos.length >= 2 && <GraficaComparativa curvas={curvas} lentes={lentes} />}
-            {ojosConDatos.length>0 && <InterpretacionAI datos={{...datos,lentes}} curvas={curvas} onInterpretacion={setInterpretacion} onSecciones={setSecciones} />}
+  <div key={ojo}>
+    <GraficaCurva ojo={ojo} mediciones={med} lente={lentes[ojo]} />
+    <button onClick={() => setMostrarBiblioteca(ojo)}
+      style={{ width:'100%', marginTop:'6px', padding:'7px', background:'#eff6ff', color:'#1e40af', border:'1.5px solid #1e40af', borderRadius:'8px', fontSize:'0.78rem', cursor:'pointer', fontWeight:600 }}>
+      📚 Ver referencia IOL · {ojo}
+    </button>
+  </div>
+))}
+            {ojosConDatos.length >= 2 && (
+  <GraficaComparativa curvas={curvas} lentes={lentes} />
+)}
+            {ojosConDatos.length>0 && (<InterpretacionAI datos={{...datos,lentes}} curvas={curvas} onInterpretacion={setInterpretacion} onSecciones={setSecciones} />)}
           </div>
         </div>
         {datos && (
@@ -356,10 +389,10 @@ export default function Home() {
         )}
         <div style={{ marginTop:'1.5rem', textAlign:'center', padding:'0.75rem', borderTop:'1px solid #e2e8f0', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px' }}>
           <LogoProlens size={24} />
-          <p style={{ margin:0, fontSize:'0.72rem', color:'#94a3b8' }}><strong style={{ color:'#1e40af' }}>PROLENS</strong> · Dr. Leonardo Orjuela · Medellin</p>
-          <p style={{ margin:0, fontSize:'0.68rem', color:'#cbd5e1' }}>MAIdx sd Bench · Analisis clinico asistido</p>
+          <p style={{ margin:0, fontSize:'0.72rem', color:'#94a3b8' }}><strong style={{ color:'#1e40af' }}>PROLENS</strong> · Dr. Leonardo Orjuela · Medellín</p>
+          <p style={{ margin:0, fontSize:'0.68rem', color:'#cbd5e1' }}>MAIdx sd Bench · Análisis clínico asistido</p>
         </div>
-        {mostrarBiblioteca && (
+      {mostrarBiblioteca && (
           <BibliotecaIOL
             curvaActual={curvas[mostrarBiblioteca]}
             nombreIOL={lentes[mostrarBiblioteca]}
