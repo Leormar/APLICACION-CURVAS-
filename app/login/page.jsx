@@ -39,7 +39,7 @@ function LoginContent() {
         </div>
 
         <button onClick={handleLogin}
-          style={{ width:'100%', padding:'1rem', background:'white', color:'#1e293b', border:'none', borderRadius:'12px', fontSize:'1rem', cursor:'pointer', fontWeight:700, marginBottom:'0.75rem', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', display:'flex', alignItems:'center', justifyContent:'center', gap:'12px' }}>
+          style={{ width:'100%', padding:'1rem', background:'white', color:'#1e293b', border:'none', borderRadius:'12px', fontSize:'1rem', cursor:'pointer', fontWeight:700, marginBottom:'0.6rem', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', display:'flex', alignItems:'center', justifyContent:'center', gap:'12px' }}>
           <svg width="20" height="20" viewBox="0 0 48 48">
             <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.6-8 19.6-20 0-1.3-.1-2.7-.4-4z"/>
             <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
@@ -48,8 +48,20 @@ function LoginContent() {
           </svg>
           Ingresar con Google
         </button>
+        <button onClick={() => signIn('apple', { callbackUrl: '/' })}
+          style={{ width:'100%', padding:'1rem', background:'#000', color:'white', border:'none', borderRadius:'12px', fontSize:'1rem', cursor:'pointer', fontWeight:700, marginBottom:'0.75rem', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', display:'flex', alignItems:'center', justifyContent:'center', gap:'12px' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+          </svg>
+          Ingresar con Apple
+        </button>
+        {error === 'OAuthCallback' || error === 'invalid_redirect_url' ? (
+          <p style={{ margin:'0 0 6px', fontSize:'0.78rem', color:'#fecaca', background:'rgba(127,29,29,0.4)', padding:'8px 12px', borderRadius:'8px' }}>
+            Error de autenticación. Verifica que el dominio esté autorizado.
+          </p>
+        ) : null}
         <p style={{ margin:0, fontSize:'0.72rem', opacity:0.55 }}>
-          Puedes elegir con qué cuenta de Google ingresar
+          Puedes elegir con qué cuenta ingresar
         </p>
       </div>
     </div>
