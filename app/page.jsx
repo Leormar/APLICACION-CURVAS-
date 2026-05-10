@@ -209,11 +209,12 @@ export default function Home() {
               <div style={{ background:'#f0f9ff', border:'1px solid #bae6fd', borderRadius:'8px', padding:'0.75rem', marginBottom:'1.25rem', fontSize:'0.8rem', color:'#0369a1', lineHeight:1.6 }}>
                 <strong>🔒 Privacidad:</strong> Información en servidores seguros. No se comparte ni usa para entrenar modelos.
               </div>
+             </button>
               <button
-                onClick={() => { setMostrarTerminos(false); signIn('google', { callbackUrl: '/', redirect: true }) }}
-                style={{ width:'100%', padding:'0.9rem', background:'#1e40af', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:'pointer', fontWeight:700, marginBottom:'8px', display:'flex', alignItems:'center', justifyContent:'center', gap:'10px' }}>
-                <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.6-8 19.6-20 0-1.3-.1-2.7-.4-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5.1l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.6-3.3-11.3-8H6.3C9.7 35.8 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.2C40.9 35.4 44 30.1 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
-                Acepto · Ingresar con Google
+                onClick={() => { setMostrarTerminos(false); signIn('apple', { callbackUrl: '/' }) }}
+                style={{ width:'100%', padding:'0.9rem', background:'black', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:'pointer', fontWeight:700, marginBottom:'8px', display:'flex', alignItems:'center', justifyContent:'center', gap:'10px' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                Ingresar con Apple
               </button>
   onClick={() => { setMostrarTerminos(false); signIn('apple', { callbackUrl: '/' }) }}
   style={{ width:'100%', padding:'0.9rem', background:'black', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:'pointer', fontWeight:700, marginBottom:'8px', display:'flex', alignItems:'center', justifyContent:'center', gap:'10px' }}>
