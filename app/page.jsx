@@ -31,6 +31,33 @@ export default function Home() {
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
   const [esPacientePrueba, setEsPacientePrueba] = useState(false)
 
+  const cargarPacientePrueba = () => {
+    fetch('/api/pacientes?q=Paciente+de+Prueba&tipo=apellido')
+      .then(r=>r.json())
+      .then(data => {
+        if (!data.pacientes || data.pacientes.length === 0) {
+          alert('No se encontró el "Paciente de Prueba" en la base de datos.')
+          return
+        }
+        const rows = data.pacientes
+        const pac = { nombre: rows[0].nombre, documento: rows[0].documento, fecha_nacimiento: rows[0].fecha_nacimiento }
+        const examenes = rows.map(r => ({
+          ojo: r.ojo,
+          iol: r.notas ? (()=>{ try{ return JSON.parse(r.notas).iol||'' }catch(e){ return '' } })() : '',
+          mediciones: r.mediciones || [],
+          refOD: r.notas ? (()=>{ try{ return JSON.parse(r.notas).refOD||'' }catch(e){ return '' } })() : '',
+          refOI: r.notas ? (()=>{ try{ return JSON.parse(r.notas).refOI||'' }catch(e){ return '' } })() : ''
+        }))
+        const refOD = examenes[0]?.refOD || ''
+        const refOI = examenes[0]?.refOI || ''
+        setPacienteCargado({ paciente: pac, examenes, refOD, refOI })
+        setDatos({ paciente: pac.nombre, documento: pac.documento, fechaNac: pac.fecha_nacimiento?.split?.('T')[0]||'', lentes:{OD:'',OI:''}, refOD, refOI, tipoAV:'logmar' })
+        setEsPacientePrueba(true)
+        setVistaMovil('graficas')
+      })
+      .catch(() => alert('Error cargando paciente de prueba.'))
+  }
+
   // Si el usuario está autenticado y aprobado, cargar perfil y (solo una vez) el paciente de prueba.
   // No re-cargar al re-evaluar la sesión: en iOS Safari useSession refresca por foco/touch y borraba datos del usuario.
   useEffect(() => {
@@ -46,27 +73,7 @@ export default function Home() {
     if (sessionStorage.getItem('prueba_cargada') === 'true') return
     if (pacienteCargado || datos) return
     sessionStorage.setItem('prueba_cargada', 'true')
-
-    fetch('/api/pacientes?q=Paciente+de+Prueba&tipo=apellido')
-      .then(r=>r.json())
-      .then(data => {
-        if (!data.pacientes || data.pacientes.length === 0) return
-        const rows = data.pacientes
-        const pac = { nombre: rows[0].nombre, documento: rows[0].documento, fecha_nacimiento: rows[0].fecha_nacimiento }
-        const examenes = rows.map(r => ({
-          ojo: r.ojo,
-          iol: r.notas ? (()=>{ try{ return JSON.parse(r.notas).iol||'' }catch(e){ return '' } })() : '',
-          mediciones: r.mediciones || [],
-          refOD: r.notas ? (()=>{ try{ return JSON.parse(r.notas).refOD||'' }catch(e){ return '' } })() : '',
-          refOI: r.notas ? (()=>{ try{ return JSON.parse(r.notas).refOI||'' }catch(e){ return '' } })() : ''
-        }))
-        const refOD = examenes[0]?.refOD || ''
-        const refOI = examenes[0]?.refOI || ''
-        setPacienteCargado({ paciente: pac, examenes, refOD, refOI })
-        setDatos({ paciente: pac.nombre, documento: pac.documento, fechaNac: pac.fecha_nacimiento?.split?.('T')[0]||'', lentes:{OD:'',OI:''}, refOD, refOI, tipoAV:'logmar' })
-        setEsPacientePrueba(true)
-      })
-      .catch(()=>{})
+    cargarPacientePrueba()
   }, [session?.user?.estado])
 
   const handleNuevoExamen = () => {
@@ -316,6 +323,11 @@ export default function Home() {
             <button onClick={()=>setMostrarBuscador(true)}
               style={{ padding:'0.45rem 0.8rem', background:'white', color:'#1e40af', border:'2px solid #1e40af', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500 }}>
               🔍 Buscar
+            </button>
+            <button onClick={cargarPacientePrueba}
+              title="Cargar paciente de prueba"
+              style={{ padding:'0.45rem 0.8rem', background:'#fef3c7', color:'#92400e', border:'1px solid #f59e0b', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:600, whiteSpace:'nowrap' }}>
+              🧪 Demo
             </button>
             {datos && (
               <button onClick={generarPDF} disabled={generandoPDF}
