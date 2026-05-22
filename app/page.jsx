@@ -29,65 +29,45 @@ export default function Home() {
   const [mostrarBiblioteca, setMostrarBiblioteca] = useState(null)
   const [aceptoTerminos, setAceptoTerminos] = useState(false)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
+  const [esPacientePrueba, setEsPacientePrueba] = useState(false)
 
-  // Si el usuario está autenticado y aprobado, no necesita aceptar términos manualmente
+  // Si el usuario está autenticado y aprobado, cargar perfil y (solo una vez) el paciente de prueba.
+  // No re-cargar al re-evaluar la sesión: en iOS Safari useSession refresca por foco/touch y borraba datos del usuario.
   useEffect(() => {
-    if (session?.user?.estado === 'aprobado') {
-      setAceptoTerminos(true)
-      fetch('/api/perfil').then(r=>r.json()).then(d => {
-        if (d.perfil) setPerfil(d.perfil)
-        else setMostrarPerfil(true)
+    if (session?.user?.estado !== 'aprobado') return
+    setAceptoTerminos(true)
+    fetch('/api/perfil').then(r=>r.json()).then(d => {
+      if (d.perfil) setPerfil(d.perfil)
+      else setMostrarPerfil(true)
+    }).catch(()=>{})
+
+    // Guarda contra recargas: solo una vez por pestaña, y solo si el usuario no tiene datos en pantalla.
+    if (typeof window === 'undefined') return
+    if (sessionStorage.getItem('prueba_cargada') === 'true') return
+    if (pacienteCargado || datos) return
+    sessionStorage.setItem('prueba_cargada', 'true')
+
+    fetch('/api/pacientes?q=Paciente+de+Prueba&tipo=apellido')
+      .then(r=>r.json())
+      .then(data => {
+        if (!data.pacientes || data.pacientes.length === 0) return
+        const rows = data.pacientes
+        const pac = { nombre: rows[0].nombre, documento: rows[0].documento, fecha_nacimiento: rows[0].fecha_nacimiento }
+        const examenes = rows.map(r => ({
+          ojo: r.ojo,
+          iol: r.notas ? (()=>{ try{ return JSON.parse(r.notas).iol||'' }catch(e){ return '' } })() : '',
+          mediciones: r.mediciones || [],
+          refOD: r.notas ? (()=>{ try{ return JSON.parse(r.notas).refOD||'' }catch(e){ return '' } })() : '',
+          refOI: r.notas ? (()=>{ try{ return JSON.parse(r.notas).refOI||'' }catch(e){ return '' } })() : ''
+        }))
+        const refOD = examenes[0]?.refOD || ''
+        const refOI = examenes[0]?.refOI || ''
+        setPacienteCargado({ paciente: pac, examenes, refOD, refOI })
+        setDatos({ paciente: pac.nombre, documento: pac.documento, fechaNac: pac.fecha_nacimiento?.split?.('T')[0]||'', lentes:{OD:'',OI:''}, refOD, refOI, tipoAV:'logmar' })
+        setEsPacientePrueba(true)
       })
-      // Cargar paciente de prueba automaticamente
-      fetch('/api/pacientes?q=Paciente+de+Prueba&tipo=apellido')
-        .then(r=>r.json())
-        .then(data => {
-          if (!data.pacientes || data.pacientes.length === 0) return
-          const rows = data.pacientes
-          const pac = { nombre: rows[0].nombre, documento: rows[0].documento, fecha_nacimiento: rows[0].fecha_nacimiento }
-          const examenes = rows.map(r => ({
-            ojo: r.ojo,
-            iol: r.notas ? (()=>{ try{ return JSON.parse(r.notas).iol||'' }catch(e){ return '' } })() : '',
-            mediciones: r.mediciones || [],
-            refOD: r.notas ? (()=>{ try{ return JSON.parse(r.notas).refOD||'' }catch(e){ return '' } })() : '',
-            refOI: r.notas ? (()=>{ try{ return JSON.parse(r.notas).refOI||'' }catch(e){ return '' } })() : ''
-          }))
-          const refOD = examenes[0]?.refOD || ''
-          const refOI = examenes[0]?.refOI || ''
-          setPacienteCargado({ paciente: pac, examenes, refOD, refOI })
-          setDatos({ paciente: pac.nombre, documento: pac.documento, fechaNac: pac.fecha_nacimiento?.split?.('T')[0]||'', lentes:{OD:'',OI:''}, refOD, refOI, tipoAV:'logmar' })
-        })
-        .catch(()=>{})
-      // Cargar paciente de prueba si es primera vez
-      const yaVioPrueba = sessionStorage.getItem('prueba_cargada')
-      if (!yaVioPrueba) {
-        sessionStorage.setItem('prueba_cargada', 'true')
-        fetch('/api/pacientes?q=Paciente+de+Prueba&tipo=apellido')
-          .then(r=>r.json())
-          .then(data => {
-            if (data.pacientes && data.pacientes.length > 0) {
-              // Agrupar por paciente
-              const p = data.pacientes[0]
-              const examenes = data.pacientes.filter(x=>x.nombre===p.nombre)
-              if (examenes.length > 0) {
-                setPacienteCargado({
-                  paciente: { nombre: p.nombre, documento: p.documento, fecha_nacimiento: p.fecha_nacimiento },
-                  examenes: examenes.map(e=>({
-                    ojo: e.ojo,
-                    iol: e.notas ? JSON.parse(e.notas||'{}').iol : '',
-                    mediciones: e.mediciones || [],
-                    refOD: '', refOI: ''
-                  })),
-                  refOD: '', refOI: ''
-                })
-              }
-            }
-          })
-          .catch(()=>{})
-      }
-    } else {
-    }
-  }, [session])
+      .catch(()=>{})
+  }, [session?.user?.estado])
 
   const handleNuevoExamen = () => {
     setCurvas({ OD: [], OI: [], AO: [] })
@@ -98,6 +78,7 @@ export default function Home() {
     setSecciones(null)
     setVistaMovil('formulario')
     setFormKey(k => k + 1)
+    setEsPacientePrueba(false)
   }
 
   const handleMediciones = (ojo, mediciones, lente) => {
@@ -147,6 +128,7 @@ export default function Home() {
     setDatos({ paciente: paciente.nombre, documento: paciente.documento, fechaNac: paciente.fecha_nacimiento?.split?.('T')[0]||'', lentes: nuevosLentes, refOD, refOI, tipoAV: 'logmar' })
     setMostrarBuscador(false)
     setVistaMovil('graficas')
+    setEsPacientePrueba(/paciente\s+de\s+prueba/i.test(paciente?.nombre || ''))
   }
 
   const generarPDF = async () => {
@@ -351,6 +333,21 @@ export default function Home() {
             </div>
           </div>
         </div>
+        {esPacientePrueba && (
+          <div style={{ marginBottom:'0.75rem', padding:'0.6rem 0.9rem', background:'linear-gradient(90deg, #fef3c7, #fde68a)', border:'1px solid #f59e0b', borderRadius:'10px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'8px', flexWrap:'wrap' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+              <span style={{ fontSize:'1.1rem' }}>🧪</span>
+              <div>
+                <strong style={{ fontSize:'0.85rem', color:'#92400e' }}>MODO DEMO — Paciente de Prueba</strong>
+                <p style={{ margin:0, fontSize:'0.72rem', color:'#a16207' }}>Estos son datos de ejemplo. Crea un examen nuevo para empezar.</p>
+              </div>
+            </div>
+            <button onClick={handleNuevoExamen}
+              style={{ padding:'6px 14px', background:'#166534', color:'white', border:'none', borderRadius:'8px', fontSize:'0.78rem', cursor:'pointer', fontWeight:600, whiteSpace:'nowrap' }}>
+              ➕ Nuevo examen
+            </button>
+          </div>
+        )}
         <div className="mobile-tabs" style={{ display:'none', marginBottom:'0.75rem', background:'#f1f5f9', borderRadius:'10px', padding:'3px', gap:'3px' }}>
           {['formulario','graficas'].map(tab => (
             <button key={tab} onClick={()=>setVistaMovil(tab)}

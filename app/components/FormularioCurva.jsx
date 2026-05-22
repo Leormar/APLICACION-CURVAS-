@@ -183,10 +183,23 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
     if (e.key==='ArrowUp') { e.preventDefault(); inputRefs.current[DEFOCUS[idx-1]]?.focus() }
   }
 
+  const conteoPorOjo = (o) => getMedicionesFromLogMAR(valoresLogMAR[o]||{}).length
+
   const handleGuardar = async () => {
+    const mediciones = getMedicionesFromLogMAR(valoresLogMAR[ojo]||{})
+    if (mediciones.length === 0) {
+      alert(`No has digitado ninguna agudeza para ${ojo}. Ingresa al menos una antes de guardar.`)
+      return
+    }
+    const otros = ['OD','OI','AO'].filter(o => o !== ojo)
+    const otrosVacios = otros.filter(o => conteoPorOjo(o) === 0)
+    if (otrosVacios.length > 0) {
+      const labels = otrosVacios.map(o => o==='OD'?'ojo derecho (OD)':o==='OI'?'ojo izquierdo (OI)':'binocular (AO)').join(' y ')
+      const ok = window.confirm(`Vas a guardar solo ${ojo}.\n\nFalta(n) datos en: ${labels}.\n\n¿Continuar igualmente?`)
+      if (!ok) return
+    }
     setGuardando(true)
     try {
-      const mediciones = getMedicionesFromLogMAR(valoresLogMAR[ojo]||{})
       const res = await fetch('/api/curvas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -249,11 +262,33 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
       </div>
 
       <p style={s.sec}>Ojo a evaluar</p>
-      <div style={{ display:'flex', gap:'6px', marginBottom:'0.5rem' }}>
-        {['OD','OI','AO'].map(o => (
-          <button key={o} onClick={()=>handleOjo(o)} style={s.btn(ojo===o)}>{o}</button>
-        ))}
+      <div style={{ display:'flex', gap:'6px', marginBottom:'0.4rem' }}>
+        {['OD','OI','AO'].map(o => {
+          const n = conteoPorOjo(o)
+          const active = ojo === o
+          return (
+            <button key={o} onClick={()=>handleOjo(o)} style={s.btn(active)}>
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'2px' }}>
+                <span>{o}</span>
+                <span style={{ fontSize:'0.65rem', fontWeight:600, color: active ? 'rgba(255,255,255,0.85)' : (n>0 ? '#16a34a' : '#cbd5e1') }}>
+                  {n > 0 ? `${n} pt${n>1?'s':''}` : 'vacío'}
+                </span>
+              </div>
+            </button>
+          )
+        })}
       </div>
+      {(() => {
+        const vacios = ['OD','OI','AO'].filter(o => conteoPorOjo(o) === 0)
+        const conDatos = ['OD','OI','AO'].filter(o => conteoPorOjo(o) > 0)
+        if (conDatos.length === 0) return null
+        if (vacios.length === 0) return null
+        return (
+          <p style={{ margin:'0 0 0.5rem', padding:'6px 10px', background:'#fff7ed', border:'1px solid #fdba74', borderRadius:'8px', fontSize:'0.72rem', color:'#9a3412' }}>
+            ⚠️ Aún falta: <strong>{vacios.join(', ')}</strong>
+          </p>
+        )
+      })()}
 
       <p style={s.sec}>Tipo de AV</p>
       <div style={{ display:'flex', gap:'6px', marginBottom:'4px' }}>
