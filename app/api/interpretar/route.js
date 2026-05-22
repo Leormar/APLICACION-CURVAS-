@@ -10,13 +10,19 @@ export async function POST(req) {
 
     const formatearOjo = (med, ojo) => {
       if (!med || med.length === 0) return ''
-      const lente = datos?.lentes?.[ojo] || 'no especificado'
+      const lenteRaw = datos?.lentes?.[ojo]
+      const lente = (lenteRaw && lenteRaw.trim()) ? lenteRaw : 'sin implante de LIO'
       const lineas = med.sort((a,b)=>a.defocus-b.defocus).map(m => {
         const v = VERGENCIAS[String(parseFloat(m.defocus))] || ''
         return `  ${m.defocus}D (${v}): ${m.agudeza} LogMAR`
       }).join('\n')
       const funcional = med.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ') || 'ninguno'
       return `${ojo} — IOL: ${lente}\n${lineas}\nRango funcional: ${funcional}`
+    }
+
+    const iolPara = (ojo) => {
+      const v = datos?.lentes?.[ojo]
+      return (v && v.trim()) ? v : 'sin implante de LIO'
     }
 
     const ojosConDatos = ['OD','OI','AO'].filter(o => curvas[o] && curvas[o].length >= 2)
@@ -28,8 +34,10 @@ DATOS DEL PACIENTE:
 Nombre: ${datos?.paciente || 'No especificado'}
 Refraccion OD: ${datos?.refOD || 'no registrada'}
 Refraccion OI: ${datos?.refOI || 'no registrada'}
-IOL OD: ${datos?.lentes?.OD || 'no especificado'}
-IOL OI: ${datos?.lentes?.OI || 'no especificado'}
+IOL OD: ${iolPara('OD')}
+IOL OI: ${iolPara('OI')}
+
+Si un ojo aparece como "sin implante de LIO", refierete a el con esa frase exacta en el informe; no uses "no especificado" ni "sin LIO".
 
 CURVAS DE DESENFOQUE:
 ${seccionesOjo}
