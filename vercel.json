@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/recordatorio?secret=prolens2026",
+      "path": "/api/cron/recordatorio",
       "schedule": "0 10 * * *"
     }
   ]

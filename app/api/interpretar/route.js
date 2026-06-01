@@ -1,5 +1,12 @@
+import { getUsuarioAprobado } from '../../../lib/auth-guard'
+
 export async function POST(req) {
   try {
+    const usuario = await getUsuarioAprobado(req)
+    if (!usuario) {
+      return Response.json({ error: 'No autorizado' }, { status: 401 })
+    }
+
     const { datos, curvas } = await req.json()
 
     const VERGENCIAS = {

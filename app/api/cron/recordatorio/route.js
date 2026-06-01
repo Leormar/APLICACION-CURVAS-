@@ -4,9 +4,16 @@ import { crearTokenBaja } from '../../../../lib/unsubscribe'
 import { APP_URL, SOPORTE_EMAIL } from '../../../../lib/config'
 
 export async function GET(req) {
+  const cronSecret = process.env.CRON_SECRET
   const { searchParams } = new URL(req.url)
-  const secret = searchParams.get('secret')
-  if (secret !== process.env.CRON_SECRET) {
+  // Vercel Cron envía automáticamente el header Authorization: Bearer <CRON_SECRET>.
+  // Aceptamos también ?secret= para disparos manuales. El secreto vive solo en env.
+  const authHeader = req.headers.get('authorization')
+  const autorizado = cronSecret && (
+    authHeader === `Bearer ${cronSecret}` ||
+    searchParams.get('secret') === cronSecret
+  )
+  if (!autorizado) {
     return Response.json({ error: 'No autorizado' }, { status: 401 })
   }
 
