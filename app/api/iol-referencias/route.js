@@ -1,6 +1,7 @@
 import pool from '../../../lib/db'
 import { getServerSession } from 'next-auth'
 import { enviarEmail } from '../../../lib/email'
+import { APP_URL } from '../../../lib/config'
 
 // GET - Obtener IOLs de referencia
 export async function GET(req) {
@@ -86,7 +87,7 @@ export async function POST(req) {
             -2D: ${v_neg2||'—'} | -3D: ${v_neg3||'—'}
           </div>
           <div style="text-align:center;margin-top:20px">
-            <a href="https://aplicacion-curvas.vercel.app/admin" 
+            <a href="${APP_URL}/admin"
               style="display:inline-block;padding:12px 28px;background:#1e40af;color:white;border-radius:10px;text-decoration:none;font-weight:700">
               Revisar en panel admin →
             </a>

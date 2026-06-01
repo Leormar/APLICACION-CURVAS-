@@ -1,5 +1,6 @@
 import pool from '../../../../lib/db'
 import { enviarEmail } from '../../../../lib/email'
+import { APP_URL } from '../../../../lib/config'
 
 export async function GET() {
   try {
@@ -35,7 +36,7 @@ export async function PATCH(req) {
             <p style="color:#374151;line-height:1.6">Hola <strong>${usuario.nombre}</strong>,</p>
             <p style="color:#374151;line-height:1.6">Tu solicitud de acceso a <strong>PROLENS Curvas de Desenfoque</strong> ha sido <strong>aprobada</strong>. Ya puedes ingresar con tu cuenta de Google.</p>
             <div style="text-align:center;margin:24px 0">
-              <a href="https://aplicacion-curvas.vercel.app" style="display:inline-block;padding:14px 28px;background:#1e40af;color:white;border-radius:10px;text-decoration:none;font-weight:bold;font-size:16px">
+              <a href="${APP_URL}" style="display:inline-block;padding:14px 28px;background:#1e40af;color:white;border-radius:10px;text-decoration:none;font-weight:bold;font-size:16px">
                 Ingresar a la app
               </a>
             </div>

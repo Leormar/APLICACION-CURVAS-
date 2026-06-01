@@ -1,5 +1,7 @@
 import pool from '../../../../lib/db'
 import { enviarEmail } from '../../../../lib/email'
+import { crearTokenBaja } from '../../../../lib/unsubscribe'
+import { APP_URL, SOPORTE_EMAIL } from '../../../../lib/config'
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url)
@@ -9,10 +11,14 @@ export async function GET(req) {
   }
 
   try {
+    // Asegura la columna de baja (idempotente) antes de filtrar por ella.
+    await pool.query('ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS desuscrito BOOLEAN DEFAULT FALSE')
+
     const res = await pool.query(`
       SELECT u.id, u.nombre, u.email, u.fecha_aprobacion
       FROM usuarios u
       WHERE u.estado = 'aprobado'
+        AND u.desuscrito IS NOT TRUE
         AND u.fecha_aprobacion <= NOW() - INTERVAL '7 days'
         AND u.email NOT IN (
           SELECT DISTINCT usuario_email FROM curvas WHERE usuario_email IS NOT NULL
@@ -23,9 +29,17 @@ export async function GET(req) {
     let enviados = 0
 
     for (const usuario of usuarios) {
+      const tokenBaja = await crearTokenBaja(usuario.id)
+      const urlBaja = `${APP_URL}/api/desuscribir?token=${encodeURIComponent(tokenBaja)}`
+      const urlOpinion = `${APP_URL}/feedback?token=${usuario.id}`
+
       await enviarEmail({
         to: usuario.email,
         subject: '📊 ¿Ya registraste tus primeras curvas? - PROLENS',
+        headers: {
+          'List-Unsubscribe': `<${urlBaja}>, <mailto:${SOPORTE_EMAIL}?subject=baja>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
         html: `
         <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#f8fafc">
           <div style="background:linear-gradient(135deg,#1e40af,#1d4ed8);padding:28px 24px;border-radius:14px 14px 0 0;text-align:center">
@@ -47,20 +61,25 @@ export async function GET(req) {
               </div>
             </div>
             <div style="text-align:center;margin-bottom:20px">
-              <a href="https://aplicacion-curvas.vercel.app" style="display:inline-block;padding:14px 36px;background:#1e40af;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">
+              <a href="${APP_URL}" style="display:inline-block;padding:14px 36px;background:#1e40af;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">
                 Registrar mi primera curva →
               </a>
             </div>
             <div style="text-align:center;margin-bottom:20px">
-              <a href="https://aplicacion-curvas.vercel.app/tutorial" style="font-size:13px;color:#1e40af;text-decoration:none">
+              <a href="${APP_URL}/tutorial" style="font-size:13px;color:#1e40af;text-decoration:none">
                 ¿Necesitas ayuda? Ver tutorial paso a paso
               </a>
             </div>
             <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0"/>
+            <p style="color:#475569;font-size:12px;text-align:center;line-height:1.6;margin:0 0 12px">
+              ¿No vas a usar la app o tienes dudas?
+              <a href="${urlOpinion}" style="color:#1e40af;font-weight:600">Cuéntanos tu opinión</a>
+            </p>
             <p style="color:#94a3b8;font-size:11px;text-align:center;line-height:1.6;margin:0">
               Dr. Leonardo Orjuela · PROLENS · Medellín, Colombia<br>
-              <a href="https://aplicacion-curvas.vercel.app/soporte" style="color:#94a3b8">Soporte</a> · 
-              <a href="https://aplicacion-curvas.vercel.app/privacidad" style="color:#94a3b8">Privacidad</a>
+              <a href="${APP_URL}/soporte" style="color:#94a3b8">Soporte</a> ·
+              <a href="${APP_URL}/privacidad" style="color:#94a3b8">Privacidad</a> ·
+              <a href="${urlBaja}" style="color:#94a3b8">Cancelar estos recordatorios</a>
             </p>
           </div>
         </div>`
