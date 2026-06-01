@@ -42,6 +42,7 @@ export async function GET(req) {
 
       await enviarEmail({
         to: usuario.email,
+        provider: 'resend',
         subject: '📊 ¿Ya registraste tus primeras curvas? - PROLENS',
         headers: {
           'List-Unsubscribe': `<${urlBaja}>, <mailto:${SOPORTE_EMAIL}?subject=baja>`,
