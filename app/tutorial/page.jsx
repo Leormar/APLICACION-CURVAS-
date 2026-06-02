@@ -129,6 +129,45 @@ const TUTORIAL = [
         correcta: 2
       }
     ]
+  },
+  {
+    tema: 'Uso de la app · Registro e informes',
+    color: '#0f766e',
+    bg: '#f0fdfa',
+    pasos: [
+      {
+        titulo: 'Tipo de LIO en cada ojo',
+        contenido: 'Al registrar un ojo eliges el LIO implantado del catálogo. Si el ojo tiene LIO pero no conoces el modelo, selecciona "Valoración ciega": la app sugiere por la forma de la curva el LIO de referencia más parecido. Si el ojo no fue operado, deja "Sin IOL · ojo no operado" y la app no sugerirá ningún lente.',
+        icono: <IconoLente color="#0f766e" />
+      },
+      {
+        titulo: 'Identificación por curva (MAIdx)',
+        contenido: 'En "Ver referencia IOL" puedes comparar la curva del paciente contra las curvas de referencia publicadas. MAIdx calcula el porcentaje de similitud e identifica el LIO más parecido. Si hay un LIO implantado, el análisis compara si la curva concuerda con ese lente o se asemeja más a otro.',
+        icono: <IconoComparar color="#0f766e" />
+      },
+      {
+        titulo: 'Informe del médico y del paciente',
+        contenido: 'Con el botón "Informe" generas un PDF o un enlace de solo lectura. El informe del médico es completo (análisis por ojo más la conclusión clínica). El del paciente muestra las curvas y su interpretación, sin recomendaciones ni comparaciones técnicas que puedan confundirlo.',
+        icono: <IconoClipboard color="#0f766e" />
+      }
+    ],
+    preguntas: [
+      {
+        pregunta: 'El ojo tiene LIO pero no conoces el modelo. ¿Qué opción eliges?',
+        opciones: ['Sin IOL · ojo no operado','Valoración ciega (la app sugiere por la curva)','Cualquier LIO del catálogo al azar','No registrar ese ojo'],
+        correcta: 1
+      },
+      {
+        pregunta: '¿Qué muestra el informe del PACIENTE respecto al del médico?',
+        opciones: ['Exactamente lo mismo','Solo el nombre del paciente','Curvas e interpretación por ojo, sin conclusión ni recomendaciones','Solo las recomendaciones'],
+        correcta: 2
+      },
+      {
+        pregunta: '¿Para qué sirve "Identificar IOL por curva (MAIdx)"?',
+        opciones: ['Para cambiar la refracción','Para encontrar el LIO de referencia más parecido a la curva','Para imprimir el informe','Para borrar el examen'],
+        correcta: 1
+      }
+    ]
   }
 ]
 
@@ -149,11 +188,14 @@ export default function Tutorial() {
   const temaTestActual = TUTORIAL[temaTest]
   const pregunta = temaTestActual?.preguntas[preguntaActual]
   const totalPreguntas = TUTORIAL.reduce((acc,t)=>acc+t.preguntas.length,0)
+  const totalPasos = TUTORIAL.reduce((acc,t)=>acc+t.pasos.length,0)
 
   const correctas = Object.entries(respuestas).filter(([key,val])=>{
     const [t,p] = key.split('-').map(Number)
     return TUTORIAL[t].preguntas[p].correcta === val
   }).length
+  const minAprobar = Math.ceil(totalPreguntas * 0.66)
+  const aprobado = correctas >= minAprobar
 
   const handleSiguientePaso = () => {
     if (pasoActual < tema.pasos.length-1) setPasoActual(pasoActual+1)
@@ -177,7 +219,7 @@ export default function Tutorial() {
   }
 
   const handleTerminar = async () => {
-    if (correctas >= 4) {
+    if (aprobado) {
       await fetch('/api/tutorial-completado', {method:'POST'})
       router.push('/')
     } else {
@@ -188,13 +230,14 @@ export default function Tutorial() {
   }
 
   const progreso = fase==='tutorial'
-    ? ((temaActual*3+pasoActual)/6)*100
-    : fase==='test' ? ((temaTest*3+preguntaActual)/6)*100 : 100
+    ? ((temaActual*3+pasoActual)/totalPasos)*100
+    : fase==='test' ? ((temaTest*3+preguntaActual)/totalPreguntas)*100 : 100
 
   if (status==='loading') return null
 
   return (
     <div style={{minHeight:'100vh',background:'linear-gradient(160deg,#0c2461 0%,#1e40af 100%)',display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
+      <style>{`.btn3d{-webkit-tap-highlight-color:transparent;transition:transform .07s ease,filter .12s ease}.btn3d:hover{filter:brightness(1.06)}.btn3d:active{transform:translateY(3px)}`}</style>
       <div style={{background:'white',borderRadius:'20px',maxWidth:'600px',width:'100%',overflow:'hidden',boxShadow:'0 24px 64px rgba(0,0,0,0.35)'}}>
 
         {/* Header */}
@@ -242,9 +285,9 @@ export default function Tutorial() {
                 ))}
               </div>
 
-              <button onClick={handleSiguientePaso}
-                style={{width:'100%',padding:'1rem',background:tema.color,color:'white',border:'none',borderRadius:'12px',fontSize:'1.1rem',cursor:'pointer',fontWeight:700,letterSpacing:'0.3px'}}>
-                {pasoActual<tema.pasos.length-1?'Siguiente →':temaActual<TUTORIAL.length-1?'Siguiente tema →':'✅ Iniciar evaluación'}
+              <button onClick={handleSiguientePaso} className="btn3d"
+                style={{width:'100%',padding:'1rem',background:tema.color,color:'white',border:'none',borderRadius:'12px',fontSize:'1.1rem',cursor:'pointer',fontWeight:700,letterSpacing:'0.3px',boxShadow:'0 4px 0 rgba(0,0,0,0.22), 0 6px 14px rgba(0,0,0,0.18)'}}>
+                {pasoActual<tema.pasos.length-1?'Siguiente':temaActual<TUTORIAL.length-1?'Siguiente tema':'Iniciar evaluación'}
               </button>
             </div>
           )}
@@ -286,14 +329,14 @@ export default function Tutorial() {
 
               {mostrandoFeedback && (
                 <div style={{padding:'12px 16px',borderRadius:'10px',marginBottom:'1rem',background:seleccion===pregunta.correcta?'#dcfce7':'#fee2e2',border:`1px solid ${seleccion===pregunta.correcta?'#22c55e':'#ef4444'}`,fontSize:'0.95rem',color:seleccion===pregunta.correcta?'#166534':'#991b1b',fontWeight:500}}>
-                  {seleccion===pregunta.correcta?'✅ ¡Correcto!':`❌ La respuesta correcta es: ${pregunta.opciones[pregunta.correcta]}`}
+                  {seleccion===pregunta.correcta?'¡Correcto!':`Respuesta correcta: ${pregunta.opciones[pregunta.correcta]}`}
                 </div>
               )}
 
               {mostrandoFeedback && (
-                <button onClick={handleSiguientePregunta}
-                  style={{width:'100%',padding:'1rem',background:temaTestActual.color,color:'white',border:'none',borderRadius:'12px',fontSize:'1.1rem',cursor:'pointer',fontWeight:700}}>
-                  {temaTest===TUTORIAL.length-1&&preguntaActual===temaTestActual.preguntas.length-1?'Ver resultado':'Siguiente →'}
+                <button onClick={handleSiguientePregunta} className="btn3d"
+                  style={{width:'100%',padding:'1rem',background:temaTestActual.color,color:'white',border:'none',borderRadius:'12px',fontSize:'1.1rem',cursor:'pointer',fontWeight:700,boxShadow:'0 4px 0 rgba(0,0,0,0.22), 0 6px 14px rgba(0,0,0,0.18)'}}>
+                  {temaTest===TUTORIAL.length-1&&preguntaActual===temaTestActual.preguntas.length-1?'Ver resultado':'Siguiente'}
                 </button>
               )}
             </div>
@@ -302,9 +345,13 @@ export default function Tutorial() {
           {/* RESULTADO */}
           {fase==='resultado' && (
             <div style={{textAlign:'center'}}>
-              <div style={{fontSize:'5rem',marginBottom:'0.5rem'}}>{correctas>=4?'🎉':'📚'}</div>
-              <h2 style={{margin:'0 0 0.5rem',fontSize:'1.6rem',fontWeight:800,color:correctas>=4?'#166534':'#92400e'}}>
-                {correctas>=4?'¡Evaluación aprobada!':'Necesitas repasar'}
+              <div style={{width:84,height:84,borderRadius:'50%',margin:'0 auto 1rem',display:'flex',alignItems:'center',justifyContent:'center',background:aprobado?'#dcfce7':'#fef3c7'}}>
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke={aprobado?'#16a34a':'#d97706'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  {aprobado ? <path d="M5 13l4 4L19 7"/> : <g><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></g>}
+                </svg>
+              </div>
+              <h2 style={{margin:'0 0 0.5rem',fontSize:'1.6rem',fontWeight:800,color:aprobado?'#166534':'#92400e'}}>
+                {aprobado?'¡Evaluación aprobada!':'Necesitas repasar'}
               </h2>
               <p style={{color:'#475569',margin:'0 0 1.5rem',fontSize:'1rem'}}>
                 Respondiste <strong>{correctas} de {totalPreguntas}</strong> preguntas correctamente
@@ -316,14 +363,14 @@ export default function Tutorial() {
                   return <div key={i} style={{width:40,height:40,borderRadius:'50%',background:ok?'#22c55e':'#ef4444',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:'1rem',fontWeight:700}}>{ok?'✓':'✗'}</div>
                 })}
               </div>
-              <div style={{background:correctas>=4?'#f0fdf4':'#fefce8',border:`1px solid ${correctas>=4?'#86efac':'#fde68a'}`,borderRadius:'12px',padding:'1.25rem',marginBottom:'1.5rem',fontSize:'1rem',color:correctas>=4?'#166534':'#92400e',lineHeight:1.7}}>
-                {correctas>=4
+              <div style={{background:aprobado?'#f0fdf4':'#fefce8',border:`1px solid ${aprobado?'#86efac':'#fde68a'}`,borderRadius:'12px',padding:'1.25rem',marginBottom:'1.5rem',fontSize:'1rem',color:aprobado?'#166534':'#92400e',lineHeight:1.7}}>
+                {aprobado
                   ?'Excelente. Ya puedes usar PROLENS Curvas de Desenfoque. Encontrarás un paciente de prueba disponible en el buscador para que practiques.'
-                  :'Se requieren mínimo 4 respuestas correctas. Por favor repasa el tutorial e intenta de nuevo.'}
+                  :`Se requieren mínimo ${minAprobar} respuestas correctas. Por favor repasa el tutorial e intenta de nuevo.`}
               </div>
-              <button onClick={handleTerminar}
-                style={{width:'100%',padding:'1rem',background:correctas>=4?'#1e40af':'#f59e0b',color:'white',border:'none',borderRadius:'12px',fontSize:'1.1rem',cursor:'pointer',fontWeight:800}}>
-                {correctas>=4?'🚀 Ingresar a la app':'📚 Repasar tutorial'}
+              <button onClick={handleTerminar} className="btn3d"
+                style={{width:'100%',padding:'1rem',background:aprobado?'#1e40af':'#f59e0b',color:'white',border:'none',borderRadius:'12px',fontSize:'1.1rem',cursor:'pointer',fontWeight:800,boxShadow:'0 4px 0 rgba(0,0,0,0.22), 0 6px 14px rgba(0,0,0,0.18)'}}>
+                {aprobado?'Ingresar a la app':'Repasar tutorial'}
               </button>
             </div>
           )}
