@@ -94,7 +94,8 @@ const limpiarFinal = (t) => {
 
 export async function POST(req) {
   try {
-    const { paciente, documento, fechaNac, lentes, iolIA, iolSugerido, refOD, refOI, tipoAV, curvas, interpretacion, secciones, perfil } = await req.json()
+    const { paciente, documento, fechaNac, lentes, iolIA, iolSugerido, refOD, refOI, tipoAV, curvas, interpretacion, secciones, perfil, modo } = await req.json()
+    const esPaciente = modo === 'paciente'
     const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
     const edad = calcEdad(fechaNac)
 
@@ -107,6 +108,12 @@ export async function POST(req) {
       const v = lentes?.[ojo]
       const ia = iolIA?.[ojo]
       const sug = iolSugerido?.[ojo]
+      // Reporte del paciente: solo el nombre del lente, sin jerga técnica ni comparaciones.
+      if (esPaciente) {
+        if (v === '__ciega__') return sug ? sug.nombre : 'Valoración ciega'
+        if (v && v !== '__ciega__') return v
+        return 'Sin LIO'
+      }
       if (ia && v) return `${v} (seleccionado por IA · examen ciego · ${ia.similitud}%)`
       if (v === '__ciega__') return sug ? `${sug.nombre} (LIO elegido por IA · examen ciego · ${sug.similitud}%)` : 'Valoración ciega'
       if (v && v !== '__ciega__') return sug ? `${v} · Según curva (IA): ${sug.nombre} (${sug.similitud}%)` : v
@@ -190,7 +197,7 @@ export async function POST(req) {
   </div>
   <div style="text-align:right;font-size:10px;color:#64748b;line-height:1.7">
     <strong style="font-size:13px;color:#1e293b;display:block">Curva de Desenfoque</strong>
-    ${fecha}
+    ${esPaciente?'<span style="font-size:9px;color:#1e40af;font-weight:600">Informe para el paciente</span><br>':''}${fecha}
   </div>
 </div>
 
@@ -214,12 +221,13 @@ ${seccionOjo(curvas?.OD,'Ojo Derecho (OD)','#1e40af',iolLabel('OD'),secciones?.O
 ${seccionOjo(curvas?.OI,'Ojo Izquierdo (OI)','#0f766e',iolLabel('OI'),secciones?.OI)}
 ${seccionOjo(curvas?.AO,'Ambos Ojos (AO)','#7c3aed','',secciones?.AO)}
 
-${textoFinal?`
+${(!esPaciente && textoFinal)?`
 <div class="seccion-titulo">Conclusión Clínica · MAIdx sd Bench</div>
 <div class="analisis">
   <div class="conclusion">${textoFinal}</div>
   <div class="disclaimer">Análisis generado por MAIdx sd Bench como apoyo diagnóstico. La interpretación clínica final es responsabilidad del profesional tratante.</div>
 </div>`:''}
+${esPaciente?`<div class="disclaimer" style="margin-top:12px">Este informe es de carácter informativo sobre su examen visual. La interpretación y las decisiones clínicas las realiza su profesional tratante.</div>`:''}
 
 <div class="footer">${nombreDoctor} · ${ciudad}, Colombia · ${fecha}</div>
 </body></html>`

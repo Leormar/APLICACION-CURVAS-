@@ -25,6 +25,7 @@ export default function Home() {
   const [secciones, setSecciones] = useState(null)
   const [generandoPDF, setGenerandoPDF] = useState(false)
   const [compartiendo, setCompartiendo] = useState(false)
+  const [mostrarInforme, setMostrarInforme] = useState(false)
   const [perfil, setPerfil] = useState(null)
   const [mostrarPerfil, setMostrarPerfil] = useState(false)
   const [vistaMovil, setVistaMovil] = useState('formulario')
@@ -166,11 +167,11 @@ export default function Home() {
     setEsPacientePrueba(/paciente\s+de\s+prueba/i.test(paciente?.nombre || ''))
   }
 
-  const generarPDF = async () => {
+  const generarPDF = async (modo='medico') => {
     if (!datos) return
     setGenerandoPDF(true)
     try {
-      const res = await fetch('/api/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, iolSugerido, interpretacion, secciones}) })
+      const res = await fetch('/api/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, iolSugerido, interpretacion, secciones, perfil, modo}) })
       if (!res.ok) throw new Error('Error ' + res.status)
       const html = await res.text()
       const blob = new Blob([html], { type:'text/html; charset=utf-8' })
@@ -183,11 +184,11 @@ export default function Home() {
     setGenerandoPDF(false)
   }
 
-  const compartirInforme = async () => {
+  const compartirInforme = async (modo='medico') => {
     if (!datos) return
     setCompartiendo(true)
     try {
-      const res = await fetch('/api/informe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, iolSugerido, interpretacion, secciones, perfil}) })
+      const res = await fetch('/api/informe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, iolSugerido, interpretacion, secciones, perfil, modo}) })
       const data = await res.json()
       if (!data.url) throw new Error(data.error || 'No se pudo generar el enlace')
       if (navigator.share) {
@@ -338,6 +339,10 @@ export default function Home() {
           .panel-formulario { display: block !important; }
           .panel-graficas { display: block !important; }
         }
+        .btn3d { border: none; border-radius: 11px; color: #fff; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .07s ease, box-shadow .07s ease, filter .12s ease; }
+        .btn3d:hover { filter: brightness(1.06); }
+        .btn3d:active { transform: translateY(3px); }
+        .btn3d:disabled { opacity: .6; cursor: default; transform: none; }
       `}</style>
       <main style={{ padding:'0.75rem', maxWidth:'1200px', margin:'0 auto', paddingBottom:'2rem' }}>
         {mostrarBuscador && <BuscadorPacientes onCargar={handleCargarExamen} onCerrar={()=>setMostrarBuscador(false)} />}
@@ -375,15 +380,9 @@ export default function Home() {
               🧪 Demo
             </button>
             {datos && (
-              <button onClick={generarPDF} disabled={generandoPDF}
-                style={{ padding:'0.45rem 0.8rem', background:generandoPDF?'#94a3b8':'#0f766e', color:'white', border:'none', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500 }}>
-                {generandoPDF?'⏳':'📄 PDF'}
-              </button>
-            )}
-            {datos && (
-              <button onClick={compartirInforme} disabled={compartiendo}
-                style={{ padding:'0.45rem 0.8rem', background:compartiendo?'#94a3b8':'#1e40af', color:'white', border:'none', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500, whiteSpace:'nowrap' }}>
-                {compartiendo?'…':'Compartir'}
+              <button onClick={()=>setMostrarInforme(true)} disabled={generandoPDF||compartiendo} className="btn3d"
+                style={{ padding:'0.5rem 1rem', background:'#0f766e', fontSize:'0.82rem', boxShadow:'0 3px 0 #0a4f48, 0 5px 12px rgba(0,0,0,0.18)', whiteSpace:'nowrap' }}>
+                {(generandoPDF||compartiendo)?'…':'Informe'}
               </button>
             )}
             <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'4px 10px', background:'#f1f5f9', borderRadius:'20px' }}>
@@ -448,8 +447,8 @@ export default function Home() {
         {datos && (
           <div style={{ marginTop:'0.75rem', padding:'0.6rem 1rem', background:'#dcfce7', color:'#166534', borderRadius:'8px', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'8px' }}>
             <span style={{ fontSize:'0.85rem' }}>✓ {datos.paciente} · {datos.documento}</span>
-            <button onClick={generarPDF} disabled={generandoPDF} style={{ padding:'4px 14px', background:'#166534', color:'white', border:'none', borderRadius:'6px', cursor:'pointer', fontSize:'0.82rem' }}>
-              Imprimir / PDF
+            <button onClick={()=>setMostrarInforme(true)} disabled={generandoPDF||compartiendo} className="btn3d" style={{ padding:'0.5rem 1rem', background:'#166534', fontSize:'0.82rem', boxShadow:'0 3px 0 #0f4424, 0 5px 12px rgba(0,0,0,0.18)' }}>
+              Informe
             </button>
           </div>
         )}
@@ -458,6 +457,44 @@ export default function Home() {
           <p style={{ margin:0, fontSize:'0.72rem', color:'#94a3b8' }}><strong style={{ color:'#1e40af' }}>PROLENS</strong> · Dr. Leonardo Orjuela · Medellín</p>
           <p style={{ margin:0, fontSize:'0.68rem', color:'#cbd5e1' }}>MAIdx sd Bench · Análisis clínico asistido</p>
         </div>
+      {mostrarInforme && (
+        <div onClick={e=>e.target===e.currentTarget&&setMostrarInforme(false)}
+          style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.6)', zIndex:3000, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
+          <div style={{ background:'white', borderRadius:'18px', padding:'1.75rem', maxWidth:'400px', width:'100%', boxShadow:'0 24px 64px rgba(0,0,0,0.35)' }}>
+            <h2 style={{ margin:'0 0 2px', fontSize:'1.15rem', color:'#1e293b' }}>Generar informe</h2>
+            <p style={{ margin:'0 0 1.25rem', fontSize:'0.85rem', color:'#64748b' }}>{datos?.paciente}</p>
+
+            <div style={{ fontSize:'0.7rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'0.5rem' }}>Descargar PDF</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:'0.6rem', marginBottom:'1.25rem' }}>
+              <button className="btn3d" disabled={generandoPDF} onClick={()=>{ setMostrarInforme(false); generarPDF('medico') }}
+                style={{ padding:'0.85rem', background:'#1e40af', boxShadow:'0 4px 0 #15307d, 0 6px 14px rgba(0,0,0,0.2)', fontSize:'0.95rem' }}>
+                Informe para el médico
+              </button>
+              <button className="btn3d" disabled={generandoPDF} onClick={()=>{ setMostrarInforme(false); generarPDF('paciente') }}
+                style={{ padding:'0.85rem', background:'#0f766e', boxShadow:'0 4px 0 #0a4f48, 0 6px 14px rgba(0,0,0,0.2)', fontSize:'0.95rem' }}>
+                Informe para el paciente
+              </button>
+            </div>
+
+            <div style={{ fontSize:'0.7rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'0.5rem' }}>Compartir enlace · solo lectura</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:'0.6rem' }}>
+              <button className="btn3d" disabled={compartiendo} onClick={()=>{ setMostrarInforme(false); compartirInforme('medico') }}
+                style={{ padding:'0.8rem', background:'#3730a3', boxShadow:'0 4px 0 #272080, 0 6px 14px rgba(0,0,0,0.2)', fontSize:'0.92rem' }}>
+                Enlace para el médico
+              </button>
+              <button className="btn3d" disabled={compartiendo} onClick={()=>{ setMostrarInforme(false); compartirInforme('paciente') }}
+                style={{ padding:'0.8rem', background:'#7c3aed', boxShadow:'0 4px 0 #5b21b6, 0 6px 14px rgba(0,0,0,0.2)', fontSize:'0.92rem' }}>
+                Enlace para el paciente
+              </button>
+            </div>
+
+            <button onClick={()=>setMostrarInforme(false)}
+              style={{ marginTop:'1.25rem', width:'100%', padding:'0.6rem', background:'none', border:'none', color:'#94a3b8', cursor:'pointer', fontSize:'0.9rem' }}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
       {mostrarBiblioteca && (
           <BibliotecaIOL
             curvaActual={curvas[mostrarBiblioteca]}

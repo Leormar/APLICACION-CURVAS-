@@ -30,6 +30,7 @@ export async function POST(req) {
       refOD: b.refOD || '', refOI: b.refOI || '', tipoAV: b.tipoAV || 'logmar',
       curvas: b.curvas || {}, interpretacion: b.interpretacion || '', secciones: b.secciones || null,
       perfil: b.perfil || null,
+      modo: b.modo === 'paciente' ? 'paciente' : 'medico',
     }
     const token = (randomUUID() + randomUUID()).replace(/-/g, '')
 
