@@ -249,7 +249,12 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
         {['OD','OI'].map(o => (
           <div key={o}>
             <label style={s.lbl}>{o==='OD'?'Ojo Derecho':'Ojo Izquierdo'}</label>
-            <select style={s.inp} value={lentes[o]} onChange={e=>setLentes(prev=>({...prev,[o]:e.target.value}))}>
+            <select style={s.inp} value={lentes[o]} onChange={e=>{
+              const val = e.target.value
+              setLentes(prev=>({...prev,[o]:val}))
+              // Propagar el LIO a la página para que la gráfica y el PDF lo muestren.
+              onMedicionesChange(o, getMedicionesFromLogMAR(valoresLogMAR[o]||{}), val)
+            }}>
               <option value="">— Sin IOL —</option>
               {Object.entries(LENTES).map(([cat,lista]) => (
                 <optgroup key={cat} label={cat}>

@@ -196,9 +196,16 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
             {seleccionado ? (
               <DetalleIOL iol={seleccionado} curvaActual={curvaActual} />
             ) : (
-              <div style={{ height:'100%', display:'flex', alignItems:'center', justifyContent:'center', color:'#94a3b8', flexDirection:'column', gap:'8px' }}>
+              <div style={{ height:'100%', display:'flex', alignItems:'center', justifyContent:'center', color:'#94a3b8', flexDirection:'column', gap:'8px', textAlign:'center', padding:'0 16px' }}>
                 <span style={{ fontSize:'2rem' }}>📚</span>
-                <span style={{ fontSize:'0.9rem' }}>Selecciona un IOL para ver su curva de referencia</span>
+                {nombreIOL ? (
+                  <span style={{ fontSize:'0.85rem', color:'#475569' }}>
+                    El LIO <strong>“{nombreIOL}”</strong> aún no tiene curva de referencia cargada en la biblioteca.
+                    Selecciónalo de la lista si está, o usa <strong>“+ Proponer IOL no encontrado”</strong> para enviar su curva.
+                  </span>
+                ) : (
+                  <span style={{ fontSize:'0.9rem' }}>Selecciona un IOL para ver su curva de referencia</span>
+                )}
                 {curvaActual?.length >= 3 && (
                   <span style={{ fontSize:'0.8rem', color:'#7c3aed' }}>o usa MAIdx para identificación ciega</span>
                 )}
