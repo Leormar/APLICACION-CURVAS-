@@ -23,9 +23,11 @@ export default function GraficaCurva({ ojo, mediciones, lente }) {
 
   const categoriaLente = (nombre) => {
     if (!nombre) return { label:'Monofocal', color:'#64748b' }
-    if (nombre.includes('PanOptix')||nombre.includes('Synergy')||nombre.includes('LISA tri')||nombre.includes('FineVision')||nombre.includes('Trifocal')) return { label:'Trifocal', color:'#7c3aed' }
-    if (nombre.includes('Vivity')||nombre.includes('Eyhance')||nombre.includes('LARA')||nombre.includes('EMV')||nombre.includes('MiniWell')||nombre.includes('EDOF')) return { label:'EDOF', color:'#0f766e' }
-    if (nombre.includes('+2')||nombre.includes('+3')||nombre.includes('ReSTOR')||nombre.includes('Bifocal')) return { label:'Bifocal', color:'#d97706' }
+    const n = nombre.toLowerCase()
+    if (n.includes('intensity')||n.includes('seelens mmf')||n.includes('synergy')||n.includes('luxsmart')||n.includes('full range')) return { label:'Full Range', color:'#dc2626' }
+    if (n.includes('panoptix')||n.includes('lisa tri')||n.includes('finevision pod')||n.includes('triedy')||n.includes('liberty')||n.includes('rayone trifocal')||n.includes('trifocal')) return { label:'Trifocal', color:'#7c3aed' }
+    if (n.includes('vivity')||n.includes('eyhance')||n.includes('lara')||n.includes('emv')||n.includes('miniwell')||n.includes('symfony')||n.includes('galaxy')||n.includes('puresee')||n.includes('triumf')||n.includes('edof')) return { label:'EDOF', color:'#0f766e' }
+    if (n.includes('+2')||n.includes('+3')||n.includes('restor')||n.includes('bifocal')) return { label:'Bifocal', color:'#d97706' }
     return { label:'Monofocal', color:'#64748b' }
   }
 
