@@ -167,11 +167,23 @@ export default function Home() {
     setEsPacientePrueba(/paciente\s+de\s+prueba/i.test(paciente?.nombre || ''))
   }
 
+  // Garantiza que haya interpretación (la genera si falta) para que el informe salga completo.
+  const asegurarInterpretacion = async () => {
+    if (interpretacion) return { interp: interpretacion, secc: secciones, sug: iolSugerido }
+    const r = await fetch('/api/interpretar', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ datos:{...datos, lentes}, curvas }) })
+    const j = await r.json()
+    if (j.error || !j.interpretacion) return { interp: '', secc: null, sug: iolSugerido }
+    const interp = j.interpretacion.replace(/#{1,6}\s*/g,'').replace(/\*\*/g,'').replace(/\*/g,'').replace(/---/g,'').trim()
+    setInterpretacion(interp); setSecciones(j.secciones||null); if (j.iolSugerido) setIolSugerido(j.iolSugerido)
+    return { interp, secc: j.secciones||null, sug: j.iolSugerido||iolSugerido }
+  }
+
   const generarPDF = async (modo='medico') => {
     if (!datos) return
     setGenerandoPDF(true)
     try {
-      const res = await fetch('/api/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, iolSugerido, interpretacion, secciones, perfil, modo}) })
+      const { interp, secc, sug } = await asegurarInterpretacion()
+      const res = await fetch('/api/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, iolSugerido:sug, interpretacion:interp, secciones:secc, perfil, modo}) })
       if (!res.ok) throw new Error('Error ' + res.status)
       const html = await res.text()
       const blob = new Blob([html], { type:'text/html; charset=utf-8' })
@@ -188,7 +200,8 @@ export default function Home() {
     if (!datos) return
     setCompartiendo(true)
     try {
-      const res = await fetch('/api/informe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, iolSugerido, interpretacion, secciones, perfil, modo}) })
+      const { interp, secc, sug } = await asegurarInterpretacion()
+      const res = await fetch('/api/informe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, iolSugerido:sug, interpretacion:interp, secciones:secc, perfil, modo}) })
       const data = await res.json()
       if (!data.url) throw new Error(data.error || 'No se pudo generar el enlace')
       if (navigator.share) {
