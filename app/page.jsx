@@ -24,6 +24,7 @@ export default function Home() {
   const [interpretacion, setInterpretacion] = useState('')
   const [secciones, setSecciones] = useState(null)
   const [generandoPDF, setGenerandoPDF] = useState(false)
+  const [compartiendo, setCompartiendo] = useState(false)
   const [perfil, setPerfil] = useState(null)
   const [mostrarPerfil, setMostrarPerfil] = useState(false)
   const [vistaMovil, setVistaMovil] = useState('formulario')
@@ -180,6 +181,23 @@ export default function Home() {
       else { win.addEventListener('load', () => { try{win.document.title=nombre}catch(e){} setTimeout(()=>win.print(),700) }) }
     } catch(e) { alert('Error: '+e.message) }
     setGenerandoPDF(false)
+  }
+
+  const compartirInforme = async () => {
+    if (!datos) return
+    setCompartiendo(true)
+    try {
+      const res = await fetch('/api/informe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, iolSugerido, interpretacion, secciones, perfil}) })
+      const data = await res.json()
+      if (!data.url) throw new Error(data.error || 'No se pudo generar el enlace')
+      if (navigator.share) {
+        await navigator.share({ title: `Informe ${datos.paciente||''}`.trim(), text: 'Informe de curva de desenfoque (solo lectura)', url: data.url })
+      } else {
+        try { await navigator.clipboard.writeText(data.url) } catch(e) {}
+        window.prompt('Enlace de solo lectura (cópialo y envíalo al médico):', data.url)
+      }
+    } catch(e) { if (e.name !== 'AbortError') alert('Error: ' + e.message) }
+    setCompartiendo(false)
   }
 
   const ojosConDatos = Object.entries(curvas).filter(([,m])=>m.length>=2)
@@ -360,6 +378,12 @@ export default function Home() {
               <button onClick={generarPDF} disabled={generandoPDF}
                 style={{ padding:'0.45rem 0.8rem', background:generandoPDF?'#94a3b8':'#0f766e', color:'white', border:'none', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500 }}>
                 {generandoPDF?'⏳':'📄 PDF'}
+              </button>
+            )}
+            {datos && (
+              <button onClick={compartirInforme} disabled={compartiendo}
+                style={{ padding:'0.45rem 0.8rem', background:compartiendo?'#94a3b8':'#1e40af', color:'white', border:'none', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500, whiteSpace:'nowrap' }}>
+                {compartiendo?'…':'Compartir'}
               </button>
             )}
             <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'4px 10px', background:'#f1f5f9', borderRadius:'20px' }}>
