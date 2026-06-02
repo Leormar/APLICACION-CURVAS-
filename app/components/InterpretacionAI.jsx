@@ -44,10 +44,10 @@ export default function InterpretacionAI({ datos, curvas, onInterpretacion, onSe
   return (
     <div style={{ background:'white', borderRadius:'12px', padding:'1.25rem', boxShadow:'0 1px 4px rgba(0,0,0,0.08)' }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.75rem' }}>
-        <h2 style={{ margin:0, fontSize:'1rem', color:'#1e293b' }}>🤖 Análisis clínico AI</h2>
-        <button onClick={interpretar} disabled={cargando}
-          style={{ padding:'6px 16px', background:cargando?'#94a3b8':'#7c3aed', color:'white', border:'none', borderRadius:'7px', fontSize:'0.85rem', cursor:cargando?'default':'pointer', fontWeight:500 }}>
-          {cargando ? '⏳ Analizando...' : '✨ Interpretar curva'}
+        <h2 style={{ margin:0, fontSize:'1rem', color:'#1e293b' }}>Análisis clínico AI</h2>
+        <button onClick={interpretar} disabled={cargando} className="btn3d"
+          style={{ padding:'0.55rem 1.1rem', background:cargando?'#94a3b8':'#7c3aed', fontSize:'0.85rem', boxShadow:cargando?'none':'0 3px 0 #5b21b6, 0 5px 12px rgba(0,0,0,0.16)' }}>
+          {cargando ? 'Analizando…' : 'Interpretar curva'}
         </button>
       </div>
       {interpretacion ? (

@@ -346,9 +346,9 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
         })}
       </div>
 
-      <button onClick={handleGuardar} disabled={guardando||!nombreCompleto}
-        style={{ marginTop:'0.75rem', width:'100%', padding:'0.75rem', background:nombreCompleto?'#1e40af':'#94a3b8', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:nombreCompleto?'pointer':'default', fontWeight:600, touchAction:'manipulation' }}>
-        {guardando?'Guardando...':`💾 Guardar curva ${ojo}`}
+      <button onClick={handleGuardar} disabled={guardando||!nombreCompleto} className="btn3d"
+        style={{ marginTop:'0.75rem', width:'100%', padding:'0.85rem', background:nombreCompleto?'#1e40af':'#94a3b8', fontSize:'1rem', touchAction:'manipulation', boxShadow:nombreCompleto?'0 4px 0 #15307d, 0 6px 14px rgba(0,0,0,0.18)':'none' }}>
+        {guardando?'Guardando…':`Guardar curva ${ojo}`}
       </button>
     </div>
   )

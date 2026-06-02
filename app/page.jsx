@@ -356,28 +356,27 @@ export default function Home() {
           </div>
           <div style={{ display:'flex', gap:'6px', alignItems:'center', flexWrap:'wrap' }}>
             {session.user.rol === 'admin' && (
-              <a href="/admin" style={{ padding:'0.4rem 0.8rem', background:'#7c3aed', color:'white', borderRadius:'8px', fontSize:'0.78rem', textDecoration:'none', fontWeight:500 }}>
-                ⚙️ Admin
+              <a href="/admin" className="btn3d" style={{ padding:'0.5rem 0.9rem', background:'#7c3aed', color:'white', fontSize:'0.8rem', textDecoration:'none', boxShadow:'0 3px 0 #5b21b6, 0 5px 12px rgba(0,0,0,0.16)', display:'inline-block' }}>
+                Admin
               </a>
             )}
             {datos && (
-              <button onClick={handleNuevoExamen}
-                style={{padding:'0.45rem 0.8rem',background:'#f0fdf4',color:'#166534',border:'2px solid #166534',borderRadius:'8px',fontSize:'0.82rem',cursor:'pointer',fontWeight:600,touchAction:'manipulation',whiteSpace:'nowrap'}}>
-                ➕ Nuevo examen
+              <button onClick={handleNuevoExamen} className="btn3d"
+                style={{ padding:'0.5rem 0.9rem', background:'#166534', fontSize:'0.8rem', boxShadow:'0 3px 0 #0f4424, 0 5px 12px rgba(0,0,0,0.16)', whiteSpace:'nowrap' }}>
+                Nuevo examen
               </button>
             )}
-            <a href="/tutorial"
-              style={{padding:'0.45rem 0.8rem',background:'#f1f5f9',color:'#475569',border:'1px solid #e2e8f0',borderRadius:'8px',fontSize:'0.78rem',textDecoration:'none',fontWeight:500,whiteSpace:'nowrap'}}>
-              📚 Tutorial
+            <a href="/tutorial" className="btn3d"
+              style={{ padding:'0.5rem 0.9rem', background:'#475569', color:'white', fontSize:'0.8rem', textDecoration:'none', boxShadow:'0 3px 0 #334155, 0 5px 12px rgba(0,0,0,0.16)', display:'inline-block', whiteSpace:'nowrap' }}>
+              Tutorial
             </a>
-            <button onClick={()=>setMostrarBuscador(true)}
-              style={{ padding:'0.45rem 0.8rem', background:'white', color:'#1e40af', border:'2px solid #1e40af', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:500 }}>
-              🔍 Buscar
+            <button onClick={()=>setMostrarBuscador(true)} className="btn3d"
+              style={{ padding:'0.5rem 0.9rem', background:'#1e40af', fontSize:'0.8rem', boxShadow:'0 3px 0 #15307d, 0 5px 12px rgba(0,0,0,0.16)' }}>
+              Buscar
             </button>
-            <button onClick={cargarPacientePrueba}
-              title="Cargar paciente de prueba"
-              style={{ padding:'0.45rem 0.8rem', background:'#fef3c7', color:'#92400e', border:'1px solid #f59e0b', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:600, whiteSpace:'nowrap' }}>
-              🧪 Demo
+            <button onClick={cargarPacientePrueba} title="Cargar paciente de prueba" className="btn3d"
+              style={{ padding:'0.5rem 0.9rem', background:'#d97706', fontSize:'0.8rem', boxShadow:'0 3px 0 #b45309, 0 5px 12px rgba(0,0,0,0.16)', whiteSpace:'nowrap' }}>
+              Demo
             </button>
             {datos && (
               <button onClick={()=>setMostrarInforme(true)} disabled={generandoPDF||compartiendo} className="btn3d"
@@ -414,7 +413,7 @@ export default function Home() {
           {['formulario','graficas'].map(tab => (
             <button key={tab} onClick={()=>setVistaMovil(tab)}
               style={{ flex:1, padding:'8px', border:'none', borderRadius:'8px', background:vistaMovil===tab?'white':'transparent', color:vistaMovil===tab?'#1e40af':'#64748b', fontWeight:vistaMovil===tab?600:400, fontSize:'0.85rem', cursor:'pointer', boxShadow:vistaMovil===tab?'0 1px 3px rgba(0,0,0,0.1)':'none' }}>
-              {tab==='formulario'?'📋 Formulario':'📈 Gráficas'}
+              {tab==='formulario'?'Formulario':'Gráficas'}
             </button>
           ))}
         </div>
@@ -433,8 +432,8 @@ export default function Home() {
   <div key={ojo}>
     <GraficaCurva ojo={ojo} mediciones={med} lente={lentes[ojo]} />
     <button onClick={() => setMostrarBiblioteca(ojo)}
-      style={{ width:'100%', marginTop:'6px', padding:'7px', background:'#eff6ff', color:'#1e40af', border:'1.5px solid #1e40af', borderRadius:'8px', fontSize:'0.78rem', cursor:'pointer', fontWeight:600 }}>
-      📚 Ver referencia IOL · {ojo}
+      style={{ width:'100%', marginTop:'6px', padding:'8px', background:'#eff6ff', color:'#1e40af', border:'1.5px solid #1e40af', borderRadius:'8px', fontSize:'0.78rem', cursor:'pointer', fontWeight:600 }}>
+      Ver referencia IOL · {ojo}
     </button>
   </div>
 ))}

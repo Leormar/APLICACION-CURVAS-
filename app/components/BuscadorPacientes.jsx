@@ -79,7 +79,7 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
       <div style={{ background:'white', borderRadius:'16px', padding:'1.5rem', width:'660px', maxHeight:'88vh', display:'flex', flexDirection:'column', boxShadow:'0 24px 64px rgba(0,0,0,0.4)' }}>
 
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem' }}>
-          <h2 style={{ margin:0, fontSize:'1.1rem', color:'#1e293b' }}>🔍 Buscar paciente</h2>
+          <h2 style={{ margin:0, fontSize:'1.1rem', color:'#1e293b' }}>Buscar paciente</h2>
           <button onClick={onCerrar} style={{ background:'#f1f5f9', border:'none', borderRadius:'6px', width:28, height:28, cursor:'pointer', color:'#64748b', fontSize:'1rem' }}>✕</button>
         </div>
 
@@ -102,9 +102,9 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
             onFocus={e => e.target.style.borderColor='#1e40af'}
             onBlur={e => e.target.style.borderColor='#e2e8f0'}
           />
-          <button onClick={buscar} disabled={cargando}
-            style={{ padding:'9px 22px', background:'#1e40af', color:'white', border:'none', borderRadius:'9px', cursor:'pointer', fontWeight:600, fontSize:'0.9rem' }}>
-            {cargando ? '⏳' : 'Buscar'}
+          <button onClick={buscar} disabled={cargando} className="btn3d"
+            style={{ padding:'9px 24px', background:'#1e40af', fontSize:'0.9rem', boxShadow:cargando?'none':'0 3px 0 #15307d, 0 5px 12px rgba(0,0,0,0.16)' }}>
+            {cargando ? '…' : 'Buscar'}
           </button>
         </div>
 
@@ -164,10 +164,10 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
                               ))}
                             </div>
                           </div>
-                          <button
+                          <button className="btn3d"
                             onClick={() => onCargar({ paciente: p, examenes: examen.curvas, refOD: examen.curvas[0]?.refOD||"", refOI: examen.curvas[0]?.refOI||"" })}
-                            style={{ padding:'5px 14px', background:'#1e40af', color:'white', border:'none', borderRadius:'7px', fontSize:'0.8rem', cursor:'pointer', fontWeight:600 }}>
-                            Cargar examen →
+                            style={{ padding:'6px 16px', background:'#1e40af', fontSize:'0.8rem', boxShadow:'0 3px 0 #15307d, 0 4px 10px rgba(0,0,0,0.16)' }}>
+                            Cargar examen
                           </button>
                         </div>
                         {/* Detalle curvas del examen */}

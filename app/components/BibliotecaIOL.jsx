@@ -84,7 +84,7 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
         <div style={{ background:'#1e40af', padding:'16px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
             <h2 style={{ color:'white', margin:0, fontSize:'1rem', fontWeight:800 }}>
-              📚 Biblioteca IOL de Referencia — {ojo}
+              Biblioteca IOL de Referencia — {ojo}
             </h2>
             <p style={{ color:'rgba(255,255,255,0.7)', margin:'2px 0 0', fontSize:'0.75rem' }}>
               MAIdx sd Bench · Curvas publicadas en literatura 2019-2025
@@ -116,9 +116,9 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
               </select>
 
               {curvaActual?.length >= 3 && (
-                <button onClick={clasificarCiega} disabled={cargando}
-                  style={{ width:'100%', padding:'8px', background:cargando?'#94a3b8':'#7c3aed', color:'white', border:'none', borderRadius:'8px', fontSize:'0.82rem', cursor:'pointer', fontWeight:700, boxSizing:'border-box' }}>
-                  {cargando ? '⏳ Analizando...' : '🔬 Identificar IOL por curva (MAIdx)'}
+                <button onClick={clasificarCiega} disabled={cargando} className="btn3d"
+                  style={{ width:'100%', padding:'9px', background:cargando?'#94a3b8':'#7c3aed', fontSize:'0.82rem', boxSizing:'border-box', boxShadow:cargando?'none':'0 3px 0 #5b21b6, 0 5px 12px rgba(0,0,0,0.16)' }}>
+                  {cargando ? 'Analizando…' : 'Identificar IOL por curva (MAIdx)'}
                 </button>
               )}
             </div>
