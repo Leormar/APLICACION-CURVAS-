@@ -1,19 +1,21 @@
 export const LENTES = {
-  "Full Range / Trifocal": [
+  "Trifocal": [
     "Alcon PanOptix (TFNT00)",
     "Alcon PanOptix Toric (TFNT30-T60)",
-    "Johnson & Johnson Tecnis Synergy",
-    "Johnson & Johnson Tecnis Synergy Toric",
     "Zeiss AT LISA tri 839MP",
     "Zeiss AT LISA tri Toric 939MP",
     "Carl Zeiss AT TRIEDY",
-    "Hoya Vivinex iSert XY1A",
-    "Bausch & Lomb LuxSmart",
     "PhysIOL FineVision POD F",
     "PhysIOL FineVision Triumf",
     "Rayner RayOne Trifocal",
-    "Rayner RayOne Galaxy",
     "Medicontur Liberty 677PMY",
+    "Hoya Vivinex iSert XY1A"
+  ],
+  "Full Range": [
+    "Johnson & Johnson Tecnis Synergy",
+    "Johnson & Johnson Tecnis Synergy Toric",
+    "Rayner RayOne Galaxy",
+    "Bausch & Lomb LuxSmart",
     "Hanita Intensity",
     "Hanita Intensity SL",
     "Hanita Intensity Toric",
