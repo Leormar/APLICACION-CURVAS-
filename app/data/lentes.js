@@ -17,7 +17,9 @@ export const LENTES = {
     "Hanita Intensity",
     "Hanita Intensity SL",
     "Hanita Intensity Toric",
-    "Hanita Intensity SL Toric"
+    "Hanita Intensity SL Toric",
+    "Hanita SeeLens MMF",
+    "Hanita SeeLens MMF Toric"
   ],
   "EDOF (Extended Depth of Focus)": [
     "Johnson & Johnson Tecnis Eyhance",
