@@ -6,7 +6,6 @@ export const LENTES = {
     "Zeiss AT LISA tri Toric 939MP",
     "Carl Zeiss AT TRIEDY",
     "PhysIOL FineVision POD F",
-    "PhysIOL FineVision Triumf",
     "Rayner RayOne Trifocal",
     "Medicontur Liberty 677PMY",
     "Hoya Vivinex iSert XY1A"
@@ -14,7 +13,6 @@ export const LENTES = {
   "Full Range": [
     "Johnson & Johnson Tecnis Synergy",
     "Johnson & Johnson Tecnis Synergy Toric",
-    "Rayner RayOne Galaxy",
     "Bausch & Lomb LuxSmart",
     "Hanita Intensity",
     "Hanita Intensity SL",
@@ -38,7 +36,9 @@ export const LENTES = {
     "PhysIOL MiniWell Ready",
     "Cristalens Artis Symbiose",
     "Asqelio Trifocal EDOF",
-    "SAV-IOL SAV Plus"
+    "SAV-IOL SAV Plus",
+    "PhysIOL FineVision Triumf",
+    "Rayner RayOne Galaxy"
   ],
   "Plus / Bifocal": [
     "Johnson & Johnson Tecnis Multifocal +2.75",
