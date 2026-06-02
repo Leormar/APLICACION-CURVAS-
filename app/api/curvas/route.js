@@ -37,11 +37,28 @@ export async function POST(req) {
     }
 
     const notasCompletas = JSON.stringify({ iol, refOD, refOI })
-    const curvaRes = await pool.query(
-      'INSERT INTO curvas (paciente_id, ojo, notas, fecha, usuario_email) VALUES ($1,$2,$3,CURRENT_DATE,$4) RETURNING id',
-      [pacienteId, ojo, notasCompletas, usuarioEmail]
+
+    // Reusar la curva del mismo ojo y día si ya existe, en vez de crear una nueva
+    // (evita acumular versiones por cada "Guardar"). Se actualiza la más reciente.
+    const existeCurva = await pool.query(
+      'SELECT id FROM curvas WHERE paciente_id=$1 AND ojo=$2 AND fecha=CURRENT_DATE ORDER BY id DESC LIMIT 1',
+      [pacienteId, ojo]
     )
-    const curvaId = curvaRes.rows[0].id
+    let curvaId
+    if (existeCurva.rows.length > 0) {
+      curvaId = existeCurva.rows[0].id
+      await pool.query(
+        'UPDATE curvas SET notas=$1, usuario_email=$2 WHERE id=$3',
+        [notasCompletas, usuarioEmail, curvaId]
+      )
+      await pool.query('DELETE FROM mediciones WHERE curva_id=$1', [curvaId])
+    } else {
+      const curvaRes = await pool.query(
+        'INSERT INTO curvas (paciente_id, ojo, notas, fecha, usuario_email) VALUES ($1,$2,$3,CURRENT_DATE,$4) RETURNING id',
+        [pacienteId, ojo, notasCompletas, usuarioEmail]
+      )
+      curvaId = curvaRes.rows[0].id
+    }
 
     for (const m of mediciones) {
       if (m.agudeza !== null && m.agudeza !== undefined) {

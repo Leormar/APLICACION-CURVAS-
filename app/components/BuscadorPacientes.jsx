@@ -24,6 +24,7 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
     setCargando(false)
   }
 
+  const ORDEN_OJO = { OD: 0, OI: 1, AO: 2 }
   const agrupar = (rows) => {
     const pacientes = {}
     rows.forEach(r => {
@@ -36,20 +37,30 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
         try { info = JSON.parse(r.notas || '{}') } catch(e) { info = {} }
         const fechaKey = r.fecha ? r.fecha.split('T')[0] : 'sin-fecha'
         if (!pacientes[r.id].examenes[fechaKey]) {
-          pacientes[r.id].examenes[fechaKey] = { fecha: fechaKey, curvas: [] }
+          pacientes[r.id].examenes[fechaKey] = { fecha: fechaKey, porOjo: {} }
         }
-        pacientes[r.id].examenes[fechaKey].curvas.push({
-          id: r.curva_id, ojo: r.ojo,
-          iol: info.iol || '—',
-          refOD: info.refOD || '',
-          refOI: info.refOI || '',
-          mediciones: (r.mediciones || []).filter(m => m && m.defocus !== null)
-        })
+        const porOjo = pacientes[r.id].examenes[fechaKey].porOjo
+        const previo = porOjo[r.ojo]
+        // Conservar solo la curva más reciente de cada ojo (mayor id = último guardado)
+        if (!previo || r.curva_id > previo.id) {
+          porOjo[r.ojo] = {
+            id: r.curva_id, ojo: r.ojo,
+            iol: info.iol || '—',
+            refOD: info.refOD || '',
+            refOI: info.refOI || '',
+            mediciones: (r.mediciones || []).filter(m => m && m.defocus !== null)
+          }
+        }
       }
     })
     return Object.values(pacientes).map(p => ({
       ...p,
-      examenes: Object.values(p.examenes).sort((a,b) => b.fecha.localeCompare(a.fecha))
+      examenes: Object.values(p.examenes)
+        .map(ex => ({
+          fecha: ex.fecha,
+          curvas: Object.values(ex.porOjo).sort((a,b) => (ORDEN_OJO[a.ojo]??9) - (ORDEN_OJO[b.ojo]??9))
+        }))
+        .sort((a,b) => b.fecha.localeCompare(a.fecha))
     }))
   }
 
