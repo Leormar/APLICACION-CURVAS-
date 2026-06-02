@@ -99,17 +99,18 @@ export async function POST(req) {
     const edad = calcEdad(fechaNac)
 
     // Etiqueta del LIO por ojo:
-    // 1) elegido manualmente por IA en la biblioteca → "X (seleccionado por IA · examen ciego · %)"
-    // 2) LIO implantado + sugerencia por curva → "X · Según curva (IA): Y (%)"
-    // 3) sin LIO pero con sugerencia → "Y (LIO elegido por IA · examen ciego · %)"
+    // - elegido manualmente por IA en la biblioteca → "X (seleccionado por IA · examen ciego · %)"
+    // - "valoración ciega" (__ciega__) → "Y (LIO elegido por IA · examen ciego · %)"
+    // - LIO implantado (nombre) → "X" o "X · Según curva (IA): Y (%)"
+    // - sin LIO / ojo no operado ("") → "Sin LIO"
     const iolLabel = (ojo) => {
-      const implantado = lentes?.[ojo]
+      const v = lentes?.[ojo]
       const ia = iolIA?.[ojo]
       const sug = iolSugerido?.[ojo]
-      if (ia) return `${implantado} (seleccionado por IA · examen ciego · ${ia.similitud}%)`
-      if (implantado) return sug ? `${implantado} · Según curva (IA): ${sug.nombre} (${sug.similitud}%)` : implantado
-      if (sug) return `${sug.nombre} (LIO elegido por IA · examen ciego · ${sug.similitud}%)`
-      return ''
+      if (ia && v) return `${v} (seleccionado por IA · examen ciego · ${ia.similitud}%)`
+      if (v === '__ciega__') return sug ? `${sug.nombre} (LIO elegido por IA · examen ciego · ${sug.similitud}%)` : 'Valoración ciega'
+      if (v && v !== '__ciega__') return sug ? `${v} · Según curva (IA): ${sug.nombre} (${sug.similitud}%)` : v
+      return 'Sin LIO'
     }
 
     const seccion = (med, titulo, color, iol, textoAI) => {

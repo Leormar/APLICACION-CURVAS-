@@ -110,6 +110,14 @@ export default function Home() {
     setIolIA(prev => ({ ...prev, [ojo]: { similitud } }))
   }
 
+  // Cambio explícito del LIO en el desplegable del formulario (autoritativo).
+  // Limpia cualquier marca/sugerencia previa para ese ojo.
+  const handleLenteChange = (ojo, val) => {
+    setLentes(prev => ({ ...prev, [ojo]: val }))
+    setIolIA(prev => { if (!prev[ojo]) return prev; const n = { ...prev }; delete n[ojo]; return n })
+    setIolSugerido(prev => { if (!prev[ojo]) return prev; const n = { ...prev }; delete n[ojo]; return n })
+  }
+
   const handleGuardado = async (d) => {
   setDatos(d)
   setVistaMovil('graficas')
@@ -389,7 +397,7 @@ export default function Home() {
         </div>
         <div className="layout-grid" style={{ display:'grid', gridTemplateColumns:'460px 1fr', gap:'1rem' }}>
           <div className="panel-formulario">
-            <FormularioCurva key={formKey} onMedicionesChange={handleMediciones} onGuardado={handleGuardado} pacienteCargado={pacienteCargado} />
+            <FormularioCurva key={formKey} onMedicionesChange={handleMediciones} onGuardado={handleGuardado} pacienteCargado={pacienteCargado} onLenteChange={handleLenteChange} />
           </div>
           <div className="panel-graficas" style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
             {ojosConDatos.length===0 && (

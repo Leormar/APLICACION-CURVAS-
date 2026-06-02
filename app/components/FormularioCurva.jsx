@@ -57,7 +57,7 @@ const defocusToKey = (defVal) => {
   return num >= 0 ? '+' + num.toFixed(2) : num.toFixed(2)
 }
 
-export default function FormularioCurva({ onMedicionesChange, onGuardado, pacienteCargado }) {
+export default function FormularioCurva({ onMedicionesChange, onGuardado, pacienteCargado, onLenteChange }) {
   const [nombre, setNombre] = useState('')
   const [apellido1, setApellido1] = useState('')
   const [apellido2, setApellido2] = useState('')
@@ -252,10 +252,11 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
             <select style={s.inp} value={lentes[o]} onChange={e=>{
               const val = e.target.value
               setLentes(prev=>({...prev,[o]:val}))
-              // Propagar el LIO a la página para que la gráfica y el PDF lo muestren.
-              onMedicionesChange(o, getMedicionesFromLogMAR(valoresLogMAR[o]||{}), val)
+              // El desplegable es la fuente autoritativa del LIO para la página.
+              if (onLenteChange) onLenteChange(o, val)
             }}>
-              <option value="">— Sin IOL —</option>
+              <option value="">— Sin IOL · ojo no operado —</option>
+              <option value="__ciega__">🔬 Valoración ciega (la IA sugiere el LIO)</option>
               {Object.entries(LENTES).map(([cat,lista]) => (
                 <optgroup key={cat} label={cat}>
                   {lista.map(l=><option key={l} value={l}>{l}</option>)}

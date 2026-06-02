@@ -1,6 +1,7 @@
 import { getUsuarioAprobado } from '../../../lib/auth-guard'
 import pool from '../../../lib/db'
 import { clasificarCurva } from '../../../lib/iol-match'
+import { pideSugerencia, IOL_CIEGA } from '../../../lib/iol-constants'
 
 export async function POST(req) {
   try {
@@ -11,11 +12,14 @@ export async function POST(req) {
 
     const { datos, curvas } = await req.json()
 
-    // LIO sugerido por la curva (determinístico, sin tokens) para cada ojo con >=3 puntos.
+    // LIO sugerido por la curva (determinístico, sin tokens).
+    // Solo para ojos con LIO real (comparación) o en "valoración ciega"; NUNCA si está sin LIO.
+    const lentesIn = datos?.lentes || {}
     const iolSugerido = {}
     try {
       const refs = await pool.query('SELECT * FROM iol_referencias WHERE validado = true')
       for (const o of ['OD','OI','AO']) {
+        if (!pideSugerencia(lentesIn[o])) continue
         const med = curvas?.[o]
         if (med && med.length >= 3) {
           const r = clasificarCurva(med, refs.rows)
@@ -33,7 +37,9 @@ export async function POST(req) {
     const formatearOjo = (med, ojo) => {
       if (!med || med.length === 0) return ''
       const lenteRaw = datos?.lentes?.[ojo]
-      const lente = (lenteRaw && lenteRaw.trim()) ? lenteRaw : 'sin implante de LIO'
+      const lente = lenteRaw === IOL_CIEGA
+        ? 'valoración ciega (tipo de LIO no especificado)'
+        : (lenteRaw && lenteRaw.trim()) ? lenteRaw : 'sin implante de LIO'
       const lineas = med.sort((a,b)=>a.defocus-b.defocus).map(m => {
         const v = VERGENCIAS[String(parseFloat(m.defocus))] || ''
         return `  ${m.defocus}D (${v}): ${m.agudeza} LogMAR`
@@ -46,6 +52,7 @@ export async function POST(req) {
 
     const iolPara = (ojo) => {
       const v = datos?.lentes?.[ojo]
+      if (v === IOL_CIEGA) return 'valoración ciega'
       return (v && v.trim()) ? v : 'sin implante de LIO'
     }
 
@@ -78,11 +85,13 @@ ANALISIS BINOCULAR (AO)
 Escribe aqui como se complementan ambos ojos en 2-3 oraciones.
 
 COMPORTAMIENTO DEL IOL
-Escribe aqui el tipo de curva en 2-3 oraciones. Para cada ojo usa el dato "LIO segun curva (MAIdx)":
-si el ojo tiene LIO implantado, compara si la morfologia de la curva concuerda con ese LIO o si se
-asemeja mas al LIO indicado por MAIdx, e indicalo explicitamente (concordancia o discrepancia).
-Si el ojo no tiene LIO implantado, indica que por valoracion ciega la curva corresponde al LIO
-indicado por MAIdx (LIO elegido por IA).
+Escribe aqui el tipo de curva en 2-3 oraciones. Para cada ojo:
+- si tiene un LIO implantado (un nombre): usa "LIO segun curva (MAIdx)" para comparar si la
+  morfologia concuerda con ese LIO o si se asemeja mas al de MAIdx (concordancia o discrepancia).
+- si esta en "valoracion ciega": indica que el tipo de LIO no se especifico y que, por la
+  morfologia, la curva corresponde al LIO indicado por MAIdx (LIO sugerido por IA).
+- si esta "sin implante de LIO": tratalo como ojo no operado / sin LIO; NO asignes ni sugieras
+  ningun LIO.
 
 IMPACTO REFRACTIVO
 Escribe aqui si la refraccion afecta los resultados en 2 oraciones.

@@ -1,5 +1,6 @@
 'use client'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Label } from 'recharts'
+import { IOL_CIEGA, nombreIOLDisplay } from '../../lib/iol-constants'
 
 const VERGENCIAS = { '1':'VP ext','0.5':'VP','0':'VL','-0.5':'2m','-1':'1m','-1.5':'67cm','-2':'50cm','-2.5':'40cm','-3':'33cm','-3.5':'29cm','-4':'25cm','-4.5':'22cm','-5':'20cm' }
 const verg = d => VERGENCIAS[String(parseFloat(d))] || ''
@@ -31,7 +32,9 @@ export default function GraficaCurva({ ojo, mediciones, lente }) {
     return { label:'Monofocal', color:'#64748b' }
   }
 
-  const cat = categoriaLente(lente)
+  const esCiega = lente === IOL_CIEGA
+  const nombreLente = nombreIOLDisplay(lente)
+  const cat = esCiega ? { label:'examen ciego', color:'#7c3aed' } : categoriaLente(lente)
 
   // Invertir datos para que 0 quede arriba: usar valor negativo internamente
   const datosInvertidos = datos.map(d => ({ ...d, avInvertido: -d.agudeza }))
@@ -47,9 +50,9 @@ export default function GraficaCurva({ ojo, mediciones, lente }) {
             <span style={{ display:'inline-block', width:10, height:10, borderRadius:'50%', background:color, marginRight:6 }}></span>
             {nombres[ojo]}
           </h2>
-          {lente && lente !== '__otro__' && (
+          {nombreLente && lente !== '__otro__' && (
             <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:3 }}>
-              <span style={{ fontSize:'0.78rem', color:'#475569' }}>{lente}</span>
+              <span style={{ fontSize:'0.78rem', color:'#475569' }}>{nombreLente}</span>
               <span style={{ fontSize:'0.7rem', padding:'1px 7px', borderRadius:'10px', background:cat.color+'22', color:cat.color, fontWeight:600 }}>{cat.label}</span>
             </div>
           )}

@@ -1,5 +1,6 @@
 'use client'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Label, Legend } from 'recharts'
+import { nombreIOLDisplay } from '../../lib/iol-constants'
 
 const VERGENCIAS = { '1':'VP ext','0.5':'VP','0':'VL','-0.5':'2m','-1':'1m','-1.5':'67cm','-2':'50cm','-2.5':'40cm','-3':'33cm','-3.5':'29cm','-4':'25cm','-4.5':'22cm','-5':'20cm' }
 const verg = d => VERGENCIAS[String(parseFloat(d))] || ''
@@ -56,13 +57,13 @@ export default function GraficaComparativa({ curvas, lentes }) {
           {hayOD && (
             <div style={{ display:'flex', alignItems:'center', gap:'6px', fontSize:'0.78rem', color:'#475569' }}>
               <div style={{ width:24, height:3, background:'#1e40af', borderRadius:2 }}></div>
-              OD {lentes?.OD ? `· ${lentes.OD}` : ''}
+              OD {nombreIOLDisplay(lentes?.OD) ? `· ${nombreIOLDisplay(lentes?.OD)}` : ''}
             </div>
           )}
           {hayOI && (
             <div style={{ display:'flex', alignItems:'center', gap:'6px', fontSize:'0.78rem', color:'#475569' }}>
               <div style={{ width:24, height:3, background:'#0f766e', borderRadius:2 }}></div>
-              OI {lentes?.OI ? `· ${lentes.OI}` : ''}
+              OI {nombreIOLDisplay(lentes?.OI) ? `· ${nombreIOLDisplay(lentes?.OI)}` : ''}
             </div>
           )}
           {hayAO && (
