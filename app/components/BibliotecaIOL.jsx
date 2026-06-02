@@ -13,7 +13,7 @@ const CATEGORIAS = {
 const VERGENCIAS = [1,0.5,0,-0.5,-1,-1.5,-2,-2.5,-3,-3.5,-4,-4.5,-5]
 const CAMPOS = ['v_pos1','v_pos05','v_0','v_neg05','v_neg1','v_neg15','v_neg2','v_neg25','v_neg3','v_neg35','v_neg4','v_neg45','v_neg5']
 
-export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar }) {
+export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, onSeleccionarIOL }) {
   const [iolRefs, setIolRefs] = useState([])
   const [seleccionado, setSeleccionado] = useState(null)
   const [categoriaFiltro, setCategoriaFiltro] = useState('')
@@ -134,11 +134,31 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar })
                 {clasificacion.top3?.map((r, i) => (
                   <div key={i}
                     onClick={() => setSeleccionado(iolRefs.find(x => x.id === r.id))}
-                    style={{ display:'flex', justifyContent:'space-between', padding:'4px 6px', borderRadius:'6px', cursor:'pointer', background: i===0 ? '#dbeafe' : 'transparent', marginBottom:'2px' }}>
-                    <span style={{ fontSize:'0.72rem', color:'#1e293b', fontWeight: i===0 ? 700 : 400 }}>{i+1}. {r.nombre}</span>
-                    <span style={{ fontSize:'0.7rem', color:'#0369a1', fontWeight:700 }}>{r.similitud}%</span>
+                    style={{ display:'flex', justifyContent:'space-between', padding:'4px 6px', borderRadius:'6px', cursor:'pointer', background: seleccionado?.id===r.id ? '#dbeafe' : 'transparent', marginBottom:'2px' }}>
+                    <span style={{ fontSize:'0.72rem', color:'#1e293b', fontWeight: seleccionado?.id===r.id ? 700 : 400 }}>{i+1}. {r.nombre}</span>
+                    <span style={{ fontSize:'0.7rem', color: r.similitud>=85 ? '#16a34a' : '#d97706', fontWeight:700 }}>{r.similitud}%</span>
                   </div>
                 ))}
+
+                {onSeleccionarIOL && seleccionado && (() => {
+                  const simSel = clasificacion.top3?.find(r => r.id === seleccionado.id)?.similitud
+                  const apto = simSel != null && simSel >= 85
+                  return (
+                    <div style={{ marginTop:'8px' }}>
+                      <button
+                        onClick={() => { if (apto) { onSeleccionarIOL(ojo, seleccionado.nombre, simSel); onCerrar() } }}
+                        disabled={!apto}
+                        style={{ width:'100%', padding:'8px', background: apto ? '#16a34a' : '#cbd5e1', color:'white', border:'none', borderRadius:'8px', fontSize:'0.78rem', cursor: apto ? 'pointer' : 'not-allowed', fontWeight:700, boxSizing:'border-box' }}>
+                        ✓ Usar este LIO en el examen ({ojo}){simSel != null ? ` — ${simSel}%` : ''}
+                      </button>
+                      {!apto && (
+                        <p style={{ margin:'4px 0 0', fontSize:'0.66rem', color:'#d97706', textAlign:'center' }}>
+                          Coincidencia &lt;85%: revisa o elige manual
+                        </p>
+                      )}
+                    </div>
+                  )
+                })()}
               </div>
             )}
 

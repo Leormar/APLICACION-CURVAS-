@@ -16,6 +16,7 @@ export default function Home() {
   const router = useRouter()
   const [curvas, setCurvas] = useState({ OD: [], OI: [], AO: [] })
   const [lentes, setLentes] = useState({ OD: '', OI: '' })
+  const [iolIA, setIolIA] = useState({})
   const [datos, setDatos] = useState(null)
   const [mostrarBuscador, setMostrarBuscador] = useState(false)
   const [pacienteCargado, setPacienteCargado] = useState(null)
@@ -52,6 +53,7 @@ export default function Home() {
         const refOI = examenes[0]?.refOI || ''
         setPacienteCargado({ paciente: pac, examenes, refOD, refOI })
         setDatos({ paciente: pac.nombre, documento: pac.documento, fechaNac: pac.fecha_nacimiento?.split?.('T')[0]||'', lentes:{OD:'',OI:''}, refOD, refOI, tipoAV:'logmar' })
+        setIolIA({})
         setEsPacientePrueba(true)
         setVistaMovil('graficas')
       })
@@ -79,6 +81,7 @@ export default function Home() {
   const handleNuevoExamen = () => {
     setCurvas({ OD: [], OI: [], AO: [] })
     setLentes({ OD: '', OI: '' })
+    setIolIA({})
     setDatos(null)
     setPacienteCargado(null)
     setInterpretacion('')
@@ -90,7 +93,18 @@ export default function Home() {
 
   const handleMediciones = (ojo, mediciones, lente) => {
     setCurvas(prev => ({ ...prev, [ojo]: mediciones }))
-    if (ojo !== 'AO') setLentes(prev => ({ ...prev, [ojo]: lente }))
+    if (ojo === 'AO') return
+    // No pisar un LIO elegido por IA con un valor vacío del formulario.
+    if (!lente && iolIA[ojo]) return
+    setLentes(prev => ({ ...prev, [ojo]: lente }))
+    // Un cambio manual real de LIO invalida la marca de IA.
+    if (lente && iolIA[ojo]) setIolIA(prev => { const n = { ...prev }; delete n[ojo]; return n })
+  }
+
+  // LIO elegido por IA (examen ciego) desde la biblioteca: queda seteado para PDF y lectura.
+  const handleSeleccionIOL = (ojo, nombre, similitud) => {
+    setLentes(prev => ({ ...prev, [ojo]: nombre }))
+    setIolIA(prev => ({ ...prev, [ojo]: { similitud } }))
   }
 
   const handleGuardado = async (d) => {
@@ -129,6 +143,7 @@ export default function Home() {
     })
     setCurvas(nuevasCurvas)
     setLentes(nuevosLentes)
+    setIolIA({})
     setInterpretacion('')
     setSecciones(null)
     setPacienteCargado({ paciente, examenes, refOD, refOI })
@@ -142,7 +157,7 @@ export default function Home() {
     if (!datos) return
     setGenerandoPDF(true)
     try {
-      const res = await fetch('/api/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, interpretacion, secciones}) })
+      const res = await fetch('/api/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, interpretacion, secciones}) })
       if (!res.ok) throw new Error('Error ' + res.status)
       const html = await res.text()
       const blob = new Blob([html], { type:'text/html; charset=utf-8' })
@@ -413,6 +428,7 @@ export default function Home() {
             nombreIOL={lentes[mostrarBiblioteca]}
             ojo={mostrarBiblioteca}
             onCerrar={() => setMostrarBiblioteca(null)}
+            onSeleccionarIOL={handleSeleccionIOL}
           />
         )}
       </main>

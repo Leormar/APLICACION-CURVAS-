@@ -94,9 +94,17 @@ const limpiarFinal = (t) => {
 
 export async function POST(req) {
   try {
-    const { paciente, documento, fechaNac, lentes, refOD, refOI, tipoAV, curvas, interpretacion, secciones, perfil } = await req.json()
+    const { paciente, documento, fechaNac, lentes, iolIA, refOD, refOI, tipoAV, curvas, interpretacion, secciones, perfil } = await req.json()
     const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
     const edad = calcEdad(fechaNac)
+
+    // Nombre del LIO + aclaración cuando fue elegido por IA (examen ciego).
+    const iolLabel = (ojo) => {
+      const nombre = lentes?.[ojo]
+      if (!nombre) return ''
+      const ia = iolIA?.[ojo]
+      return ia ? `${nombre} (seleccionado por IA · examen ciego · ${ia.similitud}%)` : nombre
+    }
 
     const seccion = (med, titulo, color, iol, textoAI) => {
       if (!med || med.length === 0) return ''
@@ -184,12 +192,12 @@ export async function POST(req) {
 <div class="refbar">
   <div class="ref-item"><strong>Refracción OD</strong>${refOD||'—'}</div>
   <div class="ref-item"><strong>Refracción OI</strong>${refOI||'—'}</div>
-  <div class="ref-item"><strong>IOL OD</strong>${lentes?.OD||'—'}</div>
-  <div class="ref-item"><strong>IOL OI</strong>${lentes?.OI||'—'}</div>
+  <div class="ref-item"><strong>IOL OD</strong>${iolLabel('OD')||'—'}</div>
+  <div class="ref-item"><strong>IOL OI</strong>${iolLabel('OI')||'—'}</div>
 </div>
 
-${seccion(curvas?.OD,'Ojo Derecho (OD)','#1e40af',lentes?.OD,secciones?.OD)}
-${seccion(curvas?.OI,'Ojo Izquierdo (OI)','#0f766e',lentes?.OI,secciones?.OI)}
+${seccion(curvas?.OD,'Ojo Derecho (OD)','#1e40af',iolLabel('OD'),secciones?.OD)}
+${seccion(curvas?.OI,'Ojo Izquierdo (OI)','#0f766e',iolLabel('OI'),secciones?.OI)}
 ${seccion(curvas?.AO,'Ambos Ojos (AO)','#7c3aed','',secciones?.AO)}
 
 ${textoFinal?`<div class="final-box">
