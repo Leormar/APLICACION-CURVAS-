@@ -17,6 +17,7 @@ export default function Home() {
   const [curvas, setCurvas] = useState({ OD: [], OI: [], AO: [] })
   const [lentes, setLentes] = useState({ OD: '', OI: '' })
   const [iolIA, setIolIA] = useState({})
+  const [iolSugerido, setIolSugerido] = useState({})
   const [datos, setDatos] = useState(null)
   const [mostrarBuscador, setMostrarBuscador] = useState(false)
   const [pacienteCargado, setPacienteCargado] = useState(null)
@@ -54,6 +55,7 @@ export default function Home() {
         setPacienteCargado({ paciente: pac, examenes, refOD, refOI })
         setDatos({ paciente: pac.nombre, documento: pac.documento, fechaNac: pac.fecha_nacimiento?.split?.('T')[0]||'', lentes:{OD:'',OI:''}, refOD, refOI, tipoAV:'logmar' })
         setIolIA({})
+        setIolSugerido({})
         setEsPacientePrueba(true)
         setVistaMovil('graficas')
       })
@@ -82,6 +84,7 @@ export default function Home() {
     setCurvas({ OD: [], OI: [], AO: [] })
     setLentes({ OD: '', OI: '' })
     setIolIA({})
+    setIolSugerido({})
     setDatos(null)
     setPacienteCargado(null)
     setInterpretacion('')
@@ -144,6 +147,7 @@ export default function Home() {
     setCurvas(nuevasCurvas)
     setLentes(nuevosLentes)
     setIolIA({})
+    setIolSugerido({})
     setInterpretacion('')
     setSecciones(null)
     setPacienteCargado({ paciente, examenes, refOD, refOI })
@@ -157,7 +161,7 @@ export default function Home() {
     if (!datos) return
     setGenerandoPDF(true)
     try {
-      const res = await fetch('/api/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, interpretacion, secciones}) })
+      const res = await fetch('/api/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...datos, curvas, lentes, iolIA, iolSugerido, interpretacion, secciones}) })
       if (!res.ok) throw new Error('Error ' + res.status)
       const html = await res.text()
       const blob = new Blob([html], { type:'text/html; charset=utf-8' })
@@ -406,7 +410,7 @@ export default function Home() {
             {ojosConDatos.length >= 2 && (
   <GraficaComparativa curvas={curvas} lentes={lentes} />
 )}
-            {ojosConDatos.length>0 && (<InterpretacionAI datos={{...datos,lentes}} curvas={curvas} onInterpretacion={setInterpretacion} onSecciones={setSecciones} />)}
+            {ojosConDatos.length>0 && (<InterpretacionAI datos={{...datos,lentes}} curvas={curvas} onInterpretacion={setInterpretacion} onSecciones={setSecciones} onSugeridos={setIolSugerido} />)}
           </div>
         </div>
         {datos && (

@@ -94,16 +94,22 @@ const limpiarFinal = (t) => {
 
 export async function POST(req) {
   try {
-    const { paciente, documento, fechaNac, lentes, iolIA, refOD, refOI, tipoAV, curvas, interpretacion, secciones, perfil } = await req.json()
+    const { paciente, documento, fechaNac, lentes, iolIA, iolSugerido, refOD, refOI, tipoAV, curvas, interpretacion, secciones, perfil } = await req.json()
     const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
     const edad = calcEdad(fechaNac)
 
-    // Nombre del LIO + aclaración cuando fue elegido por IA (examen ciego).
+    // Etiqueta del LIO por ojo:
+    // 1) elegido manualmente por IA en la biblioteca → "X (seleccionado por IA · examen ciego · %)"
+    // 2) LIO implantado + sugerencia por curva → "X · Según curva (IA): Y (%)"
+    // 3) sin LIO pero con sugerencia → "Y (LIO elegido por IA · examen ciego · %)"
     const iolLabel = (ojo) => {
-      const nombre = lentes?.[ojo]
-      if (!nombre) return ''
+      const implantado = lentes?.[ojo]
       const ia = iolIA?.[ojo]
-      return ia ? `${nombre} (seleccionado por IA · examen ciego · ${ia.similitud}%)` : nombre
+      const sug = iolSugerido?.[ojo]
+      if (ia) return `${implantado} (seleccionado por IA · examen ciego · ${ia.similitud}%)`
+      if (implantado) return sug ? `${implantado} · Según curva (IA): ${sug.nombre} (${sug.similitud}%)` : implantado
+      if (sug) return `${sug.nombre} (LIO elegido por IA · examen ciego · ${sug.similitud}%)`
+      return ''
     }
 
     const seccion = (med, titulo, color, iol, textoAI) => {

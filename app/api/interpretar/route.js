@@ -1,4 +1,6 @@
 import { getUsuarioAprobado } from '../../../lib/auth-guard'
+import pool from '../../../lib/db'
+import { clasificarCurva } from '../../../lib/iol-match'
 
 export async function POST(req) {
   try {
@@ -8,6 +10,19 @@ export async function POST(req) {
     }
 
     const { datos, curvas } = await req.json()
+
+    // LIO sugerido por la curva (determinístico, sin tokens) para cada ojo con >=3 puntos.
+    const iolSugerido = {}
+    try {
+      const refs = await pool.query('SELECT * FROM iol_referencias WHERE validado = true')
+      for (const o of ['OD','OI','AO']) {
+        const med = curvas?.[o]
+        if (med && med.length >= 3) {
+          const r = clasificarCurva(med, refs.rows)
+          if (r?.top3?.[0]) iolSugerido[o] = { nombre: r.top3[0].nombre, similitud: r.top3[0].similitud }
+        }
+      }
+    } catch (e) { console.error('iol-match en interpretar:', e.message) }
 
     const VERGENCIAS = {
       '1':'VP extrema','0.5':'VP','0':'VL','-0.5':'2m','-1':'1m',
@@ -24,7 +39,9 @@ export async function POST(req) {
         return `  ${m.defocus}D (${v}): ${m.agudeza} LogMAR`
       }).join('\n')
       const funcional = med.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ') || 'ninguno'
-      return `${ojo} — IOL: ${lente}\n${lineas}\nRango funcional: ${funcional}`
+      const sug = iolSugerido[ojo]
+      const lineaSug = sug ? `\nLIO segun curva (MAIdx): ${sug.nombre} (${sug.similitud}% de similitud)` : ''
+      return `${ojo} — IOL: ${lente}${lineaSug}\n${lineas}\nRango funcional: ${funcional}`
     }
 
     const iolPara = (ojo) => {
@@ -61,7 +78,11 @@ ANALISIS BINOCULAR (AO)
 Escribe aqui como se complementan ambos ojos en 2-3 oraciones.
 
 COMPORTAMIENTO DEL IOL
-Escribe aqui el tipo de curva y si corresponde al IOL implantado en 2-3 oraciones.
+Escribe aqui el tipo de curva en 2-3 oraciones. Para cada ojo usa el dato "LIO segun curva (MAIdx)":
+si el ojo tiene LIO implantado, compara si la morfologia de la curva concuerda con ese LIO o si se
+asemeja mas al LIO indicado por MAIdx, e indicalo explicitamente (concordancia o discrepancia).
+Si el ojo no tiene LIO implantado, indica que por valoracion ciega la curva corresponde al LIO
+indicado por MAIdx (LIO elegido por IA).
 
 IMPACTO REFRACTIVO
 Escribe aqui si la refraccion afecta los resultados en 2 oraciones.
@@ -113,7 +134,7 @@ Escribe aqui la conducta clinica y seguimiento en 3-4 oraciones.`
       completo: interpretacion
     }
 
-    return Response.json({ interpretacion, secciones })
+    return Response.json({ interpretacion, secciones, iolSugerido })
   } catch(e) {
     return Response.json({ error: e.message }, { status: 500 })
   }

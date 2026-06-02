@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-export default function InterpretacionAI({ datos, curvas, onInterpretacion, onSecciones }) {
+export default function InterpretacionAI({ datos, curvas, onInterpretacion, onSecciones, onSugeridos }) {
   const [interpretacion, setInterpretacion] = useState('')
   const [cargando, setCargando] = useState(false)
   const [confirmFaltante, setConfirmFaltante] = useState(null)
@@ -21,6 +21,7 @@ export default function InterpretacionAI({ datos, curvas, onInterpretacion, onSe
       setInterpretacion(limpio)
       if (onInterpretacion) onInterpretacion(limpio)
       if (onSecciones && json.secciones) onSecciones(json.secciones)
+      if (onSugeridos && json.iolSugerido) onSugeridos(json.iolSugerido)
     } catch(e) {
       setInterpretacion('Error: ' + e.message)
     }
