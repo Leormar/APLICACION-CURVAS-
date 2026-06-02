@@ -113,30 +113,29 @@ export async function POST(req) {
       return 'Sin LIO'
     }
 
-    const seccion = (med, titulo, color, iol, textoAI) => {
+    // Tarjeta de gráfica (sin texto de análisis): encabezado del ojo + LIO + curva + rango funcional.
+    const tarjetaGrafica = (med, titulo, color, iol) => {
       if (!med || med.length === 0) return ''
       const datos = med.map(m=>({defocus:parseFloat(m.defocus),agudeza:parseFloat(m.agudeza)})).sort((a,b)=>a.defocus-b.defocus)
       const funcional = datos.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ') || 'ninguno'
-      const tituloAI = titulo.includes('OD') ? 'Análisis Ojo Derecho' : titulo.includes('OI') ? 'Análisis Ojo Izquierdo' : 'Análisis Binocular'
-      const columnaTexto = textoAI
-        ? `<div>
-            <div style="font-size:11px;font-weight:bold;color:#1e293b;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #e2e8f0">${tituloAI}</div>
-            <div style="font-size:11px;color:#1e293b;line-height:1.9;flex:1;min-width:0">${limpiarLateral(textoAI)}</div>
-           </div>`
-        : `<div style="font-size:10px;color:#94a3b8;font-style:italic;padding-top:4px">Presiona "Interpretar curva" antes de generar el PDF para obtener el análisis clínico.</div>`
-      return `<div style="margin-top:14px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;page-break-inside:avoid">
-        <div style="background:${color};color:white;padding:9px 16px;font-size:14px;font-weight:bold">
-          ${titulo}${iol&&iol!=='—'&&iol?` · <span style="font-weight:400;font-size:12px">${iol}</span>`:''}
+      return `<div class="grafica-card" style="border-top:3px solid ${color}">
+        <div class="grafica-head">
+          <span style="font-weight:800;color:${color}">${titulo}</span>
+          ${iol ? `<span class="grafica-iol">${iol}</span>` : ''}
         </div>
-        <div style="padding:10px 14px;display:flex;flex-direction:row;gap:14px;align-items:flex-start">
-          <div>
-            <div style="flex-shrink:0;width:340px">${graficaSVG(med, color)}</div>
-            <div style="font-size:9px;color:#0369a1;margin:4px 0 0;padding:4px 8px;background:#f0f9ff;border-radius:4px;border-left:3px solid #0369a1">
-              Rango funcional (≤0.2 LogMAR): <strong>${funcional}</strong>
-            </div>
-          </div>
-          ${columnaTexto}
+        <div class="grafica-svg">${graficaSVG(med, color)}</div>
+        <div class="grafica-func">Rango funcional (≤0.2 LogMAR): <strong>${funcional}</strong></div>
+      </div>`
+    }
+
+    // Sub-bloque de análisis por ojo dentro de la sección de Análisis Clínico.
+    const analisisOjo = (titulo, color, textoAI) => {
+      if (!textoAI) return ''
+      return `<div class="analisis-ojo">
+        <div class="analisis-ojo-tit" style="color:${color}">
+          <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${color};margin-right:7px"></span>${titulo}
         </div>
+        <div class="analisis-ojo-txt">${limpiarLateral(textoAI)}</div>
       </div>`
     }
 
@@ -166,8 +165,20 @@ export async function POST(req) {
   .refbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
   .ref-item{background:white;border:1px solid #e2e8f0;border-radius:6px;padding:5px 10px;font-size:10px;color:#475569;flex:1;min-width:120px}
   .ref-item strong{display:block;font-size:11px;color:#1e293b;margin-bottom:1px}
-  .final-box{margin-top:14px;padding:12px 16px;background:#faf5ff;border-radius:8px;border:1px solid #e9d5ff;font-size:11px;line-height:1.9}
-  .disclaimer{margin-top:8px;padding:5px 10px;background:#fef3c7;border-radius:4px;border-left:3px solid #f59e0b;font-size:8.5px;color:#92400e}
+  .seccion-titulo{font-size:12px;font-weight:800;color:#1e40af;text-transform:uppercase;letter-spacing:1px;border-left:4px solid #1e40af;padding-left:9px;margin:16px 0 9px}
+  .graficas{display:flex;flex-direction:column;gap:10px}
+  .grafica-card{border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px 10px;page-break-inside:avoid}
+  .grafica-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:4px;flex-wrap:wrap;gap:4px}
+  .grafica-iol{font-size:10.5px;font-weight:600;color:#475569;background:#f1f5f9;padding:2px 9px;border-radius:10px}
+  .grafica-svg{display:flex;justify-content:center}
+  .grafica-svg svg{max-width:100%;height:auto}
+  .grafica-func{font-size:9px;color:#0369a1;margin-top:5px;padding:4px 8px;background:#f0f9ff;border-radius:4px;border-left:3px solid #0369a1}
+  .analisis{border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;page-break-inside:avoid}
+  .analisis-ojo{margin-bottom:11px}
+  .analisis-ojo-tit{font-size:11.5px;font-weight:700;margin-bottom:3px}
+  .analisis-ojo-txt{font-size:11px;color:#1e293b;line-height:1.75}
+  .conclusion{margin-top:6px;padding-top:11px;border-top:1px solid #e2e8f0;font-size:11px;line-height:1.85;color:#1e293b}
+  .disclaimer{margin-top:10px;padding:5px 10px;background:#fef3c7;border-radius:4px;border-left:3px solid #f59e0b;font-size:8.5px;color:#92400e}
   .footer{margin-top:14px;text-align:center;font-size:8px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px}
   @media print{body{padding:10px 16px}@page{margin:0.5cm;size:A4}}
 </style></head><body>
@@ -203,14 +214,22 @@ export async function POST(req) {
   <div class="ref-item"><strong>IOL OI</strong>${iolLabel('OI')||'—'}</div>
 </div>
 
-${seccion(curvas?.OD,'Ojo Derecho (OD)','#1e40af',iolLabel('OD'),secciones?.OD)}
-${seccion(curvas?.OI,'Ojo Izquierdo (OI)','#0f766e',iolLabel('OI'),secciones?.OI)}
-${seccion(curvas?.AO,'Ambos Ojos (AO)','#7c3aed','',secciones?.AO)}
+<div class="seccion-titulo">Curvas de Desenfoque</div>
+<div class="graficas">
+  ${tarjetaGrafica(curvas?.OD,'Ojo Derecho (OD)','#1e40af',iolLabel('OD'))}
+  ${tarjetaGrafica(curvas?.OI,'Ojo Izquierdo (OI)','#0f766e',iolLabel('OI'))}
+  ${tarjetaGrafica(curvas?.AO,'Ambos Ojos (AO)','#7c3aed','')}
+</div>
 
-${textoFinal?`<div class="final-box">
-  ${textoFinal}
+${(secciones?.OD||secciones?.OI||secciones?.AO||textoFinal)?`
+<div class="seccion-titulo">Análisis Clínico · MAIdx sd Bench</div>
+<div class="analisis">
+  ${analisisOjo('Ojo Derecho (OD)','#1e40af',secciones?.OD)}
+  ${analisisOjo('Ojo Izquierdo (OI)','#0f766e',secciones?.OI)}
+  ${analisisOjo('Binocular (AO)','#7c3aed',secciones?.AO)}
+  ${textoFinal?`<div class="conclusion">${textoFinal}</div>`:''}
   <div class="disclaimer">Análisis generado por MAIdx sd Bench como apoyo diagnóstico. La interpretación clínica final es responsabilidad del profesional tratante.</div>
-</div>`:''}
+</div>`:`<div style="margin-top:10px;font-size:10px;color:#94a3b8;font-style:italic">Presiona "Interpretar curva" antes de generar el PDF para incluir el análisis clínico.</div>`}
 
 <div class="footer">${nombreDoctor} · ${ciudad}, Colombia · ${fecha}</div>
 </body></html>`
