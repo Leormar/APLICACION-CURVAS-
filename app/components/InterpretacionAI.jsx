@@ -63,7 +63,6 @@ export default function InterpretacionAI({ datos, curvas, onInterpretacion, onSe
       {confirmFaltante && (
         <div style={{ position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.55)', zIndex:3000, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
           <div style={{ background:'white', borderRadius:'14px', padding:'1.5rem', maxWidth:'380px', width:'100%', boxShadow:'0 10px 40px rgba(0,0,0,0.3)' }}>
-            <div style={{ fontSize:'2rem', textAlign:'center', marginBottom:'0.5rem' }}>⚠️</div>
             <h3 style={{ margin:'0 0 0.5rem', fontSize:'1.05rem', textAlign:'center', color:'#1e293b' }}>
               Falta la curva del ojo {confirmFaltante === 'OD' ? 'derecho (OD)' : 'izquierdo (OI)'}
             </h3>

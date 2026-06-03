@@ -6,8 +6,7 @@ export default function SoportePage() {
   return (
     <div style={{ minHeight:'100vh', background:'#f8fafc', padding:'2rem 1rem' }}>
       <div style={{ maxWidth:'640px', margin:'0 auto', background:'white', borderRadius:'16px', padding:'2.5rem', border:'1px solid #e2e8f0', textAlign:'center' }}>
-        <div style={{ fontSize:'3rem' }}>💬</div>
-        <h1 style={{ color:'#1e40af', margin:'0.5rem 0 0.5rem' }}>Soporte</h1>
+        <h1 style={{ color:'#1e40af', margin:'0 0 0.5rem' }}>Soporte</h1>
         <p style={{ color:'#475569', lineHeight:1.7 }}>
           ¿Tienes dudas, encontraste un problema o quieres sugerir algo? Escríbenos y te respondemos.
         </p>

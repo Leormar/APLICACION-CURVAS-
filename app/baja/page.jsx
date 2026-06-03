@@ -27,7 +27,6 @@ function BajaContenido() {
   if (error) return (
     <div style={wrap}>
       <div style={{ ...card, padding:'2.5rem', textAlign:'center' }}>
-        <div style={{ fontSize:'3rem', marginBottom:'1rem' }}>⚠️</div>
         <h2 style={{ color:'#991b1b', margin:'0 0 1rem' }}>Enlace no válido</h2>
         <p style={{ color:'#475569', lineHeight:1.7 }}>No pudimos procesar la cancelación. El enlace puede haber caducado. Si sigues recibiendo correos, responde a este mensaje y lo gestionamos manualmente.</p>
         <a href="/" style={{ display:'inline-block', marginTop:'1.5rem', padding:'0.75rem 2rem', background:'#1e40af', color:'white', borderRadius:'10px', textDecoration:'none', fontWeight:700 }}>Ir a la app</a>
@@ -44,7 +43,9 @@ function BajaContenido() {
         </div>
         <div style={{ padding:'2rem' }}>
           <div style={{ textAlign:'center', marginBottom:'1.5rem' }}>
-            <div style={{ fontSize:'3rem' }}>✅</div>
+            <div style={{ width:64, height:64, borderRadius:'50%', margin:'0 auto 0.5rem', display:'flex', alignItems:'center', justifyContent:'center', background:'#dcfce7' }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+            </div>
             <h2 style={{ color:'#166534', margin:'0.5rem 0 0.5rem' }}>Has cancelado los recordatorios</h2>
             <p style={{ color:'#475569', lineHeight:1.7, margin:0 }}>No volverás a recibir correos de recordatorio. Tu cuenta sigue activa y puedes entrar a la app cuando quieras.</p>
           </div>
@@ -60,7 +61,7 @@ function BajaContenido() {
             </>
           ) : (
             <div style={{ textAlign:'center' }}>
-              <p style={{ color:'#166534', fontWeight:600 }}>🙏 Gracias por tu opinión</p>
+              <p style={{ color:'#166534', fontWeight:600 }}>Gracias por tu opinión</p>
               <a href="/" style={{ display:'inline-block', marginTop:'0.5rem', padding:'0.75rem 2rem', background:'#1e40af', color:'white', borderRadius:'10px', textDecoration:'none', fontWeight:700 }}>Volver a la app</a>
             </div>
           )}

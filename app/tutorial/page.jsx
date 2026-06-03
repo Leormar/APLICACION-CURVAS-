@@ -360,7 +360,9 @@ export default function Tutorial() {
                 {Array.from({length:totalPreguntas}).map((_,i)=>{
                   const t=Math.floor(i/3),p=i%3
                   const ok=respuestas[`${t}-${p}`]===TUTORIAL[t].preguntas[p].correcta
-                  return <div key={i} style={{width:40,height:40,borderRadius:'50%',background:ok?'#22c55e':'#ef4444',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:'1rem',fontWeight:700}}>{ok?'✓':'✗'}</div>
+                  return <div key={i} style={{width:40,height:40,borderRadius:'50%',background:ok?'#22c55e':'#ef4444',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">{ok?<path d="M5 13l4 4L19 7"/>:<path d="M6 6l12 12M18 6L6 18"/>}</svg>
+                  </div>
                 })}
               </div>
               <div style={{background:aprobado?'#f0fdf4':'#fefce8',border:`1px solid ${aprobado?'#86efac':'#fde68a'}`,borderRadius:'12px',padding:'1.25rem',marginBottom:'1.5rem',fontSize:'1rem',color:aprobado?'#166534':'#92400e',lineHeight:1.7}}>

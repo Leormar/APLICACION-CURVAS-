@@ -241,7 +241,7 @@ export default function Home() {
                 <p style={{ margin:0, fontSize:'0.8rem', color:'#64748b' }}>Curvas de Desenfoque · MAIdx sd Bench</p>
               </div>
               <div style={{ background:'#fef3c7', border:'1px solid #f59e0b', borderRadius:'8px', padding:'0.75rem', marginBottom:'1rem', fontSize:'0.82rem', color:'#92400e', lineHeight:1.65 }}>
-                <strong>⚠️ Términos de uso clínico</strong>
+                <strong>Términos de uso clínico</strong>
                 <p style={{ margin:'6px 0 0' }}>Esta aplicación está diseñada con el modelo <strong>MAIdx sd Bench</strong> para análisis clínico de curvas de desenfoque. Los informes son <strong>únicamente apoyo diagnóstico</strong> y no reemplazan el criterio del profesional.</p>
               </div>
               <div style={{ fontSize:'0.82rem', color:'#334155', lineHeight:1.75, marginBottom:'1rem' }}>
@@ -255,7 +255,7 @@ export default function Home() {
                 </ul>
               </div>
               <div style={{ background:'#f0f9ff', border:'1px solid #bae6fd', borderRadius:'8px', padding:'0.75rem', marginBottom:'1.25rem', fontSize:'0.8rem', color:'#0369a1', lineHeight:1.6 }}>
-                <strong>🔒 Privacidad:</strong> Información en servidores seguros. No se comparte ni usa para entrenar modelos.
+                <strong>Privacidad:</strong> Información en servidores seguros. No se comparte ni usa para entrenar modelos.
               </div>
               <button
                 onClick={() => { setMostrarTerminos(false); signIn('google', { callbackUrl: '/', redirect: true }) }}
@@ -289,7 +289,7 @@ export default function Home() {
                 Herramienta clínica para análisis, registro y seguimiento de curvas de desenfoque en pacientes con IOL multifocal y EDOF.
               </p>
               <div style={{ borderTop:'1px solid rgba(255,255,255,0.2)', paddingTop:'0.75rem', display:'flex', flexDirection:'column', gap:'6px' }}>
-                {['📈  Curvas OD · OI · AO','🔍  Buscador por nombre o ID','📄  Informes PDF con análisis clínico','📱  App para iPhone y Android'].map((item,i) => (
+                {['Curvas OD · OI · AO','Buscador por nombre o ID','Informes PDF con análisis clínico','App para iPhone y Android'].map((item,i) => (
                   <div key={i} style={{ fontSize:'0.88rem', opacity:0.88 }}>{item}</div>
                 ))}
               </div>
@@ -410,15 +410,14 @@ export default function Home() {
         {esPacientePrueba && (
           <div style={{ marginBottom:'0.75rem', padding:'0.6rem 0.9rem', background:'linear-gradient(90deg, #fef3c7, #fde68a)', border:'1px solid #f59e0b', borderRadius:'10px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'8px', flexWrap:'wrap' }}>
             <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
-              <span style={{ fontSize:'1.1rem' }}>🧪</span>
               <div>
                 <strong style={{ fontSize:'0.85rem', color:'#92400e' }}>MODO DEMO — Paciente de Prueba</strong>
                 <p style={{ margin:0, fontSize:'0.72rem', color:'#a16207' }}>Estos son datos de ejemplo. Crea un examen nuevo para empezar.</p>
               </div>
             </div>
-            <button onClick={handleNuevoExamen}
-              style={{ padding:'6px 14px', background:'#166534', color:'white', border:'none', borderRadius:'8px', fontSize:'0.78rem', cursor:'pointer', fontWeight:600, whiteSpace:'nowrap' }}>
-              ➕ Nuevo examen
+            <button onClick={handleNuevoExamen} className="btn3d"
+              style={{ padding:'0.5rem 0.9rem', background:'#166534', color:'white', fontSize:'0.78rem', whiteSpace:'nowrap', boxShadow:'0 3px 0 #0f4424, 0 5px 12px rgba(0,0,0,0.16)' }}>
+              Nuevo examen
             </button>
           </div>
         )}
@@ -437,7 +436,6 @@ export default function Home() {
           <div className="panel-graficas" style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
             {ojosConDatos.length===0 && (
               <div style={{ height:'160px', display:'flex', alignItems:'center', justifyContent:'center', color:'#94a3b8', fontSize:'0.9rem', border:'2px dashed #e2e8f0', borderRadius:'12px', flexDirection:'column', gap:'8px' }}>
-                <span style={{ fontSize:'2rem' }}>📈</span>
                 <span>Ingresa valores o busca un paciente</span>
               </div>
             )}
@@ -458,7 +456,7 @@ export default function Home() {
         </div>
         {datos && (
           <div style={{ marginTop:'0.75rem', padding:'0.6rem 1rem', background:'#dcfce7', color:'#166534', borderRadius:'8px', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'8px' }}>
-            <span style={{ fontSize:'0.85rem' }}>✓ {datos.paciente} · {datos.documento}</span>
+            <span style={{ fontSize:'0.85rem' }}>{datos.paciente} · {datos.documento}</span>
             <button onClick={()=>setMostrarInforme(true)} disabled={generandoPDF||compartiendo} className="btn3d" style={{ padding:'0.5rem 1rem', background:'#166534', fontSize:'0.82rem', boxShadow:'0 3px 0 #0f4424, 0 5px 12px rgba(0,0,0,0.18)' }}>
               Informe
             </button>

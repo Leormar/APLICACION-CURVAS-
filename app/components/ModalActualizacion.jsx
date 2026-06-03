@@ -20,7 +20,7 @@ export default function ModalActualizacion({ version }) {
           App actualizada
         </h2>
         <div style={{ background:'#fef3c7', border:'1px solid #f59e0b', borderRadius:'8px', padding:'12px', margin:'1rem 0', fontSize:'0.85rem', color:'#92400e', lineHeight:1.6 }}>
-          <strong>⚠️ Nueva versión disponible</strong>
+          <strong>Nueva versión disponible</strong>
           <p style={{ margin:'6px 0 0' }}>
             Se han realizado mejoras importantes en la aplicación. Por seguridad, tu sesión ha sido cerrada. Vuelve a ingresar para continuar.
           </p>
@@ -30,7 +30,7 @@ export default function ModalActualizacion({ version }) {
         </p>
         <button onClick={handleAceptar}
           style={{ width:'100%', padding:'0.9rem', background:'#1e40af', color:'white', border:'none', borderRadius:'10px', fontSize:'1rem', cursor:'pointer', fontWeight:700, marginBottom:'8px' }}>
-          ✅ Entendido — Volver a ingresar
+          Entendido — Volver a ingresar
         </button>
         <button onClick={handleSalir}
           style={{ width:'100%', padding:'8px', background:'none', border:'none', color:'#94a3b8', cursor:'pointer', fontSize:'0.85rem' }}>

@@ -51,7 +51,7 @@ export default function GraficaComparativa({ curvas, lentes }) {
     <div style={{ background:'white', borderRadius:'12px', padding:'1rem 1.25rem', boxShadow:'0 1px 4px rgba(0,0,0,0.08)' }}>
       <div style={{ marginBottom:'0.75rem' }}>
         <h2 style={{ margin:0, fontSize:'0.95rem', color:'#1e293b' }}>
-          📊 Comparativa OD · OI · AO
+          Comparativa OD · OI · AO
         </h2>
         <div style={{ display:'flex', gap:'16px', marginTop:'6px', flexWrap:'wrap' }}>
           {hayOD && (

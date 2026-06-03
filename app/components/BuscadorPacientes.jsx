@@ -80,7 +80,7 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
 
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem' }}>
           <h2 style={{ margin:0, fontSize:'1.1rem', color:'#1e293b' }}>Buscar paciente</h2>
-          <button onClick={onCerrar} style={{ background:'#f1f5f9', border:'none', borderRadius:'6px', width:28, height:28, cursor:'pointer', color:'#64748b', fontSize:'1rem' }}>✕</button>
+          <button onClick={onCerrar} style={{ background:'#f1f5f9', border:'none', borderRadius:'6px', width:28, height:28, cursor:'pointer', color:'#64748b', fontSize:'1.1rem' }}>×</button>
         </div>
 
         <div style={{ display:'flex', gap:'6px', marginBottom:'10px' }}>
@@ -111,7 +111,6 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
         <div style={{ overflowY:'auto', flex:1 }}>
           {buscado && pacientes.length === 0 && (
             <div style={{ textAlign:'center', padding:'3rem', color:'#94a3b8' }}>
-              <div style={{ fontSize:'2rem', marginBottom:'8px' }}>🔎</div>
               <p style={{ margin:0 }}>No se encontraron pacientes</p>
             </div>
           )}
@@ -154,7 +153,7 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
                         <div style={{ padding:'8px 14px 4px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                           <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
                             <span style={{ fontSize:'0.75rem', color:'#64748b', fontWeight:600 }}>
-                              📅 {formatFecha(examen.fecha)}
+                              {formatFecha(examen.fecha)}
                             </span>
                             <div style={{ display:'flex', gap:'4px' }}>
                               {examen.curvas.map(c => (

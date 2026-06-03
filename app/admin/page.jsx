@@ -45,7 +45,7 @@ export default function Admin() {
           <p style={{ margin:0, color:'#64748b', fontSize:'0.8rem' }}>PROLENS · Gestión de usuarios</p>
         </div>
         <a href="/" style={{ marginLeft:'auto', padding:'6px 16px', background:'#1e40af', color:'white', borderRadius:'8px', textDecoration:'none', fontSize:'0.85rem' }}>
-          ← App
+          Volver a la app
         </a>
       </div>
 

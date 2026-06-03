@@ -256,7 +256,7 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
               if (onLenteChange) onLenteChange(o, val)
             }}>
               <option value="">— Sin IOL · ojo no operado —</option>
-              <option value="__ciega__">🔬 Valoración ciega (la IA sugiere el LIO)</option>
+              <option value="__ciega__">Valoración ciega (la IA sugiere el LIO)</option>
               {Object.entries(LENTES).map(([cat,lista]) => (
                 <optgroup key={cat} label={cat}>
                   {lista.map(l=><option key={l} value={l}>{l}</option>)}
@@ -291,7 +291,7 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
         if (vacios.length === 0) return null
         return (
           <p style={{ margin:'0 0 0.5rem', padding:'6px 10px', background:'#fff7ed', border:'1px solid #fdba74', borderRadius:'8px', fontSize:'0.72rem', color:'#9a3412' }}>
-            ⚠️ Aún falta: <strong>{vacios.join(', ')}</strong>
+            Aún falta: <strong>{vacios.join(', ')}</strong>
           </p>
         )
       })()}

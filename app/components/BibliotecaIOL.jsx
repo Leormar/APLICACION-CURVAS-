@@ -90,7 +90,7 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
               MAIdx sd Bench · Curvas publicadas en literatura 2019-2025
             </p>
           </div>
-          <button onClick={onCerrar} style={{ background:'rgba(255,255,255,0.2)', border:'none', color:'white', borderRadius:'8px', padding:'6px 12px', cursor:'pointer', fontSize:'0.85rem' }}>✕ Cerrar</button>
+          <button onClick={onCerrar} style={{ background:'rgba(255,255,255,0.2)', border:'none', color:'white', borderRadius:'8px', padding:'6px 12px', cursor:'pointer', fontSize:'0.85rem' }}>Cerrar</button>
         </div>
 
         <div style={{ display:'flex', flex:1, overflow:'hidden' }}>
@@ -126,7 +126,7 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
             {clasificacion && modoCiego && (
               <div style={{ padding:'10px 12px', background:'#f0f9ff', borderBottom:'1px solid #bae6fd' }}>
                 <div style={{ fontSize:'0.72rem', fontWeight:800, color:'#0369a1', marginBottom:'4px' }}>
-                  🔬 MAIdx sd Bench — Evaluación ciega
+                  MAIdx sd Bench — Evaluación ciega
                 </div>
                 <div style={{ fontSize:'0.72rem', color:'#0369a1', marginBottom:'6px' }}>
                   {clasificacion.morfologia?.descripcion}
@@ -149,7 +149,7 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
                         onClick={() => { if (apto) { onSeleccionarIOL(ojo, seleccionado.nombre, simSel); onCerrar() } }}
                         disabled={!apto}
                         style={{ width:'100%', padding:'8px', background: apto ? '#16a34a' : '#cbd5e1', color:'white', border:'none', borderRadius:'8px', fontSize:'0.78rem', cursor: apto ? 'pointer' : 'not-allowed', fontWeight:700, boxSizing:'border-box' }}>
-                        ✓ Usar este LIO en el examen ({ojo}){simSel != null ? ` — ${simSel}%` : ''}
+                        Usar este LIO en el examen ({ojo}){simSel != null ? ` — ${simSel}%` : ''}
                       </button>
                       {!apto && (
                         <p style={{ margin:'4px 0 0', fontSize:'0.66rem', color:'#d97706', textAlign:'center' }}>
@@ -197,7 +197,6 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
               <DetalleIOL iol={seleccionado} curvaActual={curvaActual} />
             ) : (
               <div style={{ height:'100%', display:'flex', alignItems:'center', justifyContent:'center', color:'#94a3b8', flexDirection:'column', gap:'8px', textAlign:'center', padding:'0 16px' }}>
-                <span style={{ fontSize:'2rem' }}>📚</span>
                 {nombreIOL ? (
                   <span style={{ fontSize:'0.85rem', color:'#475569' }}>
                     El LIO <strong>“{nombreIOL}”</strong> aún no tiene curva de referencia cargada en la biblioteca.
@@ -249,7 +248,7 @@ function DetalleIOL({ iol, curvaActual }) {
       <div style={{ marginBottom:'12px' }}>
         <h3 style={{ margin:'0 0 4px', color:'#1e293b', fontSize:'1rem' }}>{iol.nombre}</h3>
         <div style={{ fontSize:'0.8rem', color:'#64748b' }}>{iol.casa_comercial} · {iol.tecnologia}</div>
-        <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:'4px' }}>📚 {iol.referencia_bibliografica}</div>
+        <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:'4px' }}>Ref.: {iol.referencia_bibliografica}</div>
       </div>
 
       <div style={{ background:'#fafafa', borderRadius:'10px', padding:'12px', marginBottom:'12px' }}>
@@ -338,7 +337,6 @@ function ModalPropuesta({ onCerrar, onEnviado }) {
       <div style={{ background:'white', borderRadius:'14px', padding:'24px', maxWidth:'420px', width:'90%' }}>
         {ok ? (
           <div style={{ textAlign:'center' }}>
-            <div style={{ fontSize:'2rem', marginBottom:'8px' }}>✅</div>
             <h3 style={{ color:'#166534' }}>Propuesta enviada</h3>
             <p style={{ color:'#475569', fontSize:'0.85rem' }}>El Dr. Orjuela revisará y validará el IOL para incluirlo en la biblioteca.</p>
             <button onClick={onEnviado} style={{ marginTop:'16px', padding:'10px 24px', background:'#1e40af', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontWeight:700 }}>Cerrar</button>
