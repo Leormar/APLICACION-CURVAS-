@@ -10,6 +10,7 @@ import GraficaComparativa from './components/GraficaComparativa'
 import BuscadorPacientes from './components/BuscadorPacientes'
 import LogoProlens from './components/LogoProlens'
 import BibliotecaIOL from './components/BibliotecaIOL'
+import { nombreIOLDisplay } from '../lib/iol-constants'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -215,6 +216,27 @@ export default function Home() {
   }
 
   const ojosConDatos = Object.entries(curvas).filter(([,m])=>m.length>=2)
+
+  // ¿A qué ojo se parece más la curva binocular (AO)? Indica qué LIO predomina en la calidad visual binocular.
+  const ojoDominanteAO = () => {
+    const ao = curvas.AO || [], od = curvas.OD || [], oi = curvas.OI || []
+    if (ao.length < 2) return null
+    const distancia = (otra) => {
+      let suma = 0, n = 0
+      ao.forEach(a => {
+        const m = otra.find(o => parseFloat(o.defocus) === parseFloat(a.defocus))
+        if (m) { suma += Math.abs(parseFloat(a.agudeza) - parseFloat(m.agudeza)); n++ }
+      })
+      return n > 0 ? suma / n : null
+    }
+    const dOD = od.length >= 2 ? distancia(od) : null
+    const dOI = oi.length >= 2 ? distancia(oi) : null
+    if (dOD == null && dOI == null) return null
+    if (dOD == null) return { ojo:'OI' }
+    if (dOI == null) return { ojo:'OD' }
+    if (Math.abs(dOD - dOI) < 0.02) return { ojo:'ambos' }
+    return dOD < dOI ? { ojo:'OD' } : { ojo:'OI' }
+  }
 
   // Cargando sesión
   if (status === 'loading') {
@@ -442,10 +464,24 @@ export default function Home() {
             {ojosConDatos.map(([ojo,med])=>(
   <div key={ojo}>
     <GraficaCurva ojo={ojo} mediciones={med} lente={lentes[ojo]} iolIA={iolIA[ojo]} />
-    <button onClick={() => setMostrarBiblioteca(ojo)}
-      style={{ width:'100%', marginTop:'6px', padding:'8px', background:'#eff6ff', color:'#1e40af', border:'1.5px solid #1e40af', borderRadius:'8px', fontSize:'0.78rem', cursor:'pointer', fontWeight:600 }}>
-      Ver referencia IOL · {ojo}
-    </button>
+    {ojo === 'AO' ? (() => {
+      const dom = ojoDominanteAO()
+      if (!dom) return null
+      const lenteDe = (o) => nombreIOLDisplay(lentes[o]) ? ` (${nombreIOLDisplay(lentes[o])})` : ''
+      const texto = dom.ojo === 'ambos'
+        ? 'La calidad visual binocular es equilibrada: ambos ojos aportan de forma similar.'
+        : `La calidad visual binocular se asemeja más al ${dom.ojo === 'OD' ? 'ojo derecho (OD)' : 'ojo izquierdo (OI)'}${lenteDe(dom.ojo)} — ese LIO predomina en la visión binocular.`
+      return (
+        <div style={{ marginTop:'6px', padding:'8px 12px', background:'#faf5ff', border:'1px solid #e9d5ff', borderRadius:'8px', fontSize:'0.78rem', color:'#6b21a8', lineHeight:1.55 }}>
+          {texto}
+        </div>
+      )
+    })() : (
+      <button onClick={() => setMostrarBiblioteca(ojo)}
+        style={{ width:'100%', marginTop:'6px', padding:'8px', background:'#eff6ff', color:'#1e40af', border:'1.5px solid #1e40af', borderRadius:'8px', fontSize:'0.78rem', cursor:'pointer', fontWeight:600 }}>
+        Ver referencia IOL · {ojo}
+      </button>
+    )}
   </div>
 ))}
             {ojosConDatos.length >= 2 && (
