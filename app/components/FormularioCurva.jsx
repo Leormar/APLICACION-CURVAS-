@@ -194,6 +194,15 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
       alert('No has digitado ninguna agudeza. Ingresa al menos una antes de guardar.')
       return
     }
+    // Aviso si se está modificando un examen que ya tiene AV registradas.
+    if (fechaExamen) {
+      const ok = window.confirm(
+        `Este examen ya tiene agudezas registradas (${ojosGuardar.join(', ')}).\n\n` +
+        `Se guardará como EXAMEN MODIFICADO, conservando el examen original. ` +
+        `Los ojos que no cambiaste se mantienen igual.\n\n¿Deseas continuar?`
+      )
+      if (!ok) return
+    }
     setGuardando(true)
     try {
       let okAll = true
