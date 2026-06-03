@@ -21,6 +21,21 @@ export async function GET(req) {
     // Asegura la columna de baja (idempotente) antes de filtrar por ella.
     await pool.query('ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS desuscrito BOOLEAN DEFAULT FALSE')
 
+    // Limpieza: usuarios aprobados hace +30 días que NUNCA registraron una curva
+    // se marcan inactivos y desuscritos (no se borran; reversibles desde el admin).
+    const limpieza = await pool.query(`
+      UPDATE usuarios SET estado = 'inactivo', desuscrito = TRUE
+      WHERE estado = 'aprobado'
+        AND fecha_aprobacion <= NOW() - INTERVAL '30 days'
+        AND email NOT IN (
+          SELECT DISTINCT usuario_email FROM curvas WHERE usuario_email IS NOT NULL
+        )
+      RETURNING id
+    `)
+    const inactivados = limpieza.rowCount
+
+    // Recordatorio: aprobados hace 7–30 días, sin curvas y no desuscritos.
+    // (Los de +30 días ya quedaron inactivos arriba, así que no entran aquí.)
     const res = await pool.query(`
       SELECT u.id, u.nombre, u.email, u.fecha_aprobacion
       FROM usuarios u
@@ -95,7 +110,7 @@ export async function GET(req) {
       enviados++
     }
 
-    return Response.json({ ok: true, usuarios_inactivos: usuarios.length, emails_enviados: enviados })
+    return Response.json({ ok: true, recordatorios_enviados: enviados, sin_usar_pendientes: usuarios.length, marcados_inactivos: inactivados })
 
   } catch(e) {
     console.error('Error cron recordatorio:', e)

@@ -359,6 +359,21 @@ export default function Home() {
     )
   }
 
+  if (session.user.estado === 'inactivo') {
+    return (
+      <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(160deg, #334155 0%, #1e293b 65%)', padding:'1.5rem' }}>
+        <div style={{ textAlign:'center', color:'white', maxWidth:'400px' }}>
+          <LogoProlens size={80} />
+          <h2 style={{ margin:'1rem 0 0.5rem' }}>Cuenta inactiva</h2>
+          <p style={{ opacity:0.85, lineHeight:1.7 }}>Tu cuenta se marcó como inactiva por no haberse usado. Si deseas reactivarla, contacta al Dr. Leonardo Orjuela.</p>
+          <button onClick={() => signOut({ callbackUrl: '/login' })} style={{ marginTop:'1.5rem', padding:'0.75rem 2rem', background:'white', color:'#1e293b', border:'none', borderRadius:'10px', fontWeight:700, cursor:'pointer' }}>
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   // App principal
   return (
     <>
