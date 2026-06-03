@@ -441,7 +441,7 @@ export default function Home() {
             )}
             {ojosConDatos.map(([ojo,med])=>(
   <div key={ojo}>
-    <GraficaCurva ojo={ojo} mediciones={med} lente={lentes[ojo]} />
+    <GraficaCurva ojo={ojo} mediciones={med} lente={lentes[ojo]} iolIA={iolIA[ojo]} />
     <button onClick={() => setMostrarBiblioteca(ojo)}
       style={{ width:'100%', marginTop:'6px', padding:'8px', background:'#eff6ff', color:'#1e40af', border:'1.5px solid #1e40af', borderRadius:'8px', fontSize:'0.78rem', cursor:'pointer', fontWeight:600 }}>
       Ver referencia IOL · {ojo}

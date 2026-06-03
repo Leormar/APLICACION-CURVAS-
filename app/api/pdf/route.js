@@ -114,7 +114,7 @@ export async function POST(req) {
         if (v && v !== '__ciega__') return v
         return 'Sin LIO'
       }
-      if (ia && v) return `${v} (seleccionado por IA · examen ciego · ${ia.similitud}%)`
+      if (ia && v) return `${v} (seleccionado por IA · examen ciego${ia.similitud != null ? ` · ${ia.similitud}%` : ''})`
       if (v === '__ciega__') return sug ? `${sug.nombre} (LIO elegido por IA · examen ciego · ${sug.similitud}%)` : 'Valoración ciega'
       if (v && v !== '__ciega__') return sug ? `${v} · Según curva (IA): ${sug.nombre} (${sug.similitud}%)` : v
       return 'Sin LIO'

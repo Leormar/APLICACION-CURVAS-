@@ -142,18 +142,17 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
 
                 {onSeleccionarIOL && seleccionado && (() => {
                   const simSel = clasificacion.top3?.find(r => r.id === seleccionado.id)?.similitud
-                  const apto = simSel != null && simSel >= 85
+                  const bajo = simSel != null && simSel < 85
                   return (
                     <div style={{ marginTop:'8px' }}>
-                      <button
-                        onClick={() => { if (apto) { onSeleccionarIOL(ojo, seleccionado.nombre, simSel); onCerrar() } }}
-                        disabled={!apto}
-                        style={{ width:'100%', padding:'8px', background: apto ? '#16a34a' : '#cbd5e1', color:'white', border:'none', borderRadius:'8px', fontSize:'0.78rem', cursor: apto ? 'pointer' : 'not-allowed', fontWeight:700, boxSizing:'border-box' }}>
+                      <button className="btn3d"
+                        onClick={() => { onSeleccionarIOL(ojo, seleccionado.nombre, simSel); onCerrar() }}
+                        style={{ width:'100%', padding:'9px', background: bajo ? '#d97706' : '#16a34a', color:'white', border:'none', fontSize:'0.78rem', fontWeight:700, boxSizing:'border-box', boxShadow: bajo ? '0 3px 0 #b45309' : '0 3px 0 #15803d' }}>
                         Usar este LIO en el examen ({ojo}){simSel != null ? ` — ${simSel}%` : ''}
                       </button>
-                      {!apto && (
+                      {bajo && (
                         <p style={{ margin:'4px 0 0', fontSize:'0.66rem', color:'#d97706', textAlign:'center' }}>
-                          Coincidencia &lt;85%: revisa o elige manual
+                          Coincidencia &lt;85% — confírmalo con tu criterio clínico
                         </p>
                       )}
                     </div>

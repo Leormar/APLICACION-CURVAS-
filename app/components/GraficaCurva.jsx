@@ -17,7 +17,7 @@ const CustomTick = ({ x, y, payload }) => {
   )
 }
 
-export default function GraficaCurva({ ojo, mediciones, lente }) {
+export default function GraficaCurva({ ojo, mediciones, lente, iolIA }) {
   const datos = [...mediciones].sort((a, b) => a.defocus - b.defocus)
   const color = colores[ojo] || '#1e40af'
   const funcional = datos.filter(d => d.agudeza <= 0.2)
@@ -34,7 +34,9 @@ export default function GraficaCurva({ ojo, mediciones, lente }) {
 
   const esCiega = lente === IOL_CIEGA
   const nombreLente = nombreIOLDisplay(lente)
-  const cat = esCiega ? { label:'examen ciego', color:'#7c3aed' } : categoriaLente(lente)
+  const cat = iolIA
+    ? { label: `elegido por IA${iolIA.similitud != null ? ` · ${iolIA.similitud}%` : ''}`, color:'#7c3aed' }
+    : esCiega ? { label:'examen ciego', color:'#7c3aed' } : categoriaLente(lente)
 
   // Invertir datos para que 0 quede arriba: usar valor negativo internamente
   const datosInvertidos = datos.map(d => ({ ...d, avInvertido: -d.agudeza }))
