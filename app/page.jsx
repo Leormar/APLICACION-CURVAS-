@@ -390,34 +390,34 @@ export default function Home() {
             </div>
           </div>
           <div style={{ display:'flex', gap:'6px', alignItems:'center', flexWrap:'wrap' }}>
-            {session.user.rol === 'admin' && (
-              <a href="/admin" className="btn3d" style={{ padding:'0.5rem 0.9rem', background:'#7c3aed', color:'white', fontSize:'0.8rem', textDecoration:'none', boxShadow:'0 3px 0 #5b21b6, 0 5px 12px rgba(0,0,0,0.16)', display:'inline-block' }}>
-                Admin
-              </a>
-            )}
+            <button onClick={cargarPacientePrueba} title="Cargar paciente de prueba" className="btn3d"
+              style={{ padding:'0.5rem 0.9rem', background:'#d97706', fontSize:'0.8rem', boxShadow:'0 3px 0 #b45309, 0 5px 12px rgba(0,0,0,0.16)', whiteSpace:'nowrap' }}>
+              Demo
+            </button>
             {datos && (
               <button onClick={handleNuevoExamen} className="btn3d"
                 style={{ padding:'0.5rem 0.9rem', background:'#166534', fontSize:'0.8rem', boxShadow:'0 3px 0 #0f4424, 0 5px 12px rgba(0,0,0,0.16)', whiteSpace:'nowrap' }}>
                 Nuevo examen
               </button>
             )}
-            <a href="/tutorial" className="btn3d"
-              style={{ padding:'0.5rem 0.9rem', background:'#475569', color:'white', fontSize:'0.8rem', textDecoration:'none', boxShadow:'0 3px 0 #334155, 0 5px 12px rgba(0,0,0,0.16)', display:'inline-block', whiteSpace:'nowrap' }}>
-              Tutorial
-            </a>
             <button onClick={()=>setMostrarBuscador(true)} className="btn3d"
               style={{ padding:'0.5rem 0.9rem', background:'#1e40af', fontSize:'0.8rem', boxShadow:'0 3px 0 #15307d, 0 5px 12px rgba(0,0,0,0.16)' }}>
               Buscar
             </button>
-            <button onClick={cargarPacientePrueba} title="Cargar paciente de prueba" className="btn3d"
-              style={{ padding:'0.5rem 0.9rem', background:'#d97706', fontSize:'0.8rem', boxShadow:'0 3px 0 #b45309, 0 5px 12px rgba(0,0,0,0.16)', whiteSpace:'nowrap' }}>
-              Demo
-            </button>
+            <a href="/tutorial" className="btn3d"
+              style={{ padding:'0.5rem 0.9rem', background:'#475569', color:'white', fontSize:'0.8rem', textDecoration:'none', boxShadow:'0 3px 0 #334155, 0 5px 12px rgba(0,0,0,0.16)', display:'inline-block', whiteSpace:'nowrap' }}>
+              Tutorial
+            </a>
             {datos && (
               <button onClick={()=>setMostrarInforme(true)} disabled={generandoPDF||compartiendo} className="btn3d"
                 style={{ padding:'0.5rem 1rem', background:'#0f766e', fontSize:'0.82rem', boxShadow:'0 3px 0 #0a4f48, 0 5px 12px rgba(0,0,0,0.18)', whiteSpace:'nowrap' }}>
                 {(generandoPDF||compartiendo)?'…':'Informe'}
               </button>
+            )}
+            {(session.user.rol === 'admin' || session.user.email === 'lorjuela7@gmail.com') && (
+              <a href="/admin" className="btn3d" style={{ padding:'0.5rem 0.9rem', background:'#7c3aed', color:'white', fontSize:'0.8rem', textDecoration:'none', boxShadow:'0 3px 0 #5b21b6, 0 5px 12px rgba(0,0,0,0.16)', display:'inline-block' }}>
+                Admin
+              </a>
             )}
             <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'4px 10px', background:'#f1f5f9', borderRadius:'20px' }}>
               {session.user.image && <img src={session.user.image} style={{ width:26, height:26, borderRadius:'50%' }} />}
