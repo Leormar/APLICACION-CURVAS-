@@ -205,8 +205,10 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
           body: JSON.stringify({
             paciente: nombreCompleto, documento, fechaNac, ojo: o,
             iol: o==='AO' ? '' : lentes[o], refOD, refOI, mediciones: med,
-            // Si se está editando un examen cargado: misma fecha + marca de modificado.
-            fecha: fechaExamen || undefined, modificado: !!fechaExamen
+            // Editar un examen cargado crea un examen NUEVO (hoy) marcado "modificado",
+            // conservando intacto el examen anterior. Los ojos no tocados se heredan
+            // porque siguen cargados en el formulario y se guardan también.
+            modificado: !!fechaExamen
           })
         })
         if (!res.ok) okAll = false
