@@ -131,40 +131,79 @@ const TUTORIAL = [
     ]
   },
   {
-    tema: 'Uso de la app · Registro e informes',
+    tema: 'Tipos de LIO y modo de examen',
     color: '#0f766e',
     bg: '#f0fdfa',
     pasos: [
       {
-        titulo: 'Tipo de LIO en cada ojo',
-        contenido: 'Al registrar un ojo eliges el LIO implantado del catálogo. Si el ojo tiene LIO pero no conoces el modelo, selecciona "Valoración ciega": la app sugiere por la forma de la curva el LIO de referencia más parecido. Si el ojo no fue operado, deja "Sin IOL · ojo no operado" y la app no sugerirá ningún lente.',
+        titulo: 'Tipos de LIO y su curva',
+        contenido: 'Cada tipo de LIO deja una forma de curva distinta. Monofocal / Monofocal plus: enfocan sobre todo de lejos (la plus extiende algo el intermedio). EDOF (rango extendido): meseta continua de lejos a intermedio con visión cercana funcional. Trifocal: tres focos definidos (lejos, intermedio y cerca), su curva muestra tres picos. Full range: visión continua y amplia de lejos a cerca, sin valles marcados. Por eso la forma de la curva permite reconocer a qué LIO se parece.',
         icono: <IconoLente color="#0f766e" />
       },
       {
-        titulo: 'Identificación por curva (MAIdx)',
-        contenido: 'En "Ver referencia IOL" puedes comparar la curva del paciente contra las curvas de referencia publicadas. MAIdx calcula el porcentaje de similitud e identifica el LIO más parecido. Si hay un LIO implantado, el análisis compara si la curva concuerda con ese lente o se asemeja más a otro.',
-        icono: <IconoComparar color="#0f766e" />
+        titulo: 'Modo de examen: con LIO, ciego o sin LIO',
+        contenido: 'En cada ojo eliges una de tres opciones. 1) Un LIO del catálogo: cuando conoces el modelo implantado; la app compara la curva con ese LIO. 2) Valoración ciega: hay LIO implantado pero no sabes cuál; la app lo deduce por la forma de la curva (evaluación no sesgada por conocer el lente). 3) Sin IOL · ojo no operado: el ojo conserva su cristalino natural; la app no sugiere ningún lente.',
+        icono: <IconoOjo color="#0f766e" />
       },
       {
-        titulo: 'Informe del médico y del paciente',
-        contenido: 'Con el botón "Informe" generas un PDF o un enlace de solo lectura. El informe del médico es completo (análisis por ojo más la conclusión clínica). El del paciente muestra las curvas y su interpretación, sin recomendaciones ni comparaciones técnicas que puedan confundirlo.',
-        icono: <IconoClipboard color="#0f766e" />
+        titulo: '¿Cuándo usa la app la inteligencia artificial?',
+        contenido: 'Son dos cosas distintas. (a) La identificación del LIO por la curva (MAIdx) es un CÁLCULO matemático de similitud: no usa IA generativa ni consume créditos, y es reproducible. (b) La interpretación clínica escrita del informe SÍ usa IA (modelo de lenguaje). En un ojo marcado "sin LIO" la app no sugiere ningún lente. En todos los casos tú revisas y decides.',
+        icono: <IconoComparar color="#0f766e" />
       }
     ],
     preguntas: [
       {
-        pregunta: 'El ojo tiene LIO pero no conoces el modelo. ¿Qué opción eliges?',
-        opciones: ['Sin IOL · ojo no operado','Valoración ciega (la app sugiere por la curva)','Cualquier LIO del catálogo al azar','No registrar ese ojo'],
+        pregunta: '¿Qué patrón de curva corresponde a un LIO trifocal?',
+        opciones: ['Una meseta plana sin picos','Tres picos definidos: lejos, intermedio y cerca','Una caída brusca después de lejos','Una sola subida en cerca'],
         correcta: 1
       },
       {
+        pregunta: 'El ojo tiene LIO implantado pero no conoces el modelo. ¿Qué opción eliges?',
+        opciones: ['Sin IOL · ojo no operado','Valoración ciega (la app lo deduce por la curva)','Cualquier LIO del catálogo al azar','No registrar ese ojo'],
+        correcta: 1
+      },
+      {
+        pregunta: '¿La identificación del LIO por la curva (MAIdx) usa IA generativa?',
+        opciones: ['Sí, escribe el informe con IA','No, es un cálculo de similitud; la IA solo redacta la interpretación clínica','Sí, y consume créditos cada vez','No hace ningún cálculo'],
+        correcta: 1
+      }
+    ]
+  },
+  {
+    tema: 'Registro e informes',
+    color: '#7c3aed',
+    bg: '#faf5ff',
+    pasos: [
+      {
+        titulo: 'Identificar el LIO por la curva',
+        contenido: 'En "Ver referencia IOL" comparas la curva del paciente contra las curvas de referencia publicadas. MAIdx calcula el porcentaje de similitud (Pareto) e indica el LIO más parecido; si hay un LIO implantado, señala si la curva concuerda con ese lente o se asemeja más a otro. Con "Usar este LIO" lo dejas asignado al examen.',
+        icono: <IconoComparar color="#7c3aed" />
+      },
+      {
+        titulo: 'Informe del médico',
+        contenido: 'Es el informe completo: curvas de cada ojo con su análisis al lado, comportamiento del IOL, impacto refractivo, conclusión clínica y recomendaciones. Lo generas con el botón "Informe" como PDF o enlace de solo lectura.',
+        icono: <IconoClipboard color="#7c3aed" />
+      },
+      {
+        titulo: 'Informe del paciente y compartir',
+        contenido: 'El informe del paciente muestra las curvas y su interpretación por ojo, SIN recomendaciones ni comparaciones técnicas que puedan confundirlo. Con "Compartir" generas un enlace de solo lectura (caduca a los 30 días) para enviar al paciente o a otro médico, que lo ve sin poder modificarlo.',
+        icono: <IconoClipboard color="#7c3aed" />
+      }
+    ],
+    preguntas: [
+      {
         pregunta: '¿Qué muestra el informe del PACIENTE respecto al del médico?',
-        opciones: ['Exactamente lo mismo','Solo el nombre del paciente','Curvas e interpretación por ojo, sin conclusión ni recomendaciones','Solo las recomendaciones'],
-        correcta: 2
+        opciones: ['Exactamente lo mismo','Curvas e interpretación por ojo, sin conclusión ni recomendaciones','Solo el nombre del paciente','Solo las recomendaciones'],
+        correcta: 1
       },
       {
         pregunta: '¿Para qué sirve "Identificar IOL por curva (MAIdx)"?',
         opciones: ['Para cambiar la refracción','Para encontrar el LIO de referencia más parecido a la curva','Para imprimir el informe','Para borrar el examen'],
+        correcta: 1
+      },
+      {
+        pregunta: '¿Qué hace el botón "Compartir"?',
+        opciones: ['Borra el examen','Genera un enlace de solo lectura para enviar el informe','Cambia el tipo de LIO','Cierra la sesión'],
         correcta: 1
       }
     ]
