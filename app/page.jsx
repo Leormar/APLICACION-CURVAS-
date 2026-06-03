@@ -140,7 +140,7 @@ export default function Home() {
   }
 }
 
-  const handleCargarExamen = ({ paciente, examenes }) => {
+  const handleCargarExamen = ({ paciente, examenes, fecha }) => {
     const nuevasCurvas = { OD: [], OI: [], AO: [] }
     const nuevosLentes = { OD: '', OI: '' }
     let refOD = '', refOI = ''
@@ -161,7 +161,7 @@ export default function Home() {
     setIolSugerido({})
     setInterpretacion('')
     setSecciones(null)
-    setPacienteCargado({ paciente, examenes, refOD, refOI })
+    setPacienteCargado({ paciente, examenes, refOD, refOI, fechaExamen: fecha })
     setDatos({ paciente: paciente.nombre, documento: paciente.documento, fechaNac: paciente.fecha_nacimiento?.split?.('T')[0]||'', lentes: nuevosLentes, refOD, refOI, tipoAV: 'logmar' })
     setMostrarBuscador(false)
     setVistaMovil('graficas')

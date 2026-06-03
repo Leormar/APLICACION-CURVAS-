@@ -73,13 +73,15 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
   // Lo que el usuario ve/escribe en pantalla
   const [valoresDisplay, setValoresDisplay] = useState({ OD: {}, OI: {}, AO: {} })
   const [guardando, setGuardando] = useState(false)
+  const [fechaExamen, setFechaExamen] = useState(null) // fecha del examen cargado (para editar en sitio)
   const inputRefs = useRef({})
 
   const nombreCompleto = `${nombre} ${apellido1} ${apellido2}`.trim().replace(/\s+/g,' ')
 
   useEffect(() => {
     if (!pacienteCargado) return
-    const { paciente: p, examenes, refOD: rOD, refOI: rOI } = pacienteCargado
+    const { paciente: p, examenes, refOD: rOD, refOI: rOI, fechaExamen: fEx } = pacienteCargado
+    setFechaExamen(fEx || null)
     const partes = (p.nombre || '').trim().split(' ')
     if (partes.length >= 4) {
       // 4+ palabras: ultimas 2 apellidos, resto nombre
@@ -186,27 +188,32 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
   const conteoPorOjo = (o) => getMedicionesFromLogMAR(valoresLogMAR[o]||{}).length
 
   const handleGuardar = async () => {
-    const mediciones = getMedicionesFromLogMAR(valoresLogMAR[ojo]||{})
-    if (mediciones.length === 0) {
-      alert(`No has digitado ninguna agudeza para ${ojo}. Ingresa al menos una antes de guardar.`)
+    // Guarda TODOS los ojos con datos (no solo el actual), para no perder ningún ojo al editar.
+    const ojosGuardar = ['OD','OI','AO'].filter(o => getMedicionesFromLogMAR(valoresLogMAR[o]||{}).length > 0)
+    if (ojosGuardar.length === 0) {
+      alert('No has digitado ninguna agudeza. Ingresa al menos una antes de guardar.')
       return
-    }
-    const otros = ['OD','OI','AO'].filter(o => o !== ojo)
-    const otrosVacios = otros.filter(o => conteoPorOjo(o) === 0)
-    if (otrosVacios.length > 0) {
-      const labels = otrosVacios.map(o => o==='OD'?'ojo derecho (OD)':o==='OI'?'ojo izquierdo (OI)':'binocular (AO)').join(' y ')
-      const ok = window.confirm(`Vas a guardar solo ${ojo}.\n\nFalta(n) datos en: ${labels}.\n\n¿Continuar igualmente?`)
-      if (!ok) return
     }
     setGuardando(true)
     try {
-      const res = await fetch('/api/curvas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paciente: nombreCompleto, documento, fechaNac, ojo, iol: ojo==='AO'?'':lentes[ojo], refOD, refOI, mediciones })
-      })
-      if (res.ok) onGuardado({ paciente: nombreCompleto, documento, fechaNac, ojo, lentes, refOD, refOI, tipoAV })
-    } catch(e) { console.error(e) }
+      let okAll = true
+      for (const o of ojosGuardar) {
+        const med = getMedicionesFromLogMAR(valoresLogMAR[o]||{})
+        const res = await fetch('/api/curvas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paciente: nombreCompleto, documento, fechaNac, ojo: o,
+            iol: o==='AO' ? '' : lentes[o], refOD, refOI, mediciones: med,
+            // Si se está editando un examen cargado: misma fecha + marca de modificado.
+            fecha: fechaExamen || undefined, modificado: !!fechaExamen
+          })
+        })
+        if (!res.ok) okAll = false
+      }
+      if (okAll) onGuardado({ paciente: nombreCompleto, documento, fechaNac, ojo, lentes, refOD, refOI, tipoAV })
+      else alert('Algunas curvas no se pudieron guardar. Revisa tu conexión e intenta de nuevo.')
+    } catch(e) { console.error(e); alert('Error al guardar. Intenta de nuevo.') }
     setGuardando(false)
   }
 
@@ -348,7 +355,7 @@ export default function FormularioCurva({ onMedicionesChange, onGuardado, pacien
 
       <button onClick={handleGuardar} disabled={guardando||!nombreCompleto} className="btn3d"
         style={{ marginTop:'0.75rem', width:'100%', padding:'0.85rem', background:nombreCompleto?'#1e40af':'#94a3b8', fontSize:'1rem', touchAction:'manipulation', boxShadow:nombreCompleto?'0 4px 0 #15307d, 0 6px 14px rgba(0,0,0,0.18)':'none' }}>
-        {guardando?'Guardando…':`Guardar curva ${ojo}`}
+        {guardando?'Guardando…':'Guardar examen'}
       </button>
     </div>
   )

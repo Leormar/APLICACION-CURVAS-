@@ -48,6 +48,7 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
             iol: info.iol || '—',
             refOD: info.refOD || '',
             refOI: info.refOI || '',
+            modificado: !!info.modificado,
             mediciones: (r.mediciones || []).filter(m => m && m.defocus !== null)
           }
         }
@@ -58,6 +59,7 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
       examenes: Object.values(p.examenes)
         .map(ex => ({
           fecha: ex.fecha,
+          modificado: Object.values(ex.porOjo).some(c => c.modificado),
           curvas: Object.values(ex.porOjo).sort((a,b) => (ORDEN_OJO[a.ojo]??9) - (ORDEN_OJO[b.ojo]??9))
         }))
         .sort((a,b) => b.fecha.localeCompare(a.fecha))
@@ -152,8 +154,8 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
                         {/* Fecha del examen */}
                         <div style={{ padding:'8px 14px 4px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                           <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
-                            <span style={{ fontSize:'0.75rem', color:'#64748b', fontWeight:600 }}>
-                              {formatFecha(examen.fecha)}
+                            <span style={{ fontSize:'0.75rem', color: examen.modificado ? '#7c3aed' : '#64748b', fontWeight:600 }}>
+                              {examen.modificado ? 'Examen modificado · ' : ''}{formatFecha(examen.fecha)}
                             </span>
                             <div style={{ display:'flex', gap:'4px' }}>
                               {examen.curvas.map(c => (
@@ -164,7 +166,7 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
                             </div>
                           </div>
                           <button className="btn3d"
-                            onClick={() => onCargar({ paciente: p, examenes: examen.curvas, refOD: examen.curvas[0]?.refOD||"", refOI: examen.curvas[0]?.refOI||"" })}
+                            onClick={() => onCargar({ paciente: p, examenes: examen.curvas, refOD: examen.curvas[0]?.refOD||"", refOI: examen.curvas[0]?.refOI||"", fecha: examen.fecha })}
                             style={{ padding:'6px 16px', background:'#1e40af', fontSize:'0.8rem', boxShadow:'0 3px 0 #15307d, 0 4px 10px rgba(0,0,0,0.16)' }}>
                             Cargar examen
                           </button>

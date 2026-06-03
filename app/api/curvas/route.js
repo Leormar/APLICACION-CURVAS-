@@ -3,7 +3,10 @@ import { getServerSession } from 'next-auth'
 
 export async function POST(req) {
   try {
-    const { paciente, documento, fechaNac, ojo, iol, refOD, refOI, mediciones } = await req.json()
+    const { paciente, documento, fechaNac, ojo, iol, refOD, refOI, mediciones, fecha, modificado } = await req.json()
+    // Si viene la fecha de un examen ya existente, se guarda bajo ESA fecha (actualizar en sitio),
+    // en vez de crear uno nuevo con la fecha de hoy.
+    const usarFecha = typeof fecha === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(fecha)
     const session = await getServerSession()
     const usuarioEmail = session?.user?.email || null
 
@@ -36,13 +39,15 @@ export async function POST(req) {
       pacienteId = nuevo.rows[0].id
     }
 
-    const notasCompletas = JSON.stringify({ iol, refOD, refOI })
+    const notasCompletas = JSON.stringify({ iol, refOD, refOI, ...(modificado ? { modificado: true } : {}) })
 
-    // Reusar la curva del mismo ojo y día si ya existe, en vez de crear una nueva
-    // (evita acumular versiones por cada "Guardar"). Se actualiza la más reciente.
+    // Reusar la curva del mismo ojo y fecha si ya existe (actualizar en sitio), en vez de crear otra.
+    // La fecha objetivo es la del examen editado (si vino) o la de hoy (examen nuevo).
     const existeCurva = await pool.query(
-      'SELECT id FROM curvas WHERE paciente_id=$1 AND ojo=$2 AND fecha=CURRENT_DATE ORDER BY id DESC LIMIT 1',
-      [pacienteId, ojo]
+      usarFecha
+        ? 'SELECT id FROM curvas WHERE paciente_id=$1 AND ojo=$2 AND fecha=$3::date ORDER BY id DESC LIMIT 1'
+        : 'SELECT id FROM curvas WHERE paciente_id=$1 AND ojo=$2 AND fecha=CURRENT_DATE ORDER BY id DESC LIMIT 1',
+      usarFecha ? [pacienteId, ojo, fecha] : [pacienteId, ojo]
     )
     let curvaId
     if (existeCurva.rows.length > 0) {
@@ -54,8 +59,10 @@ export async function POST(req) {
       await pool.query('DELETE FROM mediciones WHERE curva_id=$1', [curvaId])
     } else {
       const curvaRes = await pool.query(
-        'INSERT INTO curvas (paciente_id, ojo, notas, fecha, usuario_email) VALUES ($1,$2,$3,CURRENT_DATE,$4) RETURNING id',
-        [pacienteId, ojo, notasCompletas, usuarioEmail]
+        usarFecha
+          ? 'INSERT INTO curvas (paciente_id, ojo, notas, fecha, usuario_email) VALUES ($1,$2,$3,$5::date,$4) RETURNING id'
+          : 'INSERT INTO curvas (paciente_id, ojo, notas, fecha, usuario_email) VALUES ($1,$2,$3,CURRENT_DATE,$4) RETURNING id',
+        usarFecha ? [pacienteId, ojo, notasCompletas, usuarioEmail, fecha] : [pacienteId, ojo, notasCompletas, usuarioEmail]
       )
       curvaId = curvaRes.rows[0].id
     }
