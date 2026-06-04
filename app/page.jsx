@@ -303,7 +303,11 @@ export default function Home() {
                     style={{ padding:'10px 12px', border:'1px solid #cbd5e1', borderRadius:'8px', fontSize:'0.95rem' }} />
                   <input type="password" placeholder="Contraseña" value={revPass} onChange={e=>setRevPass(e.target.value)}
                     style={{ padding:'10px 12px', border:'1px solid #cbd5e1', borderRadius:'8px', fontSize:'0.95rem' }} />
-                  <button onClick={() => signIn('revisor', { email: revEmail, password: revPass, callbackUrl: '/' })}
+                  <button onClick={async () => {
+                      const res = await signIn('revisor', { email: revEmail, password: revPass, redirect: false })
+                      if (res?.ok) { window.location.href = '/' }
+                      else { alert('Correo o contraseña incorrectos.') }
+                    }}
                     style={{ padding:'0.8rem', background:'#1e40af', color:'white', border:'none', borderRadius:'10px', fontSize:'0.95rem', cursor:'pointer', fontWeight:700 }}>
                     Ingresar con correo
                   </button>
