@@ -68,14 +68,18 @@ async function buildOptions() {
         try {
           const email = user?.email
           if (!email) return false
+          // Cuentas que se aprueban automáticamente (revisor de App Store).
+          const EMAILS_AUTO = ['revisor@prolens.app']
+          const esAuto = EMAILS_AUTO.includes(email.toLowerCase())
           const name = user.name || email
           const image = user.image || ''
           const existing = await pool.query('SELECT * FROM usuarios WHERE email=$1', [email])
           if (existing.rows.length === 0) {
             await pool.query(
               'INSERT INTO usuarios (email, nombre, foto, estado) VALUES ($1,$2,$3,$4)',
-              [email, name, image, 'pendiente']
+              [email, name, image, esAuto ? 'aprobado' : 'pendiente']
             )
+            if (esAuto) return true
             await enviarEmail({
               to: 'lorjuela7@gmail.com',
               subject: '🔔 Nueva solicitud de acceso - PROLENS',
@@ -92,6 +96,11 @@ async function buildOptions() {
             return '/pendiente'
           }
           const u = existing.rows[0]
+          // El revisor siempre queda aprobado (por si estaba pendiente/rechazado/inactivo).
+          if (esAuto && u.estado !== 'aprobado') {
+            await pool.query("UPDATE usuarios SET estado='aprobado' WHERE id=$1", [u.id])
+            return true
+          }
           if (u.estado === 'aprobado') return true
           if (u.estado === 'rechazado') return '/rechazado'
           return '/pendiente'
