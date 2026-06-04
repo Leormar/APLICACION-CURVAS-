@@ -34,6 +34,9 @@ export default function Home() {
   const [mostrarBiblioteca, setMostrarBiblioteca] = useState(null)
   const [aceptoTerminos, setAceptoTerminos] = useState(false)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
+  const [accesoCorreo, setAccesoCorreo] = useState(false)
+  const [revEmail, setRevEmail] = useState('')
+  const [revPass, setRevPass] = useState('')
   const [esPacientePrueba, setEsPacientePrueba] = useState(false)
 
   const cargarPacientePrueba = () => {
@@ -291,6 +294,21 @@ export default function Home() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
                 Acepto · Ingresar con Apple
               </button>
+              <button onClick={() => setAccesoCorreo(v=>!v)} style={{ width:'100%', padding:'6px', background:'none', border:'none', color:'#64748b', cursor:'pointer', fontSize:'0.8rem', textDecoration:'underline' }}>
+                Acceso con correo (revisores / soporte)
+              </button>
+              {accesoCorreo && (
+                <div style={{ marginTop:'8px', display:'flex', flexDirection:'column', gap:'8px' }}>
+                  <input type="email" placeholder="Correo" value={revEmail} onChange={e=>setRevEmail(e.target.value)}
+                    style={{ padding:'10px 12px', border:'1px solid #cbd5e1', borderRadius:'8px', fontSize:'0.95rem' }} />
+                  <input type="password" placeholder="Contraseña" value={revPass} onChange={e=>setRevPass(e.target.value)}
+                    style={{ padding:'10px 12px', border:'1px solid #cbd5e1', borderRadius:'8px', fontSize:'0.95rem' }} />
+                  <button onClick={() => signIn('revisor', { email: revEmail, password: revPass, callbackUrl: '/' })}
+                    style={{ padding:'0.8rem', background:'#1e40af', color:'white', border:'none', borderRadius:'10px', fontSize:'0.95rem', cursor:'pointer', fontWeight:700 }}>
+                    Ingresar con correo
+                  </button>
+                </div>
+              )}
               <button onClick={() => setMostrarTerminos(false)} style={{ width:'100%', padding:'8px', background:'none', border:'none', color:'#94a3b8', cursor:'pointer', fontSize:'0.85rem' }}>Cancelar</button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import AppleProvider from 'next-auth/providers/apple'
+import CredentialsProvider from 'next-auth/providers/credentials'
 import { SignJWT, importPKCS8 } from 'jose'
 import pool from '../../../../lib/db'
 import { enviarEmail } from '../../../../lib/email'
@@ -45,6 +46,29 @@ async function buildOptions() {
       }
     }),
   ]
+
+  // Acceso con correo/contraseña SOLO para el revisor de App Store (no depende de Google/Apple).
+  const REV_EMAIL = (process.env.REVISOR_EMAIL || 'revisor@prolens.app').toLowerCase()
+  const REV_PASS = process.env.REVISOR_PASS || 'RevisionApple2026'
+  providers.push(CredentialsProvider({
+    id: 'revisor',
+    name: 'Correo',
+    credentials: { email: { label: 'Correo', type: 'email' }, password: { label: 'Contraseña', type: 'password' } },
+    async authorize(creds) {
+      const email = (creds?.email || '').toLowerCase().trim()
+      const password = creds?.password || ''
+      if (email !== REV_EMAIL || password !== REV_PASS) return null
+      try {
+        const ex = await pool.query('SELECT id, estado FROM usuarios WHERE email=$1', [email])
+        if (ex.rows.length === 0) {
+          await pool.query("INSERT INTO usuarios (email, nombre, foto, estado) VALUES ($1,$2,$3,'aprobado')", [email, 'Revisor App Store', ''])
+        } else if (ex.rows[0].estado !== 'aprobado') {
+          await pool.query("UPDATE usuarios SET estado='aprobado' WHERE email=$1", [email])
+        }
+      } catch (e) { console.error('revisor authorize:', e.message) }
+      return { id: email, email, name: 'Revisor App Store' }
+    }
+  }))
 
   const appleConfigured = process.env.APPLE_ID && process.env.APPLE_TEAM_ID
     && process.env.APPLE_KEY_ID && process.env.APPLE_PRIVATE_KEY
