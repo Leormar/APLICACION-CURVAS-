@@ -87,7 +87,7 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
               Biblioteca IOL de Referencia — {ojo}
             </h2>
             <p style={{ color:'rgba(255,255,255,0.7)', margin:'2px 0 0', fontSize:'0.75rem' }}>
-              MAIdx sd Bench · Curvas publicadas en literatura 2019-2025
+              Curvas IOL IAdx · Curvas publicadas en literatura 2019-2025
             </p>
           </div>
           <button onClick={onCerrar} style={{ background:'rgba(255,255,255,0.2)', border:'none', color:'white', borderRadius:'8px', padding:'6px 12px', cursor:'pointer', fontSize:'0.85rem' }}>Cerrar</button>
@@ -118,7 +118,7 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
               {curvaActual?.length >= 3 && (
                 <button onClick={clasificarCiega} disabled={cargando} className="btn3d"
                   style={{ width:'100%', padding:'9px', background:cargando?'#94a3b8':'#7c3aed', fontSize:'0.82rem', boxSizing:'border-box', boxShadow:cargando?'none':'0 3px 0 #5b21b6, 0 5px 12px rgba(0,0,0,0.16)' }}>
-                  {cargando ? 'Analizando…' : 'Identificar IOL por curva (MAIdx)'}
+                  {cargando ? 'Analizando…' : 'Identificar IOL por curva'}
                 </button>
               )}
             </div>
@@ -126,7 +126,7 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
             {clasificacion && modoCiego && (
               <div style={{ padding:'10px 12px', background:'#f0f9ff', borderBottom:'1px solid #bae6fd' }}>
                 <div style={{ fontSize:'0.72rem', fontWeight:800, color:'#0369a1', marginBottom:'4px' }}>
-                  MAIdx sd Bench — Evaluación ciega
+                  Curvas IOL IAdx — Evaluación ciega
                 </div>
                 <div style={{ fontSize:'0.72rem', color:'#0369a1', marginBottom:'6px' }}>
                   {clasificacion.morfologia?.descripcion}
@@ -205,7 +205,7 @@ export default function BibliotecaIOL({ curvaActual, nombreIOL, ojo, onCerrar, o
                   <span style={{ fontSize:'0.9rem' }}>Selecciona un IOL para ver su curva de referencia</span>
                 )}
                 {curvaActual?.length >= 3 && (
-                  <span style={{ fontSize:'0.8rem', color:'#7c3aed' }}>o usa MAIdx para identificación ciega</span>
+                  <span style={{ fontSize:'0.8rem', color:'#7c3aed' }}>o usa identificación ciega por curva</span>
                 )}
               </div>
             )}

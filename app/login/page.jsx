@@ -26,7 +26,7 @@ function LoginContent() {
         <p style={{ margin:'0 0 4px', fontSize:'1.1rem', fontWeight:600, opacity:0.95 }}>Curvas de Desenfoque</p>
         <p style={{ margin:'0 0 8px', fontSize:'0.82rem', opacity:0.7 }}>Dr. Leonardo Orjuela · Medellín</p>
         <div style={{ display:'inline-block', background:'rgba(255,255,255,0.2)', borderRadius:'20px', padding:'5px 18px', marginBottom:'1.5rem', fontSize:'0.82rem', fontWeight:700, letterSpacing:'1px' }}>
-          MAIdx sd Bench
+          Curvas IOL IAdx
         </div>
 
         <div style={{ background:'rgba(255,255,255,0.12)', borderRadius:'14px', padding:'1.25rem', marginBottom:'1.5rem', border:'1px solid rgba(255,255,255,0.2)' }}>

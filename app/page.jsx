@@ -263,11 +263,11 @@ export default function Home() {
               <div style={{ textAlign:'center', marginBottom:'1rem' }}>
                 <LogoProlens size={64} />
                 <h2 style={{ margin:'10px 0 2px', color:'#1e40af', fontSize:'1.1rem', fontWeight:800 }}>PROLENS</h2>
-                <p style={{ margin:0, fontSize:'0.8rem', color:'#64748b' }}>Curvas de Desenfoque · MAIdx sd Bench</p>
+                <p style={{ margin:0, fontSize:'0.8rem', color:'#64748b' }}>Curvas de Desenfoque · Curvas IOL IAdx</p>
               </div>
               <div style={{ background:'#fef3c7', border:'1px solid #f59e0b', borderRadius:'8px', padding:'0.75rem', marginBottom:'1rem', fontSize:'0.82rem', color:'#92400e', lineHeight:1.65 }}>
                 <strong>Términos de uso clínico</strong>
-                <p style={{ margin:'6px 0 0' }}>Esta aplicación está diseñada con el modelo <strong>MAIdx sd Bench</strong> para análisis clínico de curvas de desenfoque. Los informes son <strong>únicamente apoyo diagnóstico</strong> y no reemplazan el criterio del profesional.</p>
+                <p style={{ margin:'6px 0 0' }}>Esta aplicación está diseñada con <strong>Curvas IOL IAdx</strong> (orquestamiento diagnóstico con IA de Claude, Anthropic) para análisis clínico de curvas de desenfoque. Los informes son <strong>únicamente apoyo diagnóstico</strong> y no reemplazan el criterio del profesional.</p>
               </div>
               <div style={{ fontSize:'0.82rem', color:'#334155', lineHeight:1.75, marginBottom:'1rem' }}>
                 <p><strong>Al usar esta aplicación usted acepta:</strong></p>
@@ -326,7 +326,7 @@ export default function Home() {
             <p style={{ margin:'0 0 4px', fontSize:'1.2rem', fontWeight:600, opacity:0.92 }}>Curvas de Desenfoque</p>
             <p style={{ margin:'0 0 8px', fontSize:'0.85rem', opacity:0.7 }}>Dr. Leonardo Orjuela · Medellín</p>
             <div style={{ display:'inline-block', background:'rgba(255,255,255,0.2)', borderRadius:'20px', padding:'5px 18px', marginBottom:'1.5rem', fontSize:'0.82rem', fontWeight:700, letterSpacing:'1px', border:'1px solid rgba(255,255,255,0.3)' }}>
-              MAIdx sd Bench
+              Curvas IOL IAdx
             </div>
             <div style={{ background:'rgba(255,255,255,0.1)', borderRadius:'14px', padding:'1.25rem', marginBottom:'1.5rem', border:'1px solid rgba(255,255,255,0.18)', textAlign:'left' }}>
               <p style={{ margin:'0 0 0.75rem', fontSize:'0.95rem', lineHeight:1.7, opacity:0.95, textAlign:'center' }}>
@@ -538,7 +538,7 @@ export default function Home() {
         <div style={{ marginTop:'1.5rem', textAlign:'center', padding:'0.75rem', borderTop:'1px solid #e2e8f0', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px' }}>
           <LogoProlens size={24} />
           <p style={{ margin:0, fontSize:'0.72rem', color:'#94a3b8' }}><strong style={{ color:'#1e40af' }}>PROLENS</strong> · Dr. Leonardo Orjuela · Medellín</p>
-          <p style={{ margin:0, fontSize:'0.68rem', color:'#cbd5e1' }}>MAIdx sd Bench · Análisis clínico asistido</p>
+          <p style={{ margin:0, fontSize:'0.68rem', color:'#cbd5e1' }}>Curvas IOL IAdx · Análisis clínico asistido por Claude (Anthropic)</p>
         </div>
       {mostrarInforme && (
         <div onClick={e=>e.target===e.currentTarget&&setMostrarInforme(false)}

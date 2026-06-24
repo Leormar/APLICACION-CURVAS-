@@ -17,7 +17,7 @@ function FeedbackForm() {
     { key:'completo_tutorial', label:'Completo el tutorial clinico?', opciones:opciones2 },
     { key:'probo_paciente', label:'Probo el paciente de prueba?', opciones:opciones2 },
     { key:'registro_curva', label:'Registro una curva de desenfoque real?', opciones:opciones2 },
-    { key:'aporto_ia', label:'El analisis con IA MAIdx sd Bench le aporto al diagnostico?', opciones:opciones3 },
+    { key:'aporto_ia', label:'El analisis con IA Curvas IOL IAdx le aporto al diagnostico?', opciones:opciones3 },
   ]
   const enviar = async () => {
     if (!form.facil_usar||!form.completo_tutorial||!form.probo_paciente||!form.registro_curva||!form.aporto_ia) { setError('Por favor responda todas las preguntas.'); return }

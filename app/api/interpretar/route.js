@@ -46,7 +46,7 @@ export async function POST(req) {
       }).join('\n')
       const funcional = med.filter(m=>m.agudeza<=0.2).map(m=>`${m.defocus}D`).join(', ') || 'ninguno'
       const sug = iolSugerido[ojo]
-      const lineaSug = sug ? `\nLIO segun curva (MAIdx): ${sug.nombre} (${sug.similitud}% de similitud)` : ''
+      const lineaSug = sug ? `\nLIO segun curva (IAdx): ${sug.nombre} (${sug.similitud}% de similitud)` : ''
       return `${ojo} — IOL: ${lente}${lineaSug}\n${lineas}\nRango funcional: ${funcional}`
     }
 
@@ -86,10 +86,10 @@ Escribe aqui como se complementan ambos ojos en 2-3 oraciones.
 
 COMPORTAMIENTO DEL IOL
 Escribe aqui el tipo de curva en 2-3 oraciones. Para cada ojo:
-- si tiene un LIO implantado (un nombre): usa "LIO segun curva (MAIdx)" para comparar si la
-  morfologia concuerda con ese LIO o si se asemeja mas al de MAIdx (concordancia o discrepancia).
+- si tiene un LIO implantado (un nombre): usa "LIO segun curva (IAdx)" para comparar si la
+  morfologia concuerda con ese LIO o si se asemeja mas al de IAdx (concordancia o discrepancia).
 - si esta en "valoracion ciega": indica que el tipo de LIO no se especifico y que, por la
-  morfologia, la curva corresponde al LIO indicado por MAIdx (LIO sugerido por IA).
+  morfologia, la curva corresponde al LIO indicado por IAdx (LIO sugerido por IA).
 - si esta "sin implante de LIO": tratalo como ojo no operado / sin LIO; NO asignes ni sugieras
   ningun LIO.
 

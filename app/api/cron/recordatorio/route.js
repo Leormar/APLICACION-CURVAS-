@@ -67,7 +67,7 @@ export async function GET(req) {
         <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#f8fafc">
           <div style="background:linear-gradient(135deg,#1e40af,#1d4ed8);padding:28px 24px;border-radius:14px 14px 0 0;text-align:center">
             <h1 style="color:white;margin:0;font-size:24px;font-weight:900;letter-spacing:2px">PROLENS</h1>
-            <p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:13px">Curvas de Desenfoque · MAIdx sd Bench</p>
+            <p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:13px">Curvas de Desenfoque · Curvas IOL IAdx</p>
           </div>
           <div style="background:white;padding:28px 24px;border-radius:0 0 14px 14px;border:1px solid #e2e8f0">
             <h2 style="color:#1e293b;margin:0 0 12px;font-size:18px">Hola <strong>${usuario.nombre}</strong> 👋</h2>

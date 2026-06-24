@@ -222,10 +222,10 @@ ${seccionOjo(curvas?.OI,'Ojo Izquierdo (OI)','#0f766e',iolLabel('OI'),secciones?
 ${seccionOjo(curvas?.AO,'Ambos Ojos (AO)','#7c3aed','',secciones?.AO)}
 
 ${(!esPaciente && textoFinal)?`
-<div class="seccion-titulo">Conclusión Clínica · MAIdx sd Bench</div>
+<div class="seccion-titulo">Conclusión Clínica · Curvas IOL IAdx</div>
 <div class="analisis">
   <div class="conclusion">${textoFinal}</div>
-  <div class="disclaimer">Análisis generado por MAIdx sd Bench como apoyo diagnóstico. La interpretación clínica final es responsabilidad del profesional tratante.</div>
+  <div class="disclaimer">Análisis generado por Curvas IOL IAdx (IA: Claude, Anthropic) como apoyo diagnóstico. La interpretación clínica final es responsabilidad del profesional tratante.</div>
 </div>`:''}
 ${esPaciente?`<div class="disclaimer" style="margin-top:12px">Este informe es de carácter informativo sobre su examen visual. La interpretación y las decisiones clínicas las realiza su profesional tratante.</div>`:''}
 

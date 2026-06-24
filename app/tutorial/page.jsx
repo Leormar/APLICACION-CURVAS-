@@ -147,7 +147,7 @@ const TUTORIAL = [
       },
       {
         titulo: '¿Cuándo usa la app la inteligencia artificial?',
-        contenido: 'Son dos cosas distintas. (a) La identificación del LIO por la curva (MAIdx) es un CÁLCULO matemático de similitud: no usa IA generativa ni consume créditos, y es reproducible. (b) La interpretación clínica escrita del informe SÍ usa IA (modelo de lenguaje). En un ojo marcado "sin LIO" la app no sugiere ningún lente. En todos los casos tú revisas y decides.',
+        contenido: 'Son dos cosas distintas. (a) La identificación del LIO por la curva es un CÁLCULO matemático de similitud: no usa IA generativa ni consume créditos, y es reproducible. (b) La interpretación clínica escrita del informe SÍ usa IA (Claude de Anthropic). En un ojo marcado "sin LIO" la app no sugiere ningún lente. En todos los casos tú revisas y decides.',
         icono: <IconoComparar color="#0f766e" />
       }
     ],
@@ -163,7 +163,7 @@ const TUTORIAL = [
         correcta: 1
       },
       {
-        pregunta: '¿La identificación del LIO por la curva (MAIdx) usa IA generativa?',
+        pregunta: '¿La identificación del LIO por la curva usa IA generativa?',
         opciones: ['Sí, escribe el informe con IA','No, es un cálculo de similitud; la IA solo redacta la interpretación clínica','Sí, y consume créditos cada vez','No hace ningún cálculo'],
         correcta: 1
       }
@@ -176,7 +176,7 @@ const TUTORIAL = [
     pasos: [
       {
         titulo: 'Identificar el LIO por la curva',
-        contenido: 'En "Ver referencia IOL" comparas la curva del paciente contra las curvas de referencia publicadas. MAIdx calcula el porcentaje de similitud (Pareto) e indica el LIO más parecido; si hay un LIO implantado, señala si la curva concuerda con ese lente o se asemeja más a otro. Con "Usar este LIO" lo dejas asignado al examen.',
+        contenido: 'En "Ver referencia IOL" comparas la curva del paciente contra las curvas de referencia publicadas. El algoritmo calcula el porcentaje de similitud (Pareto) e indica el LIO más parecido; si hay un LIO implantado, señala si la curva concuerda con ese lente o se asemeja más a otro. Con "Usar este LIO" lo dejas asignado al examen.',
         icono: <IconoComparar color="#7c3aed" />
       },
       {
@@ -197,7 +197,7 @@ const TUTORIAL = [
         correcta: 1
       },
       {
-        pregunta: '¿Para qué sirve "Identificar IOL por curva (MAIdx)"?',
+        pregunta: '¿Para qué sirve "Identificar IOL por curva"?',
         opciones: ['Para cambiar la refracción','Para encontrar el LIO de referencia más parecido a la curva','Para imprimir el informe','Para borrar el examen'],
         correcta: 1
       },
