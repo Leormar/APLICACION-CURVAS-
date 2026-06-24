@@ -107,7 +107,7 @@ Escribe aqui la conducta clinica y seguimiento en 3-4 oraciones.`
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1500,
         messages: [{ role: 'user', content: prompt }]
       })
