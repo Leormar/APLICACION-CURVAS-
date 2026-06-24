@@ -4,18 +4,24 @@ import { getServerSession } from 'next-auth'
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url)
-    const q = searchParams.get('q') || ''
-    const tipo = searchParams.get('tipo') || 'apellido'
+    const q = (searchParams.get('q') || '').trim()
     const session = await getServerSession()
     const usuarioEmail = session?.user?.email
     const esAdmin = session?.user?.rol === 'admin' || usuarioEmail === 'lorjuela7@gmail.com'
-    const campo = tipo === 'documento' ? 'p.documento' : 'p.nombre'
 
-    const whereClause = esAdmin
-      ? `WHERE ${campo} ILIKE $1`
-      : `WHERE ${campo} ILIKE $1 AND (p.creado_por = $2 OR p.creado_por IS NULL OR p.creado_por = 'sistema')`
-
-    const params = esAdmin ? [`%${q}%`] : [`%${q}%`, usuarioEmail]
+    let whereClause, params
+    if (q) {
+      const filtro = `(p.nombre ILIKE $1 OR p.documento ILIKE $1)`
+      whereClause = esAdmin
+        ? `WHERE ${filtro}`
+        : `WHERE ${filtro} AND (p.creado_por = $2 OR p.creado_por IS NULL OR p.creado_por = 'sistema')`
+      params = esAdmin ? [`%${q}%`] : [`%${q}%`, usuarioEmail]
+    } else {
+      whereClause = esAdmin
+        ? ''
+        : `WHERE (p.creado_por = $1 OR p.creado_por IS NULL OR p.creado_por = 'sistema')`
+      params = esAdmin ? [] : [usuarioEmail]
+    }
 
     const res = await pool.query(
       `SELECT

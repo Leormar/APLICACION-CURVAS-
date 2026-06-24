@@ -1,28 +1,35 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 
 export default function BuscadorPacientes({ onCargar, onCerrar }) {
   const [busqueda, setBusqueda] = useState('')
-  const [tipoBusqueda, setTipoBusqueda] = useState('apellido')
   const [resultados, setResultados] = useState([])
   const [cargando, setCargando] = useState(false)
-  const [buscado, setBuscado] = useState(false)
+  const [cargaInicial, setCargaInicial] = useState(true)
   const [expandido, setExpandido] = useState(null)
   const inputRef = useRef(null)
+  const timerRef = useRef(null)
 
-  const buscar = async () => {
-    if (!busqueda.trim()) return
+  const buscar = useCallback(async (q = '') => {
     setCargando(true)
     try {
-      const res = await fetch(`/api/pacientes?q=${encodeURIComponent(busqueda)}&tipo=${tipoBusqueda}`)
+      const url = q.trim() ? `/api/pacientes?q=${encodeURIComponent(q)}` : '/api/pacientes'
+      const res = await fetch(url)
       const json = await res.json()
       if (json.error) { alert('Error: ' + json.error); setCargando(false); return }
       setResultados(json.pacientes || [])
-      setBuscado(true)
       setExpandido(null)
     } catch(e) { alert('Error de conexión') }
     setCargando(false)
-  }
+    setCargaInicial(false)
+  }, [])
+
+  const buscarConDelay = useCallback((q) => {
+    clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => buscar(q), 300)
+  }, [buscar])
+
+  useEffect(() => { buscar() }, [buscar])
 
   const ORDEN_OJO = { OD: 0, OI: 1, AO: 2 }
   const agrupar = (rows) => {
@@ -81,39 +88,36 @@ export default function BuscadorPacientes({ onCargar, onCerrar }) {
       <div style={{ background:'white', borderRadius:'16px', padding:'1.5rem', width:'660px', maxHeight:'88vh', display:'flex', flexDirection:'column', boxShadow:'0 24px 64px rgba(0,0,0,0.4)' }}>
 
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem' }}>
-          <h2 style={{ margin:0, fontSize:'1.1rem', color:'#1e293b' }}>Buscar paciente</h2>
+          <h2 style={{ margin:0, fontSize:'1.1rem', color:'#1e293b' }}>Mis pacientes</h2>
           <button onClick={onCerrar} style={{ background:'#f1f5f9', border:'none', borderRadius:'6px', width:28, height:28, cursor:'pointer', color:'#64748b', fontSize:'1.1rem' }}>×</button>
-        </div>
-
-        <div style={{ display:'flex', gap:'6px', marginBottom:'10px' }}>
-          {[{val:'apellido',label:'Por apellido'},{val:'documento',label:'Por documento / ID'}].map(t => (
-            <button key={t.val} onClick={() => { setTipoBusqueda(t.val); setTimeout(()=>inputRef.current?.focus(),50) }}
-              style={{ padding:'6px 14px', border:`1.5px solid ${tipoBusqueda===t.val?'#1e40af':'#e2e8f0'}`, borderRadius:'20px', background:tipoBusqueda===t.val?'#eff6ff':'white', color:tipoBusqueda===t.val?'#1e40af':'#64748b', fontSize:'0.8rem', cursor:'pointer', fontWeight:tipoBusqueda===t.val?600:400 }}>
-              {t.label}
-            </button>
-          ))}
         </div>
 
         <div style={{ display:'flex', gap:'8px', marginBottom:'1rem' }}>
           <input ref={inputRef} autoFocus
             style={{ flex:1, padding:'9px 14px', border:'2px solid #e2e8f0', borderRadius:'9px', fontSize:'0.9rem', outline:'none' }}
-            placeholder={tipoBusqueda==='apellido'?'Ej: Orjuela, García...':'Ej: 79245491...'}
+            placeholder="Buscar por nombre o documento..."
             value={busqueda}
-            onChange={e => setBusqueda(e.target.value)}
-            onKeyDown={e => e.key==='Enter' && buscar()}
+            onChange={e => { setBusqueda(e.target.value); buscarConDelay(e.target.value) }}
             onFocus={e => e.target.style.borderColor='#1e40af'}
             onBlur={e => e.target.style.borderColor='#e2e8f0'}
           />
-          <button onClick={buscar} disabled={cargando} className="btn3d"
-            style={{ padding:'9px 24px', background:'#1e40af', fontSize:'0.9rem', boxShadow:cargando?'none':'0 3px 0 #15307d, 0 5px 12px rgba(0,0,0,0.16)' }}>
-            {cargando ? '…' : 'Buscar'}
-          </button>
+          {busqueda && (
+            <button onClick={() => { setBusqueda(''); buscar('') }}
+              style={{ padding:'9px 14px', background:'#f1f5f9', border:'1px solid #e2e8f0', borderRadius:'9px', fontSize:'0.8rem', cursor:'pointer', color:'#64748b' }}>
+              Limpiar
+            </button>
+          )}
         </div>
 
         <div style={{ overflowY:'auto', flex:1 }}>
-          {buscado && pacientes.length === 0 && (
+          {!cargaInicial && pacientes.length === 0 && (
             <div style={{ textAlign:'center', padding:'3rem', color:'#94a3b8' }}>
-              <p style={{ margin:0 }}>No se encontraron pacientes</p>
+              <p style={{ margin:0 }}>{busqueda ? 'No se encontraron pacientes' : 'Aún no tienes pacientes registrados'}</p>
+            </div>
+          )}
+          {cargaInicial && cargando && (
+            <div style={{ textAlign:'center', padding:'3rem', color:'#94a3b8' }}>
+              <p style={{ margin:0 }}>Cargando pacientes…</p>
             </div>
           )}
 
